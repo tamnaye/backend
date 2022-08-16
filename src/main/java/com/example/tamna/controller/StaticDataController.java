@@ -22,7 +22,6 @@ public class StaticDataController {
         return "success";
     }
 
-
     @GetMapping(value = "/conference-room")
     public String insertConferenceRoom() throws IOException {
         StaticDataService.conferenceCsv();
