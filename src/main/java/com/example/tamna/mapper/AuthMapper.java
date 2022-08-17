@@ -1,4 +1,4 @@
 package com.example.tamna.mapper;
 
-public interface LoginMapper {
+public interface AuthMapper {
 }
