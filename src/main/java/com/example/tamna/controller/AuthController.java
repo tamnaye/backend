@@ -1,16 +1,20 @@
 package com.example.tamna.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.tamna.config.jwt.JwtProvider;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AuthController {
+    private final JwtProvider jwtProvider;
 
-    @GetMapping("/login")
-    public void reqLogin(){
+    @GetMapping("/login/token/{userId}")
+    public void reqToken(@PathVariable("userId") String userId){
+        jwtProvider.createAccessToken(userId);
+        jwtProvider.createRefreshToken(userId);
+
 
     }
 

@@ -11,11 +11,6 @@ import java.io.IOException;
 @RequestMapping("/api/csv")
 public class StaticDataController {
 
-    @GetMapping(value ="/app")
-    public String hello(){
-        return "hello";
-    }
-
     @GetMapping(value = "/user")
     public String insertUserData() throws IOException {
         StaticDataService.userCsv();

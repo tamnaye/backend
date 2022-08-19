@@ -1,6 +1,5 @@
 package com.example.tamna.config;
 
-import com.example.tamna.filter.MyFilter1;
 import com.example.tamna.filter.MyFilter3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,9 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.filter.CorsFilter;
 
 //시큐리티 관련 설정
@@ -33,8 +30,10 @@ public class SecurityConfig {
                 .formLogin().disable() // formLogin 사용 x
                 .httpBasic().disable() // 기본 http basic 인증방식 사용 x
                 .authorizeRequests()
-                .antMatchers("/api/tamna/admin/**")
-                .access("hasRole('ROLE_ADMIN')");
+//                .antMatchers("/api/tamna/admin/**")
+//                .access("hasRole('ROLE_ADMIN')")
+                .antMatchers("/api/login/**").permitAll() // /api/auth/ 는 security 적용 x
+                .anyRequest().authenticated(); // 나머지 API 전부 인증 필요
         return http.build();
 
     }
