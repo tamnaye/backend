@@ -1,15 +1,13 @@
 package com.example.tamna.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenDto {
     private String userId;
     private String refreshToken;
-
-    public TokenDto(String userId, String refreshToken) {
-        this.userId = userId;
-        this.refreshToken = refreshToken;
-    }
-
 }

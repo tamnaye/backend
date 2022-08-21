@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class RoomDto {
     private int classes;
-    private String userId;
-    private String userName;
-    private String roles;
+    private int floor;
+    private int roomId;
+    private String roomName;
 }

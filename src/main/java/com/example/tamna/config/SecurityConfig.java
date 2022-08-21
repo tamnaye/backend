@@ -22,7 +22,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity http) throws Exception {
         // SecurityFilterChain이 내가 만든 필터(ex. FilterConfig파일)보다 항상 먼저 실행됨. 먼저 실행하게 하고싶으면 시큐리티 필터체인에 등록시킨 후 addFilterBefore를 통해 가장 먼저 실행되는 필터보다 우선으로 적용하면 됨
-        http.addFilterBefore(new MyFilter3(), SecurityContextHolderFilter.class); //BasicAuthenticationFilter가 실행되기 전에 동작
+//        http.addFilterBefore(new MyFilter3(), SecurityContextHolderFilter.class); //BasicAuthenticationFilter가 실행되기 전에 동작
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 세션사용 x
                 .and()
@@ -32,8 +32,9 @@ public class SecurityConfig {
                 .authorizeRequests()
 //                .antMatchers("/api/tamna/admin/**")
 //                .access("hasRole('ROLE_ADMIN')")
-                .antMatchers("/api/login/**").permitAll() // /api/auth/ 는 security 적용 x
-                .anyRequest().authenticated(); // 나머지 API 전부 인증 필요
+//                .antMatchers("/api/login/**").permitAll() // /api/auth/ 는 security 적용 x
+//                .anyRequest().authenticated()// 나머지 API 전부 인증 필요
+                .antMatchers("/api/**").permitAll(); // 403에러 임시 방편
         return http.build();
 
     }

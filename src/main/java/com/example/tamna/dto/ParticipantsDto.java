@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    private int classes;
-    private String userId;
-    private String userName;
-    private String roles;
+public class ParticipantsDto {
+    private int bookingId;
+    private Map<String, Object> participants;
+
 }
