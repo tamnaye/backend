@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -11,6 +13,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class ParticipantsDto {
     private int bookingId;
-    private Map<String, Object> participants;
+    private Date dates;
+    private List<Map<String, Object>> participants;
 
 }

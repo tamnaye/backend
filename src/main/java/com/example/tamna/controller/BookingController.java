@@ -1,73 +1,92 @@
 package com.example.tamna.controller;
 
-import com.example.tamna.dto.BookingDto;
 import com.example.tamna.dto.PostBookingDataDto;
-import com.example.tamna.dto.RoomDto;
+
+
+import com.example.tamna.dto.UserDto;
+import com.example.tamna.mapper.RoomMapper;
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.service.BookingService;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import com.example.tamna.service.RoomService;
+import com.example.tamna.service.UserService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import net.bytebuddy.asm.Advice;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalTime;
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/booking")
 public class BookingController {
 
-    private BookingService bookingService;
-    private Set<String> teamMate;
-    private UserMapper userMapper;
+    private final BookingService bookingService;
+    private RoomService roomService;
+    private UserService userService;
 
-    public BookingController(UserMapper userMapper){
+    private UserMapper userMapper;
+    private RoomMapper roomMapper;
+
+    @Autowired
+    public BookingController(BookingService bookingService,RoomService roomService, UserService userService, UserMapper userMapper, RoomMapper roomMapper){
+        this.bookingService = bookingService;
+        this.roomService = roomService;
+        this.userService = userService;
         this.userMapper = userMapper;
+        this.roomMapper = roomMapper;
     }
 
-//    @ApiOperation(value="GET 예약페이지", notes = "예약페이지 데이터 가져오기")
-//    @GetMapping(value = "")
-////    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> getBookingState(@RequestParam String userId, @RequestParam String roomId) throws NullPointerException {
-//        // @ApiParam 매개변수에 대한 설명 및 설정을 위한 어노테이션
-//
-//
-//        List<RoomDto> rooms = bookingService.getRoomList();
-//
-//        List<BookingDto> bookingState = bookingService.getBookingState(roomId);
-//
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("roomData",rooms);
-//        map.put("bookingData", bookingState);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//
-//    }
+
+    @GetMapping(value = "")
+    public ResponseEntity<Map<String, Object>> getBookingState(@RequestParam("userId") String userId, @RequestParam("roomId") int roomId) {
+        System.out.println(userId);
+        System.out.println(roomId);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("roomData",bookingService.roomList());
+        map.put("bookingData", bookingService.roomBookingState(roomId));
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
 
     @PostMapping(value = "/test")
-    public ResponseEntity<String> updateBooking(@RequestBody PostBookingDataDto bookingPostDataDto){
-//        List<String> usersName = bookingPostDataDto.getTeamMate();
-//        System.out.println(usersName);
+    public ResponseEntity<String> updateBooking(@RequestBody PostBookingDataDto postBookingDataDto){
         StringBuilder sb = new StringBuilder();
-        bookingPostDataDto.getTeamMate().forEach(m -> sb.append("'"+ m +"',"));
-        sb.insert(0,"(");
-        sb.insert(sb.length()-1,")");
+        postBookingDataDto.getTeamMate().forEach(m -> sb.append("'"+ m +"',"));
+//        sb.insert(0,"(");
+//        sb.insert(sb.length()-1,")");
         String users = sb.substring(0, sb.length()-1);
         System.out.println(users);
+        List<UserDto> a = userService.getMemberData(postBookingDataDto.getClasses(), users);
+        System.out.println(a);
+
+
+//        List<UserDto> teamMates = new ArrayList<>();
+//        int classes = postBookingDataDto.getClasses();
+//        postBookingDataDto.getTeamMate().forEach(m -> teamMates.add(userMapper.findByUserName(classes, m)));
+//        teamMates.add(userMapper.findByUserId(postBookingDataDto.getUserId()));
+//        System.out.println(teamMates);
+
+
 //        System.out.println(userMapper.findByUserName(users));
-        System.out.println(userMapper.findUserByName(users));
-        System.out.println(users.getClass().getName());
-        return ResponseEntity.status(HttpStatus.OK).body("success");
-    }
+//        System.out.println(userMapper.findUserByName(users));
+//        System.out.println(users.getClass().getName());
 
-
-    @PostMapping(value = "/timetest")
-    public ResponseEntity<String> checkTime(@RequestBody PostBookingDataDto bookingDataDto){
-        System.out.println(bookingDataDto);
+//        bookingService.insertMember(1, )
 
         return ResponseEntity.status(HttpStatus.OK).body("success");
     }
+
+    @ApiOperation(value="[완료] 메인 회의실, 예약 데이터 보내기")
+    @GetMapping(value = "/main")
+    public ResponseEntity<Map<String, Object>> getUsers(@RequestParam("floor") int floor){
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("RoomData",roomService.getFloorRoom(floor));
+        map.put("BookingData", bookingService.floorBookingData(floor));
+
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
 }

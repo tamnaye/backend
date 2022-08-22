@@ -9,6 +9,11 @@ import java.util.List;
 @Mapper
 public interface RoomMapper {
 
-    @Select("Select * from ROOM")
+    // 모든 층의 회의실 데이터
+    @Select("SELECT * FROM ROOM")
     List<RoomDto> AllFindRoom();
+
+    // 층별 회의실 데이터
+    @Select("SELECT * FROM ROOM WHERE FLOOR=#{floor}")
+    List<RoomDto> findFloorRoom(int floor);
 }

@@ -15,7 +15,6 @@ public class AuthController {
         jwtProvider.createAccessToken(userId);
         jwtProvider.createRefreshToken(userId);
 
-
     }
 
     @PostMapping("token")
