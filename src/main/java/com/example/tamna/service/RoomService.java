@@ -17,8 +17,17 @@ public class RoomService {
         this.roomMapper = roomMapper;
     }
 
-    // 층별 회의실 데이터
+
+    // 회의실 목록 데이터
+    public List<RoomDto> roomList(){
+        return roomMapper.AllFindRoom();
+    }
+
+    // 층별 회의실 목록 데이터
     public List<RoomDto> getFloorRoom(int floor){
+        System.out.println(roomMapper.findFloorRoom(floor));
         return roomMapper.findFloorRoom(floor);
     }
+
+
 }

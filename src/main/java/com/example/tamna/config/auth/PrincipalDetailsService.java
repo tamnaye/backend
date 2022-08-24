@@ -14,7 +14,6 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     private UserMapper userMapper;
 
-
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException{
 

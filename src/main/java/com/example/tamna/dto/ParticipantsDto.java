@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParticipantsDto {
-    private int bookingId;
     private Date dates;
-    private List<Map<String, Object>> participants;
+    private int bookingId;
+    private String userId;
+    private String userType; // 예약자 일때 true;
 
 }

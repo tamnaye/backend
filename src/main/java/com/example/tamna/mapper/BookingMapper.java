@@ -5,11 +5,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Date;
-import java.time.LocalTime;
 import java.util.List;
 
 @Mapper
@@ -28,6 +25,7 @@ public interface BookingMapper {
     List<BookingDto> findByRoomId(@Param("today") Date today, @Param("roomId") int roomId);
 
     // 예약 데이터 삽입
+
     @Insert("INSERT INTO BOOKING(DATES, ROOM_ID, START_TIME, END_TIME) VALUES (#{today}, #{roomId}, #{startTime}, #{endTime})")
     int insertBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 

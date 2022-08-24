@@ -2,6 +2,7 @@ package com.example.tamna.service;
 
 import com.example.tamna.dto.BookingDto;
 import com.example.tamna.dto.RoomDto;
+import com.example.tamna.dto.UserDto;
 import com.example.tamna.mapper.BookingMapper;
 import com.example.tamna.mapper.ParticipantsMapper;
 import com.example.tamna.mapper.RoomMapper;
@@ -35,17 +36,13 @@ public class BookingService {
     }
 
 
-    // 회의실 목록 데이터
-    public List<RoomDto> roomList(){
-       return  roomMapper.AllFindRoom();
-    }
 
     // 전체 회의실 예약 현황 가져오기
     public List<BookingDto> allRoomBookingState(){
         return bookingMapper.findAllRoomState(today);
     }
 
-    // 회의실별 예약현황  << null 예외처리 해줘야함
+    // 회의실별 예약현황
     public List<BookingDto> roomBookingState(int roomId){
         return bookingMapper.findByRoomId(today, roomId);
     }
@@ -56,19 +53,22 @@ public class BookingService {
     }
 
 
+
+//    public List<UserDto>
+
+
+
     // 회원 회의실 신청 확인
 //    public List<ParticipantsDto> checkUser(String userId, List<String> teamMate){
 //        return
 //    }
 
-    // 예약자 insert test
-    public int insertMember(int bookingId, Map<String, Object> member){
-        return participantsMapper.insertParticipants(bookingId, today, member);
-    }
+
 
 
     // 회의실 예약
-    public int updateBooking(int roomId, String startTime, String endTime) {
+    public int insertBooking(int roomId, String startTime, String endTime) {
+
         return bookingMapper.insertBooking(today, roomId, startTime, endTime);
     }
     // 회의실 예약

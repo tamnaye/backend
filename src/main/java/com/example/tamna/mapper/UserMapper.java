@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 
 import java.util.List;
-import java.util.Set;
 
 @Mapper
 public interface UserMapper {
@@ -24,6 +23,9 @@ public interface UserMapper {
     @Select("SELECT * FROM USER WHERE classes=#{classes} AND user_name IN (${users})")
     List<UserDto> findByUserName(@Param("classes")int classes, @Param("users") String users);
 
+    // 기수별 유저 이름들만 가져오기
+    @Select("SELECT USER_NAME FROM USER WHERE classes=#{classes}")
+    List<String> findUserNamesByClasses(int classes);
 
 
 

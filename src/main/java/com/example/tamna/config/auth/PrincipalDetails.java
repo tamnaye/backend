@@ -1,28 +1,37 @@
 package com.example.tamna.config.auth;
 
 import com.example.tamna.dto.UserDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 // Security에서 사용자의 정보를 담는 인터페이스
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PrincipalDetails implements UserDetails {
 
     private UserDto user;
+    private Role role;
 
     public PrincipalDetails(UserDto user) {
         this.user = user;
+        this.role = role;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 //        Collection<GrantedAuthority> authorities = new ArrayList<>();
-//        user.getRoleList().forEach(r->{
+//        role.getValue(user.getRoles()).forEach(r->{
 //            authorities.add(()->r);
-//        });
+//        });32
 //        return authorities;
         return null;
     }

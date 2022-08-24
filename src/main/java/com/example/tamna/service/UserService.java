@@ -17,6 +17,15 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
+    // 한번에 select 하기 위한 유저들 데이터 문자열 변환
+    public String changeString(String userData, List<String> teamMateData){
+        StringBuilder sb = new StringBuilder();
+        sb.append("'" + userData + "'");
+        teamMateData.forEach(m -> sb.append(",'" + m + "'"));
+        return sb.substring(0, sb.length());
+    }
+
+
     // 최대 기수 가져오기
     public int getMaxClasses(){
        return userMapper.findMaxClasses();
@@ -27,8 +36,15 @@ public class UserService {
         return userMapper.findByUserId(userId);
     }
 
-    // 같은 기수의 유저 이름으로 정보 조회
-    public List<UserDto> getMemberData(int classes, String users){
+    // 같은 기수 유저들 이름 모두 가져오기
+    public List<String> getUserNames(int classes) {
+        System.out.println(userMapper.findUserNamesByClasses(classes).getClass().getName());
+        return userMapper.findUserNamesByClasses(classes);
+    }
+
+    // 같은 기수의 유저들 이름으로 정보 조회
+    public List<UserDto> getUsersData(int classes, String users){
         return userMapper.findByUserName(classes, users);
     }
+
 }
