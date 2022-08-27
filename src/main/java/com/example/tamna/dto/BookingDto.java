@@ -13,7 +13,7 @@ public class BookingDto {
     private int roomId;
     private String startTime;
     private String endTime;
-    private boolean special;
+    private boolean official;
 
 }
 

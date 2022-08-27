@@ -12,8 +12,8 @@ public class AuthController {
 
     @GetMapping("/login/token/{userId}")
     public void reqToken(@PathVariable("userId") String userId){
-        jwtProvider.createAccessToken(userId);
-        jwtProvider.createRefreshToken(userId);
+//        jwtProvider.createAccessToken(userId);
+//        jwtProvider.createRefreshToken(userId);
 
     }
 

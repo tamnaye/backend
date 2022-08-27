@@ -1,46 +1,51 @@
 package com.example.tamna.config.jwt;
 
 import com.example.tamna.config.auth.PrincipalDetailsService;
-import com.example.tamna.dto.TokenDto;
 import com.example.tamna.mapper.AuthMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 // 토큰 생성, 유효성 검증
 @Component
 public class JwtProvider implements InitializingBean {
 
-    private static final String AUTHORITIES_KEY = "auth";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String REAUTHORIZATION_HEADER = "reAuthorization";
 
-    private final String secretKey;
-    private final long accessTokenValidityInMilliSeconds;
-    private final long refreshTokenValidityInMilliSeconds;
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.accesstoken-validity-in-seconds}")
+    private long accessTokenValidityInMilliSeconds;
+
+    @Value("${jwt.refreshtoken-validity-in-seconds}")
+    private long refreshTokenValidityInMilliSeconds;
 
     private PrincipalDetailsService principalDetailsService;
 
     private AuthMapper authMapper;
-
     private Key key;
 
-    // 생성자
-    public JwtProvider(
-            @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.accesstoken-validity-in-seconds}") long accessTokenValidityInMilliSeconds,
-            @Value("${jwt.refreshtoken-validity-in-seconds}") long refreshTokenValidityInMilliSeconds, AuthMapper authMapper){
 
-        this.secretKey = secretKey;
-        this.accessTokenValidityInMilliSeconds = accessTokenValidityInMilliSeconds * 1000;
-        this.refreshTokenValidityInMilliSeconds = refreshTokenValidityInMilliSeconds * 1000;
+    @Autowired
+    public JwtProvider(PrincipalDetailsService principalDetailsService,
+             AuthMapper authMapper){
+        this.principalDetailsService = principalDetailsService;
         this.authMapper = authMapper;
     }
 
@@ -55,21 +60,21 @@ public class JwtProvider implements InitializingBean {
 
 
     // accessToken 생성
-//    public String createAccessToken(Authentication authentication){
-    public String createAccessToken(String userId){
-
-//            String userId = authentication.getName();
-        System.out.println("name: "+ userId);
+    public String createAccessToken(String userId, String userRole){
+        Claims claims = Jwts.claims().setSubject(userId);
+        claims.put("role", userRole);
+        System.out.println("id: "+ userId);
+        System.out.println("role: " + userRole);
 
         long now = (new Date()).getTime();
         System.out.println("now: " + now);
 
-        Date accessValidity = new Date(now + this.accessTokenValidityInMilliSeconds);
+        Date accessValidity = new Date(now + accessTokenValidityInMilliSeconds * 1000);
 
         String accessToken = Jwts.builder()
-                .setSubject(userId)
+                .setClaims(claims) // user 정보
                 .signWith(key, SignatureAlgorithm.HS256)
-                .setExpiration(accessValidity)
+                .setExpiration(accessValidity) // 만료시간 설정
                 .compact();
 
         System.out.println(accessToken);
@@ -78,27 +83,26 @@ public class JwtProvider implements InitializingBean {
 
 
     // refreshToken 생성
-//    public String createRefreshToken(Authentication authentication){
     public String createRefreshToken(String userId){
-
-//    String userId = authentication.getName();
 
         long now = (new Date()).getTime();
         System.out.println("now: " + now);
 
-        Date refreshValidity = new Date(now + this.refreshTokenValidityInMilliSeconds);
+        Date refreshValidity = new Date(now + refreshTokenValidityInMilliSeconds * 1000);
 
         String refreshToken = Jwts.builder()
-                .setSubject("")
+                .setSubject("") // 유저 데이터 x
                 .signWith(key, SignatureAlgorithm.HS256)
                 .setExpiration(refreshValidity)
                 .compact();
 
-//        TokenDto success = authMapper.updateToken(userId,refreshToken);
-//        System.out.println("getUserId= " + success.getUserId() + "getRefresh= " + success.getRefreshToken());
-        System.out.println(refreshToken);
+        System.out.println("refreshToken" + refreshToken);
+
+        int success = authMapper.insertToken(userId, refreshToken);
+        System.out.println(success);
         return refreshToken;
     }
+
 
     // access토큰에서 아이디 추출
     public String getUserIdFromJwt(String accessToken){
@@ -110,21 +114,38 @@ public class JwtProvider implements InitializingBean {
                 .getBody();
 
         System.out.println("claims= " + claims);
-//        UserDetails principal = new PrincipalDetails(claims.getSubject(), "", "");
 
         return claims.getSubject();
     }
-    // jwt 인증 정보 조회
+
+
+    // 인증 선공시 SecurityContextHolder에 저장할 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
         UserDetails principalDetails = principalDetailsService.loadUserByUsername(getUserIdFromJwt(token));
         return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
     }
 
+    // 헤더에서 가져오기
+    public List<String> getHeaderToken(HttpServletRequest request){
+        List<String> bearerToken = new ArrayList<>();
+
+        bearerToken.add(request.getHeader(AUTHORIZATION_HEADER));
+        bearerToken.add(request.getHeader(REAUTHORIZATION_HEADER));
+
+        for(int i=0; i < bearerToken.toArray().length; i++){
+            String token = bearerToken.get(i);
+            if (StringUtils.hasText(token) && token.startsWith("Bearer ")){
+                bearerToken.set(i, token.substring(7));
+            }
+        }
+        return bearerToken;
+    }
+
     // Jwt 유효성 검사
     public boolean validateToken(String token){
         try{
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date());
         }catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e){
             System.out.println("잘못된 JWT 서명");
         }catch (ExpiredJwtException e){
@@ -137,6 +158,5 @@ public class JwtProvider implements InitializingBean {
         return false;
     }
 
-    // access토큰 재발급
 
 }

@@ -1,8 +1,6 @@
 package com.example.tamna.service;
 
 import com.example.tamna.dto.BookingDto;
-import com.example.tamna.dto.RoomDto;
-import com.example.tamna.dto.UserDto;
 import com.example.tamna.mapper.BookingMapper;
 import com.example.tamna.mapper.ParticipantsMapper;
 import com.example.tamna.mapper.RoomMapper;
@@ -36,7 +34,6 @@ public class BookingService {
     }
 
 
-
     // 전체 회의실 예약 현황 가져오기
     public List<BookingDto> allRoomBookingState(){
         return bookingMapper.findAllRoomState(today);
@@ -52,9 +49,24 @@ public class BookingService {
         return bookingMapper.findByFloor(today, floor);
     }
 
+    // 예약 되어 있는지 확인
+    public boolean findSameBooking(int roomId, String startTime){
+        BookingDto sameBooking = bookingMapper.findSameBooking(today, roomId, startTime);
+        if(sameBooking == null){
+            System.out.println("현재 예약 되어 있지 않음");
+            return true;
+        }else{
+            System.out.println("현재 예약 되어 있음 에러!");
+            return false;
+        }
+    }
 
-
-//    public List<UserDto>
+    // 회의실 예약
+    public int insertBooking(int roomId, String startTime, String endTime, boolean official) {
+        bookingMapper.insertBooking(today, roomId, startTime, endTime, official);
+        int bookingId = bookingMapper.selectResultInsert(today, roomId, startTime, endTime, official);
+        return bookingId;
+    }
 
 
 
@@ -65,12 +77,6 @@ public class BookingService {
 
 
 
-
-    // 회의실 예약
-    public int insertBooking(int roomId, String startTime, String endTime) {
-
-        return bookingMapper.insertBooking(today, roomId, startTime, endTime);
-    }
     // 회의실 예약
 //    public BookingDto updateBooking(int roomId, String startTime, String endTime){
 //        BookingDto nowBookingState = bookingMapper.findRoomState(today, roomId, startTime, endTime);
@@ -86,11 +92,5 @@ public class BookingService {
 //        return bookingMapper.updateBooking(today, roomId, startTime, endTime);
 //    }
 
-
-    // 현재시간, 사용자들 예약된 거에서 현재시간이랑 비교
-//    public boolean check_use(){
-//        userMapper.findByUserId(userId);
-//
-//    }
 
 }

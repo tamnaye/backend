@@ -1,11 +1,8 @@
 package com.example.tamna.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -13,6 +10,7 @@ import java.util.List;
 public class PostBookingDataDto {
     private int classes;
     private int roomId;
+    private String roomType;
     private String userId;
     private String userName;
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
