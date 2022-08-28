@@ -1,6 +1,6 @@
 package com.example.tamna.config.auth;
 
-import com.example.tamna.dto.UserDto;
+import com.example.tamna.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,9 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 public class PrincipalDetails implements UserDetails {
 
-    private UserDto user;
+    private User user;
 
-    public PrincipalDetails(UserDto user) {
+    public PrincipalDetails(User user) {
         this.user = user;
     }
 

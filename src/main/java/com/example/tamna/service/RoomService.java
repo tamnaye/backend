@@ -1,6 +1,6 @@
 package com.example.tamna.service;
 
-import com.example.tamna.dto.RoomDto;
+import com.example.tamna.model.Room;
 import com.example.tamna.mapper.RoomMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,12 +19,12 @@ public class RoomService {
 
 
     // 회의실 목록 데이터
-    public List<RoomDto> roomList(){
+    public List<Room> roomList(){
         return roomMapper.AllFindRoom();
     }
 
     // 층별 회의실 목록 데이터
-    public List<RoomDto> getFloorRoom(int floor){
+    public List<Room> getFloorRoom(int floor){
         System.out.println(roomMapper.findFloorRoom(floor));
         return roomMapper.findFloorRoom(floor);
     }

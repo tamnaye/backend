@@ -5,12 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class NaboxBookingDataDto {
+@AllArgsConstructor
+public class OfficialBookingDataDto {
+    private int classes;
     private int roomId;
-    private String roomType;
     private String userId;
-    private String StartTime;
-    private String EndTime;
+    private String startTime;
+    private String endTime;
+
 }

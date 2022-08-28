@@ -20,9 +20,12 @@ public class PostBookingDataDto {
     private String startTime;
     private String endTime;
     private List<String> teamMate;
+//    private boolean official;
 
 
-    public PostBookingDataDto(int classes, int roomId, String userId, String userName, String startTime, String endTime, List<String> teamMate) {
+    public PostBookingDataDto(int classes, int roomId, String userId, String userName, String startTime, String endTime, List<String> teamMate
+//                              ,boolean official
+    ) {
         this.classes = classes;
         this.roomId = roomId;
         this.userId = userId;
@@ -34,5 +37,6 @@ public class PostBookingDataDto {
         this.startTime = startTime;
         this.endTime = endTime;
         this.teamMate = teamMate;
+//        this.official = official;
     }
 }

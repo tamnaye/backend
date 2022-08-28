@@ -1,7 +1,6 @@
 package com.example.tamna.config.auth;
 
-import com.example.tamna.dto.UserDto;
-import com.example.tamna.mapper.UserMapper;
+import com.example.tamna.model.User;
 import com.example.tamna.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException{
 
         System.out.println("PrincipalDetailsService: 진입");
-        UserDto user = userService.getUserData(userId);
+        User user = userService.getUserData(userId);
 
         return new PrincipalDetails(user);
     }

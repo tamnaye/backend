@@ -1,6 +1,6 @@
 package com.example.tamna.service;
 
-import com.example.tamna.dto.UserDto;
+import com.example.tamna.model.User;
 import com.example.tamna.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,14 +25,13 @@ public class UserService {
         return sb.substring(0, sb.length());
     }
 
-
     // 최대 기수 가져오기
     public int getMaxClasses(){
        return userMapper.findMaxClasses();
     }
 
     // 유저 아이디로 정보조회
-    public UserDto getUserData(String userId){
+    public User getUserData(String userId){
         return userMapper.findByUserId(userId);
     }
 
@@ -43,8 +42,9 @@ public class UserService {
     }
 
     // 같은 기수의 유저들 이름으로 정보 조회
-    public List<UserDto> getUsersData(int classes, String users){
+    public List<User> getUsersData(int classes, String users){
         return userMapper.findByUserName(classes, users);
     }
+
 
 }
