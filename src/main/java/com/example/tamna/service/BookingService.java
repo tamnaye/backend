@@ -65,37 +65,79 @@ public class BookingService {
 
 
     // 예약된 회의실 디테일 정보
-    public DetailBookingDataDto findDetailBookingData(int roomId, String startTime){
-        List<JoinBooking> detailData = bookingMapper.findDetailBookingData(today, roomId, startTime);
-        System.out.println(bookingMapper.findDetailBookingData(today, roomId, startTime));
-        DetailBookingDataDto combineData = new DetailBookingDataDto();
-        if(!detailData.isEmpty()) {
-            Map<String, String> applicants = new HashMap<>();
-            List<String> teamMate = new ArrayList<>();
-            for (int i = 0; i < detailData.toArray().length; i++) {
-                if (detailData.get(i).isUserType()) {
-                    applicants.put("userId", detailData.get(i).getUserId());
-                    applicants.put("userName", detailData.get(i).getUserName());
-                    combineData.setApplicant(applicants);
-                } else {
-                    teamMate.add(detailData.get(i).getUserName());
+    public List<DetailBookingDataDto> floorDetailBookingData(int floor){
+        List<DetailBookingDataDto> floorDetailBooking = new ArrayList<>();
+        List<Booking> floorBooking = bookingMapper.findByFloor(today, floor);
+        for(int k=0; k < floorBooking.toArray().length; k ++){
+            int roomId = floorBooking.get(k).getRoomId();
+            String startTime = floorBooking.get(k).getStartTime();
+            List<JoinBooking> detailData = bookingMapper.findDetailBookingData(today, roomId, startTime);
+            System.out.println(bookingMapper.findDetailBookingData(today, roomId, startTime));
+            DetailBookingDataDto combineData = new DetailBookingDataDto();
+            if(!detailData.isEmpty()) {
+                Map<String, String> applicants = new HashMap<>();
+                List<String> teamMate = new ArrayList<>();
+                for (int i = 0; i < detailData.toArray().length; i++) {
+                    if (detailData.get(i).isUserType()) {
+                        applicants.put("userId", detailData.get(i).getUserId());
+                        applicants.put("userName", detailData.get(i).getUserName());
+                        combineData.setApplicant(applicants);
+                    } else {
+                        teamMate.add(detailData.get(i).getUserName());
+                    }
                 }
-            }
-            combineData.setBookingId(detailData.get(0).getBookingId());
-            combineData.setRoomId(detailData.get(0).getRoomId());
-            combineData.setRoomName(detailData.get(0).getRoomName());
-            combineData.setStartTime(detailData.get(0).getStartTime());
-            combineData.setEndTime(detailData.get(0).getEndTime());
-            combineData.setRoomType(detailData.get(0).getRoomType());
-            combineData.setOfficial(detailData.get(0).isOfficial());
-            combineData.setParticipants(teamMate);
+                combineData.setBookingId(detailData.get(0).getBookingId());
+                combineData.setRoomId(detailData.get(0).getRoomId());
+                combineData.setRoomName(detailData.get(0).getRoomName());
+                combineData.setStartTime(detailData.get(0).getStartTime());
+                combineData.setEndTime(detailData.get(0).getEndTime());
+                combineData.setRoomType(detailData.get(0).getRoomType());
+                combineData.setOfficial(detailData.get(0).isOfficial());
+                combineData.setParticipants(teamMate);
 
-            return combineData;
-        }else{
-            combineData = null;
-            return combineData;
+                floorDetailBooking.add(combineData);
+            }else{
+                combineData = null;
+                floorDetailBooking.add(combineData);
+            }
         }
+        return floorDetailBooking;
+
     }
+
+//    // 회의실별 예약된 디테일 정보
+//    public DetailBookingDataDto findDetailBookingData(int roomId, String startTime){
+//        List<JoinBooking> detailData = bookingMapper.findDetailBookingData(today, roomId, startTime);
+//        System.out.println(bookingMapper.findDetailBookingData(today, roomId, startTime));
+//        DetailBookingDataDto combineData = new DetailBookingDataDto();
+//        if(!detailData.isEmpty()) {
+//            Map<String, String> applicants = new HashMap<>();
+//            List<String> teamMate = new ArrayList<>();
+//            for (int i = 0; i < detailData.toArray().length; i++) {
+//                if (detailData.get(i).isUserType()) {
+//                    applicants.put("userId", detailData.get(i).getUserId());
+//                    applicants.put("userName", detailData.get(i).getUserName());
+//                    combineData.setApplicant(applicants);
+//                } else {
+//                    teamMate.add(detailData.get(i).getUserName());
+//                }
+//            }
+//            combineData.setBookingId(detailData.get(0).getBookingId());
+//            combineData.setRoomId(detailData.get(0).getRoomId());
+//            combineData.setRoomName(detailData.get(0).getRoomName());
+//            combineData.setStartTime(detailData.get(0).getStartTime());
+//            combineData.setEndTime(detailData.get(0).getEndTime());
+//            combineData.setRoomType(detailData.get(0).getRoomType());
+//            combineData.setOfficial(detailData.get(0).isOfficial());
+//            combineData.setParticipants(teamMate);
+//
+//            return combineData;
+//        }else{
+//            combineData = null;
+//            return combineData;
+//        }
+//    }
+
 
     // 회의실 예약
     public int insertBooking(int roomId, String startTime, String endTime, boolean official) {
@@ -110,7 +152,6 @@ public class BookingService {
         bookingIdList.forEach(m -> sb.append("'"+m+"',"));
         return sb.substring(0, sb.length()-1);
     }
-
 
 
     // 내가 포함된 에약 데이터 조회
@@ -161,5 +202,12 @@ public class BookingService {
         }
 
     };
+
+    // 예약 취소
+    public String deleteBooking(int bookingId){
+        int checkBookingDelete = bookingMapper.deleteBooking(bookingId);
+        int checkParticipantsDelete = participantsMapper.deleteParticipants(bookingId);
+        return "success";
+    }
 
 }

@@ -11,6 +11,7 @@ import com.example.tamna.service.ParticipantsService;
 import com.example.tamna.service.RoomService;
 import com.example.tamna.service.UserService;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,17 +28,13 @@ public class BookingController {
     private UserService userService;
     private ParticipantsService participantsService;
 
-    private UserMapper userMapper;
-    private RoomMapper roomMapper;
 
     @Autowired
-    public BookingController(BookingService bookingService,RoomService roomService, UserService userService, ParticipantsService participantsService, UserMapper userMapper, RoomMapper roomMapper){
+    public BookingController(BookingService bookingService,RoomService roomService, UserService userService, ParticipantsService participantsService){
         this.bookingService = bookingService;
         this.roomService = roomService;
         this.userService = userService;
         this.participantsService = participantsService;
-        this.userMapper = userMapper;
-        this.roomMapper = roomMapper;
     }
 
 
@@ -71,8 +68,19 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     };
 
+    @ApiOperation(value=" [완료] 예약 현황 페이지 데이터", notes = "@Param(floor)가 2,3층이면 각 층 데이터")
+    @GetMapping(value = "/details-booking")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getBookingState(@RequestParam("floor") int floor){
+        Map<String, Object> map = new HashMap<>();
+        map.put("RoomData", roomService.getFloorRoom(floor));
+        map.put("BookingData", bookingService.floorDetailBookingData(floor));
 
-    @ApiOperation(value = "[완료] nabox 예약", notes = "roomType이 nabox인 경우! => 필요한 데이터 {int classes, int roomId, String roomType, String userId, String userName, String StartTime, String EndTime;")
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+
+    @ApiOperation(value = "[완료] nabox 예약", notes = "roomType이 nabox인 경우! teamMate=[]로 보내주셔야 해여!")
     @PostMapping(value = "/nabox") // 현재 회의실 사용하는지 확인해야됨..;;;;
     public ResponseEntity<Map<String, Object>> naboxBooking(@RequestBody PostBookingDataDto naboxBookingDataDto) {
         // 같은 날 나박스를 사용했는지 확인
@@ -87,45 +95,6 @@ public class BookingController {
 //            if(checkUsing){
             if(!checkUsing.isEmpty()){
                 System.out.println("현재 회의실 사용 중인 인재분 있음");
-                arr.put("fail", "현재 다른 회의실을 이용중이세요!ㅠㅠ 동시간대 예약은 안됩니다!ㅠㅠ");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            }
-            // 회의실이 예약되어있는지 확인
-            boolean checkBooking = bookingService.findSameBooking(naboxBookingDataDto.getRoomId(), naboxBookingDataDto.getStartTime());
-            if (checkBooking) {
-                arr.put("fail", "이미 예약된 시간대의 나박스 입니다. ㅠㅠ");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            } else {
-                // 예약하고 예약된 bookingId 반환
-                int bookingId = bookingService.insertBooking(naboxBookingDataDto.getRoomId(), naboxBookingDataDto.getStartTime(), naboxBookingDataDto.getEndTime(), false);
-                participantsService.insertNaboxApplicant(bookingId, naboxBookingDataDto.getUserId());
-                arr.put("success", "예약 성공!");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            }
-        } else {
-            arr.put("fail", "NaBox 예약 횟수를 초과하였습니다.");
-            map.put("message", arr);
-            return ResponseEntity.status(HttpStatus.OK).body(map);
-        }
-    };
-
-
-    @ApiOperation(value = "[완료] nabox2 예약", notes = "roomType이 nabox인 경우! => 필요한 데이터 {int roomId, String roomType, String userId, String StartTime, String EndTime, boolean official;")
-    @PostMapping(value = "/nabox2") // 현재 회의실 사용하는지 확인해야됨..;;;;
-    public ResponseEntity<Map<String, Object>> naboxBooking2(@RequestBody NaboxBookingDataDto naboxBookingDataDto) {
-        // 같은 날 나박스를 사용했는지 확인
-        boolean notUsedNabox = participantsService.checkBookingUser(naboxBookingDataDto.getUserId(), naboxBookingDataDto.getRoomType());
-        Map<String, Object> map = new HashMap<>();
-        Map<String, String> arr = new HashMap<>();
-
-        if (notUsedNabox) {
-            // 현재 동시간대 중복 예약 확인
-            boolean checkUsing = participantsService.checkUsingBookingForNabox(naboxBookingDataDto);
-            if(checkUsing){
-                System.out.println("현재 회의실 사용 중인 인재분이 있음");
                 arr.put("fail", "현재 다른 회의실을 이용중이세요!ㅠㅠ 동시간대 예약은 안됩니다!ㅠㅠ");
                 map.put("message", arr);
                 return ResponseEntity.status(HttpStatus.OK).body(map);
@@ -202,6 +171,21 @@ public class BookingController {
         }
     };
 
+    @Data
+    static class BookingId{
+        private int bookingId;
+    }
+
+    @ApiOperation(value = "[완료] 예약 취소")
+    @PostMapping(value ="/cancellation")
+    public ResponseEntity<Map<String, Object>> cancelBooking(@RequestBody BookingId bookingId){
+        Map<String, Object> map = new HashMap<>();
+        int intBookingId = bookingId.bookingId;
+        String checkCancel = bookingService.deleteBooking(intBookingId);
+        map.put(checkCancel, "예약 취소가 완료되었습니다.");
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
 //    @PostMapping(value = "/manager")
 //    public ResponseEntity<Map<String, Object>> forOfficialSchedule(OfficialBookingDataDto officialBookingDataDto){
 //        if(officialBookingDataDto.getClasses() == 0){
@@ -210,20 +194,15 @@ public class BookingController {
 //    }
 
 
-//    // 예약 넣기 테스트
-//    @PostMapping(value = "/bookingTest")
-//    public ResponseEntity<String> update(@RequestBody PostBookingDataDto postBookingDataDto){
-//        bookingService.userIncludedBooking(postBookingDataDto.getUserId());
-//        return ResponseEntity.status(HttpStatus.OK).body("success");
+//    @ApiOperation(value = "[완료] 캘린더 상세 예약 정보")
+//    @GetMapping(value = "/details-booking")
+//    @ResponseBody
+//    public ResponseEntity<Map<String, Object>> detailsBookingData(@RequestParam("roomId") int roomId, @RequestParam("startTime") String startTime){
+//        Map<String, Object> map = new HashMap<>();
+//        DetailBookingDataDto detailData = bookingService.findDetailBookingData(roomId, startTime);
+//        map.put("detailBookingData", detailData);
+//        return ResponseEntity.status(HttpStatus.OK).body(map);
 //    }
 
-    @ApiOperation(value = "[완료] 캘린더 상세 예약 정보")
-    @GetMapping(value = "/details-booking")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> detailsBookingData(@RequestParam("roomId") int roomId, @RequestParam("startTime") String startTime){
-        Map<String, Object> map = new HashMap<>();
-        DetailBookingDataDto detailData = bookingService.findDetailBookingData(roomId, startTime);
-        map.put("detailBookingData", detailData);
-        return ResponseEntity.status(HttpStatus.OK).body(map);
-    }
+
 }

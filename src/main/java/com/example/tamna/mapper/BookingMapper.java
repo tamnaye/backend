@@ -4,6 +4,8 @@ import com.example.tamna.dto.DetailBookingDataDto;
 import com.example.tamna.model.Booking;
 import com.example.tamna.model.JoinBooking;
 import org.apache.ibatis.annotations.*;
+import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.sql.Date;
 import java.util.List;
@@ -48,5 +50,11 @@ public interface BookingMapper {
     // 예약된 회의실 별 디테일 정보
     @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND ROOM_ID=#{roomId} AND START_TIME=#{startTime}")
     List<JoinBooking> findDetailBookingData(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime);
+
+    // 예약 취소
+    @Delete("DELETE FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
+    int deleteBooking(int bookingId);
+
+
 }
 

@@ -1,12 +1,8 @@
 package com.example.tamna.mapper;
 
 import com.example.tamna.dto.BookingDataDto;
-import com.example.tamna.dto.BookingUserDataDto;
 import com.example.tamna.model.Participants;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.security.core.parameters.P;
 
 import java.sql.Date;
@@ -35,6 +31,8 @@ public interface ParticipantsMapper {
     @Insert("INSERT INTO PARTICIPANTS VALUES (#{bookingId}, #{userId}, #{userType})")
     int insertParticipants( @Param("bookingId") int bookingId, @Param("userId") String userId, @Param("userType") boolean userType);
 
-
+    // 예약 취소시 예약자들 삭제
+    @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID=#{bookingId}")
+    int deleteParticipants(int bookingId);
 
 }

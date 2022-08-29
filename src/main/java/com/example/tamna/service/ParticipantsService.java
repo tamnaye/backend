@@ -1,7 +1,6 @@
 package com.example.tamna.service;
 
 import com.example.tamna.dto.BookingDataDto;
-import com.example.tamna.dto.NaboxBookingDataDto;
 import com.example.tamna.dto.PostBookingDataDto;
 import com.example.tamna.model.Participants;
 import com.example.tamna.model.User;
@@ -37,12 +36,12 @@ public class ParticipantsService {
         users.stream().filter(m -> teamMateId.add(m.getUserId()));
         String usersIdData = userService.changeString(userId, teamMateId);
         return participantsMapper.findByUsersId(today, usersIdData);
-    }
+    }//
 
     // 나박스 회의실 예약자 insert
     public int insertNaboxApplicant(int bookingId, String userId){
         return participantsMapper.insertParticipants(bookingId, userId, true);
-    }
+    }//
 
 
     // 회의실 예약 신청자와 멤버 구분하여 insert
@@ -56,7 +55,7 @@ public class ParticipantsService {
             }
             System.out.println("인재분들 참가자 디비 insert 성공");
         }
-    }
+    }//
 
 
     // 회의실 횟수 한번 제한을 위한 체크
@@ -71,22 +70,8 @@ public class ParticipantsService {
                 System.out.println(roomType + " 예약한 적 있음 예약 불가능");
                 return false;
             }
-        }
+        }//
 
-//    // 회의실 예약시, 동시간대 예약 체크
-//    public boolean checkUsingBooking(int classes, String userName, List<String> teamMateNames, String StartTime){
-//        String usersName= userService.changeString(userName, teamMateNames);
-//        System.out.println(usersName);
-//        List<BookingDataDto> usingCheck = participantsMapper.selectUsingUsers(today, classes, StartTime, usersName);
-//        System.out.println(participantsMapper.selectUsingUsers(today, classes, StartTime, usersName));
-//        if(!usingCheck.isEmpty()){
-//            System.out.println("현재 회의실 사용 중");
-//            return true;
-//        }else{
-//            System.out.println("현재 회의실을 사용하고 있지 않음");
-//            return false;
-//        }
-//    }
 
     // 회의실 예약시, 동시간대 예약 체크
     public List<String> checkUsingBooking(PostBookingDataDto postBookingDataDto){
@@ -110,22 +95,6 @@ public class ParticipantsService {
             return usingUsers;
         }
         }//
-
-
-
-    // 나박스 예약시, 동시간대 예약 체크
-    public boolean checkUsingBookingForNabox(NaboxBookingDataDto naboxBookingDataDto){
-        List<BookingDataDto> usingCheck;
-        usingCheck = participantsMapper.selectUsingOnlyUser(today, naboxBookingDataDto.getStartTime(), naboxBookingDataDto.getUserId());
-        System.out.println(participantsMapper.selectUsingOnlyUser(today, naboxBookingDataDto.getStartTime(), naboxBookingDataDto.getUserId()));
-        if(!usingCheck.isEmpty()){
-            System.out.println("현재 회의실 사용 중");
-            return true;
-        }else{
-            System.out.println("현재 회의실을 사용하고 있지 않음");
-            return false;
-        }
-    }
 
 
 };
