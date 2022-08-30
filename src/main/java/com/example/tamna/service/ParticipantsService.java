@@ -5,6 +5,8 @@ import com.example.tamna.dto.PostBookingDataDto;
 import com.example.tamna.model.Participants;
 import com.example.tamna.model.User;
 import com.example.tamna.mapper.ParticipantsMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +14,21 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
 public class ParticipantsService {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(ParticipantsService.class);
+
     private ParticipantsMapper participantsMapper;
     private UserService userService;
     private Date today;
+
+
 
 
     @Autowired
@@ -59,9 +67,9 @@ public class ParticipantsService {
 
 
     // 회의실 횟수 한번 제한을 위한 체크
-    public boolean checkBookingUser(String usersId, String roomType){
-            List<BookingDataDto> user = participantsMapper.selectBookingUser(today, roomType, usersId, true);
-            System.out.println(participantsMapper.selectBookingUser(today, roomType, usersId,true));
+    public boolean checkBookingUser(String roomType, String userId){
+            List<BookingDataDto> user = participantsMapper.selectBookingUser(today, roomType, userId, true);
+            System.out.println(participantsMapper.selectBookingUser(today, roomType, userId,true));
             if(user.isEmpty()){
                 System.out.println(user.isEmpty());
                 System.out.println(roomType +" 예약 한 적 없음. 예약 가능");
@@ -74,27 +82,29 @@ public class ParticipantsService {
 
 
     // 회의실 예약시, 동시간대 예약 체크
-    public List<String> checkUsingBooking(PostBookingDataDto postBookingDataDto){
+    public Set<String> checkUsingBooking(PostBookingDataDto postBookingDataDto){
         List<BookingDataDto> usingCheck;
+
         if(postBookingDataDto.getRoomType().equals("meeting")) {
             String usersName = userService.changeString(postBookingDataDto.getUserName(), postBookingDataDto.getTeamMate());
-            System.out.println(usersName);
-            usingCheck = participantsMapper.selectUsingUsers(today, postBookingDataDto.getClasses(), postBookingDataDto.getStartTime(), usersName);
-            System.out.println(participantsMapper.selectUsingUsers(today, postBookingDataDto.getClasses(), postBookingDataDto.getStartTime(), usersName));
+            LOGGER.info("예약자 + 팀원들 이름: {}", usersName);
+            usingCheck = participantsMapper.selectUsingUsers(today, postBookingDataDto.getClasses(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), usersName);
         }else{
-            usingCheck = participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getUserId());
-            System.out.println(participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getUserId()));
+            usingCheck = participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId());
+            System.out.println(participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId()));
         }
-        List<String> usingUsers = new ArrayList<>();
-        if(!usingCheck.isEmpty()){
+        LOGGER.info("현재 회의실 사용중인 유저들: {}", usingCheck);
+
+        Set<String> usingUsers = new HashSet<>();
+        if(usingCheck.isEmpty()){
+            System.out.println("사용중인 사람 x -> 회의실 사용 가능");
+
+        }else{
             usingCheck.forEach(m -> usingUsers.add(m.getUserName()));
             System.out.println(usingUsers + "현재 회의실 사용 중");
-            return usingUsers;
-        }else{
-            System.out.println("현재 회의실을 사용하고 있지 않음");
-            return usingUsers;
         }
-        }//
+        return usingUsers;
+        }
 
 
 };

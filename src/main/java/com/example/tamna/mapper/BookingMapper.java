@@ -6,6 +6,7 @@ import com.example.tamna.model.JoinBooking;
 import org.apache.ibatis.annotations.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.Date;
 import java.util.List;
@@ -36,8 +37,8 @@ public interface BookingMapper {
     int selectResultInsert(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("official") boolean official);
 
     // 회의실 예약 확인
-    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND START_TIME <= #{startTime} AND #{startTime} < END_TIME")
-    Booking findSameBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime);
+    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND START_TIME <= #{startTime} AND #{startTime} < END_TIME OR START_TIME < #{endTime} AND #{endTime} <= END_TIME")
+    List<Booking> findSameBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 내가 포함된 예약 bookingId 조회
     @Select("SELECT BOOKING_ID FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) where DATES=#{today} AND USER_ID=#{userId}")

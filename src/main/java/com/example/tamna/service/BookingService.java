@@ -8,6 +8,8 @@ import com.example.tamna.mapper.RoomMapper;
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.model.JoinBooking;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.util.*;
 @NoArgsConstructor
 public class BookingService {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(BookingService.class);
     private UserMapper userMapper;
     private RoomMapper roomMapper;
     private BookingMapper bookingMapper;
@@ -52,15 +55,14 @@ public class BookingService {
     }
 
     // 예약 되어 있는지 확인
-    public boolean findSameBooking(int roomId, String startTime){
-        Booking sameBooking = bookingMapper.findSameBooking(today, roomId, startTime);
-        if(sameBooking != null){
-            System.out.println("현재 예약된 회의실 에러!");
+    public boolean findSameBooking(int roomId, String startTime, String endTime){
+        List<Booking> sameBooking = bookingMapper.findSameBooking(today, roomId, startTime, endTime);
+        if(!sameBooking.isEmpty()){
+            System.out.println("현재 예약된 회의실!");
             return true;
-        }else{
-            System.out.println("현재 예약 되어 있지 않은 회의실임");
-            return false;
         }
+            System.out.println("현재 예약 되어 있지 않은 회의실!");
+            return false;
     }
 
 
@@ -95,9 +97,6 @@ public class BookingService {
                 combineData.setOfficial(detailData.get(0).isOfficial());
                 combineData.setParticipants(teamMate);
 
-                floorDetailBooking.add(combineData);
-            }else{
-                combineData = null;
                 floorDetailBooking.add(combineData);
             }
         }
@@ -148,9 +147,13 @@ public class BookingService {
 
     // bookingId들 한번에 검색
     public String addBookingId(List<Integer> bookingIdList){
-        StringBuilder sb = new StringBuilder ();
-        bookingIdList.forEach(m -> sb.append("'"+m+"',"));
-        return sb.substring(0, sb.length()-1);
+        if(!bookingIdList.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            bookingIdList.forEach(m -> sb.append("'" + m + "',"));
+            return sb.substring(0, sb.length() - 1);
+        }else{
+            return null;
+        }
     }
 
 
@@ -161,53 +164,62 @@ public class BookingService {
 
         // 내가 예약된 예약정보의 bookingId들 받아옴
         List<Integer> bookingIdList = bookingMapper.findMyBookingId(today, userId);
+        System.out.println("내가 예약된 BookingId" + bookingIdList);
+        LOGGER.info("{}가 예약한 bookingId 리스트 : {}", userId, bookingIdList);
+        String bookingIdString = addBookingId(bookingIdList);
 
-        // bookingId들 문자열로 변환 후 한번에 데이터들 모두 조회
-        List<JoinBooking> myBookingList = bookingMapper.findMyBookingData(addBookingId(bookingIdList));
-        System.out.println(bookingMapper.findMyBookingData(addBookingId(bookingIdList)));
+        // 예약한 데이터가 있을 때
+        if(bookingIdString != null){
+            // bookingId들 문자열로 변환 후 한번에 데이터들 모두 조회
+            List<JoinBooking> myBookingList = bookingMapper.findMyBookingData(bookingIdString);
+            System.out.println(bookingMapper.findMyBookingData(addBookingId(bookingIdList)));
 
-
-        if(!myBookingList.isEmpty()){
-            for(int i : bookingIdList){
-                DetailBookingDataDto combineData = new DetailBookingDataDto();
-                List<String> teamMate = new ArrayList<>();
-                for(int j=0; j < myBookingList.toArray().length; j++){
-                   if(myBookingList.get(j).getBookingId() == i){
-                       if(myBookingList.get(j).isUserType()){
-                           combineData.setBookingId(myBookingList.get(j).getBookingId());
-                           combineData.setRoomId(myBookingList.get(j).getRoomId());
-                           combineData.setRoomName(myBookingList.get(j).getRoomName());
-                           combineData.setRoomType(myBookingList.get(j).getRoomType());
-                           combineData.setStartTime(myBookingList.get(j).getStartTime());
-                           combineData.setEndTime(myBookingList.get(j).getEndTime());
-                           combineData.setOfficial(myBookingList.get(j).isOfficial());
-                           Map<String, String> applicant = new HashMap<>();
-                           applicant.put("userId", myBookingList.get(j).getUserId());
-                           applicant.put("userName", myBookingList.get(j).getUserName());
-                           combineData.setApplicant(applicant);
-                       }else{
-                           teamMate.add(myBookingList.get(j).getUserName());
-                       }
-                   } // bookingId가 다를 때 최상위 for문으로 이동
-                   continue;
+            if(!myBookingList.isEmpty()){
+                for(int i : bookingIdList){
+                    DetailBookingDataDto combineData = new DetailBookingDataDto();
+                    List<String> teamMate = new ArrayList<>();
+                    for(int j=0; j < myBookingList.toArray().length; j++){
+                       if(myBookingList.get(j).getBookingId() == i){
+                           if(myBookingList.get(j).isUserType()){
+                               combineData.setBookingId(myBookingList.get(j).getBookingId());
+                               combineData.setRoomId(myBookingList.get(j).getRoomId());
+                               combineData.setRoomName(myBookingList.get(j).getRoomName());
+                               combineData.setRoomType(myBookingList.get(j).getRoomType());
+                               combineData.setStartTime(myBookingList.get(j).getStartTime());
+                               combineData.setEndTime(myBookingList.get(j).getEndTime());
+                               combineData.setOfficial(myBookingList.get(j).isOfficial());
+                               Map<String, String> applicant = new HashMap<>();
+                               applicant.put("userId", myBookingList.get(j).getUserId());
+                               applicant.put("userName", myBookingList.get(j).getUserName());
+                               combineData.setApplicant(applicant);
+                           }else{
+                               teamMate.add(myBookingList.get(j).getUserName());
+                           }
+                       } // bookingId가 다를 때 최상위 for문으로 이동
+                       continue;
+                    }
+                    combineData.setParticipants(teamMate);
+                    System.out.println(combineData);
+                    allMyBookingData.add(combineData);
                 }
-                combineData.setParticipants(teamMate);
-                System.out.println(combineData);
-                allMyBookingData.add(combineData);
+            }else{
+                allMyBookingData.add(null);
             }
-            return allMyBookingData;
-        }else{
-            allMyBookingData.add(null);
-            return allMyBookingData;
         }
-
+        LOGGER.info("allMyBookingData: {}", allMyBookingData.isEmpty());
+        return allMyBookingData;
     };
 
     // 예약 취소
     public String deleteBooking(int bookingId){
         int checkBookingDelete = bookingMapper.deleteBooking(bookingId);
         int checkParticipantsDelete = participantsMapper.deleteParticipants(bookingId);
-        return "success";
+        System.out.println(checkBookingDelete);
+        System.out.println(checkParticipantsDelete);
+        if(checkBookingDelete == 1 && checkParticipantsDelete >= 1){
+            return "success";
+        }
+        return "fail";
     }
 
 }

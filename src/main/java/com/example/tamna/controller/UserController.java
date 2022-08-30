@@ -49,6 +49,7 @@ public class UserController {
     @ApiOperation(value = "[완료] 마이페이지 자기 예약 목록 보기")
     @GetMapping(value = "/mypage")
     public ResponseEntity<Map<String, Object>> myBookingState(@RequestParam("userId") String userId){
+        System.out.println(userId);
         Map<String, Object> map = new HashMap<>();
         map.put("userData", userService.getUserData(userId));
         List<DetailBookingDataDto> myBookingDetailDataList = bookingService.userIncludedBooking(userId);

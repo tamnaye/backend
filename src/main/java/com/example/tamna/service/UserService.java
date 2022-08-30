@@ -42,7 +42,8 @@ public class UserService {
     }
 
     // 같은 기수의 유저들 이름으로 정보 조회
-    public List<User> getUsersData(int classes, String users){
+    public List<User> getUsersData(int classes, String userData, List<String> teamMateData){
+        String users = changeString(userData, teamMateData);
         return userMapper.findByUserName(classes, users);
     }
 
