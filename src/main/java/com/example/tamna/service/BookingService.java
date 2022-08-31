@@ -54,9 +54,10 @@ public class BookingService {
         return bookingMapper.findByFloor(today, floor);
     }
 
-    // 예약 되어 있는지 확인
+    // 현재 회의실 예약 되어 있는지 확인
     public boolean findSameBooking(int roomId, String startTime, String endTime){
         List<Booking> sameBooking = bookingMapper.findSameBooking(today, roomId, startTime, endTime);
+        System.out.println(sameBooking);
         if(!sameBooking.isEmpty()){
             System.out.println("현재 예약된 회의실!");
             return true;
@@ -70,11 +71,14 @@ public class BookingService {
     public List<DetailBookingDataDto> floorDetailBookingData(int floor){
         List<DetailBookingDataDto> floorDetailBooking = new ArrayList<>();
         List<Booking> floorBooking = bookingMapper.findByFloor(today, floor);
+        System.out.println("floorBooking: " + floorBooking);
         for(int k=0; k < floorBooking.toArray().length; k ++){
             int roomId = floorBooking.get(k).getRoomId();
+            System.out.println("roomId: " + roomId);
             String startTime = floorBooking.get(k).getStartTime();
+            System.out.println("startTime: " + startTime);
             List<JoinBooking> detailData = bookingMapper.findDetailBookingData(today, roomId, startTime);
-            System.out.println(bookingMapper.findDetailBookingData(today, roomId, startTime));
+            System.out.println("detailData: " + detailData);
             DetailBookingDataDto combineData = new DetailBookingDataDto();
             if(!detailData.isEmpty()) {
                 Map<String, String> applicants = new HashMap<>();
@@ -156,7 +160,6 @@ public class BookingService {
         }
     }
 
-
     // 내가 포함된 에약 데이터 조회
     public  List<DetailBookingDataDto> userIncludedBooking(String userId) {
 
@@ -188,6 +191,7 @@ public class BookingService {
                                combineData.setStartTime(myBookingList.get(j).getStartTime());
                                combineData.setEndTime(myBookingList.get(j).getEndTime());
                                combineData.setOfficial(myBookingList.get(j).isOfficial());
+                               combineData.setMode(myBookingList.get(j).getMode());
                                Map<String, String> applicant = new HashMap<>();
                                applicant.put("userId", myBookingList.get(j).getUserId());
                                applicant.put("userName", myBookingList.get(j).getUserName());
@@ -221,5 +225,29 @@ public class BookingService {
         }
         return "fail";
     }
+
+
+    // 공식일정으로 인한 예약 수정
+    public String updateBooking(int roomId, String userId, String startTime, String endTime, boolean official) {
+        System.out.println(startTime);
+        List<Booking> sameBooking = bookingMapper.findSameBooking(today, roomId, startTime, endTime);
+            System.out.println(sameBooking);
+        if (!sameBooking.isEmpty()) {
+            List<Integer> bookingIdList = new ArrayList<>();
+            for (int i = 0; i < sameBooking.toArray().length; i++) {
+                bookingIdList.add(sameBooking.get(i).getBookingId());
+            }
+            System.out.println("bookingIdList: " + bookingIdList);
+            String bookingsIdString = addBookingId(bookingIdList);
+            int updateResultCount = bookingMapper.cancelBooking(bookingsIdString);
+            System.out.println("updateCount" + updateResultCount);
+        }
+        int resultBookingId = insertBooking(roomId, startTime, endTime, official);
+        int resultParticipant = participantsMapper.insertParticipants(resultBookingId, userId, true);
+        System.out.println(resultBookingId + " + " + resultParticipant);
+        return "success";
+
+    }
+
 
 }

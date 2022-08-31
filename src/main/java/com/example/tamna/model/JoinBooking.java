@@ -12,6 +12,7 @@ public class JoinBooking {
     private String startTime;
     private String endTime;
     private boolean official;
+    private String mode;
     private int roomId;
     private String roomName;
     private String roomType;

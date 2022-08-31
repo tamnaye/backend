@@ -1,12 +1,9 @@
 package com.example.tamna.mapper;
 
-import com.example.tamna.dto.DetailBookingDataDto;
 import com.example.tamna.model.Booking;
 import com.example.tamna.model.JoinBooking;
 import org.apache.ibatis.annotations.*;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 
 import java.sql.Date;
 import java.util.List;
@@ -15,15 +12,15 @@ import java.util.List;
 public interface BookingMapper {
 
     // 오늘 모든 예약 현황
-    @Select("SELECT * FROM BOOKING WHERE dates=#{today} ORDER BY ROOM_ID ASC")
+    @Select("SELECT * FROM BOOKING WHERE dates=#{today} AND MODE is null ORDER BY ROOM_ID ASC")
     List<Booking> findAllRoomState(Date today);
 
     // 층수별 예약 현황
-    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND ROOM_ID LIKE '${floor}__' ORDER BY ROOM_ID ASC")
+    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND MODE is null AND ROOM_ID LIKE '${floor}__' ORDER BY ROOM_ID ASC")
     List<Booking> findByFloor(@Param("today") Date today, @Param("floor") int floor);
 
     // 회의실별 예약 현황
-    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} ORDER BY START_TIME ASC")
+    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND MODE is null AND ROOM_ID=#{roomId} ORDER BY START_TIME ASC")
     List<Booking> findByRoomId(@Param("today") Date today, @Param("roomId") int roomId);
 
     // 예약 데이터 삽입
@@ -37,7 +34,7 @@ public interface BookingMapper {
     int selectResultInsert(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("official") boolean official);
 
     // 회의실 예약 확인
-    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND #{startTime} <= START_TIME AND START_TIME < #{endTime} AND #{startTime} < END_TIME AND END_TIME <= #{endTime}")
+    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime})")
     List<Booking> findSameBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 내가 포함된 예약 bookingId 조회
@@ -49,13 +46,15 @@ public interface BookingMapper {
     List<JoinBooking> findMyBookingData(@Param("bookingIdList") String bookingIdList);
 
     // 예약된 회의실 별 디테일 정보
-    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND ROOM_ID=#{roomId} AND START_TIME=#{startTime}")
+    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND START_TIME=#{startTime}")
     List<JoinBooking> findDetailBookingData(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime);
 
     // 예약 취소
     @Delete("DELETE FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
     int deleteBooking(int bookingId);
 
+    @Update("UPDATE BOOKING SET MODE = 'cancel' WHERE BOOKING_ID IN (${bookingsId})")
+    int cancelBooking(String bookingsId);
 
 }
 

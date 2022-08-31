@@ -85,100 +85,98 @@ public class BookingController {
     }
 
 
-    @ApiOperation(value = "[완료] nabox 예약", notes = "roomType이 nabox인 경우! teamMate=[]로 보내주셔야 해여!")
-    @PostMapping(value = "/nabox") // 현재 회의실 사용하는지 확인해야됨..;;;;
-    public ResponseEntity<Map<String, Object>> naboxBooking(@RequestBody PostBookingDataDto naboxBookingDataDto) {
-        // 같은 날 나박스를 사용했는지 확인
-        boolean notUsedNabox = participantsService.checkBookingUser(naboxBookingDataDto.getUserId(), naboxBookingDataDto.getRoomType());
-        Map<String, Object> map = new HashMap<>();
-        Map<String, String> arr = new HashMap<>();
-
-        if (notUsedNabox && naboxBookingDataDto.getTeamMate().isEmpty()) {
-            // 현재 동시간대 중복 예약 확인
-//            boolean checkUsing = participantsService.checkUsingBooking(naboxBookingDataDto);
-            Set<String> checkUsing = participantsService.checkUsingBooking(naboxBookingDataDto);
-//            if(checkUsing){
-            if (!checkUsing.isEmpty()) {
-                System.out.println("현재 회의실 사용 중인 인재분 있음");
-                arr.put("fail", "현재 다른 회의실을 이용중이세요!ㅠㅠ 동시간대 예약은 안됩니다!ㅠㅠ");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            }
-            // 회의실이 예약되어있는지 확인
-            boolean checkBooking = bookingService.findSameBooking(naboxBookingDataDto.getRoomId(), naboxBookingDataDto.getStartTime(), naboxBookingDataDto.getEndTime());
-            if (checkBooking) {
-                arr.put("fail", "이미 예약된 시간대의 나박스 입니다. ㅠㅠ");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            } else {
-                // 예약하고 예약된 bookingId 반환
-                int bookingId = bookingService.insertBooking(naboxBookingDataDto.getRoomId(), naboxBookingDataDto.getStartTime(), naboxBookingDataDto.getEndTime(), false);
-                participantsService.insertNaboxApplicant(bookingId, naboxBookingDataDto.getUserId());
-                arr.put("success", "예약 성공!");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            }
-        } else {
-            arr.put("fail", "NaBox 예약 횟수를 초과하였습니다.");
-            map.put("message", arr);
-            return ResponseEntity.status(HttpStatus.OK).body(map);
-        }
-    }
-
-    ;
-
-
-    @PostMapping(value = "/conference1")
-    public ResponseEntity<Map<String, Object>> conferenceRoomBooking1(@RequestBody PostBookingDataDto postBookingDataDto) {
-        List<String> teamMateNames = postBookingDataDto.getTeamMate();
-        Map<String, Object> map = new HashMap<>();
-        Map<String, Object> arr = new HashMap<>();
-        // 팀원 선택 되었는지 체크
-        if (!teamMateNames.isEmpty()) {
-            // 신청자 하루에 예약 한번 체크
-            boolean checkBooking = participantsService.checkBookingUser(postBookingDataDto.getUserId(), postBookingDataDto.getRoomType());
-            if (checkBooking) {
-                // 예약 신청자들 중 회의실 사용중인 유저 체크
-                Set<String> checkUsing = participantsService.checkUsingBooking(postBookingDataDto);
-                if (!checkUsing.isEmpty()) {
-                    System.out.println("현재 회의실 사용 중인 인재분이 있음");
-                    arr.put("fail", "현재 회의실 사용 중인 인재분" + checkUsing + "이 포함되어 있어요!ㅠㅠ");
-                    map.put("message", arr);
-                    return ResponseEntity.status(HttpStatus.OK).body(map);
-                } else {
-                    // 신청하는 회의실이 예약 되었는지 확인
-                    boolean usingBooking = bookingService.findSameBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
-                    if (usingBooking) {
-                        System.out.println("이미 예약이 완료된 회의실 입니다. ㅠㅠ");
-                        arr.put("fail", "이미 예약이 완료된 회의실 입니다. ㅠㅠ");
-                        map.put("message", arr);
-                    } else {
-                        // 회의실 예약
-                        int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
-                        // 참여자들 insert
-                        List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
-                        participantsService.insertParticipants(bookingId, users, teamMateNames);
-                        arr.put("success", "예약 성공!");
-                        map.put("message", arr);
-                    }
-                    return ResponseEntity.status(HttpStatus.OK).body(map);
-                }
-            } else {
-                System.out.println("유저 applicant = true");
-                arr.put("fail", "회의실 예약 횟수를 초과했어요!ㅠㅠ");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            }
-        } else {
-            System.out.println("회의실은 2인이상일 경우만 예약하실 수 있습니다.");
-            arr.put("fail", "회의실은 2인이상일 경우만 예약할 수 있어요!ㅠㅠ");
-            map.put("message", arr);
-            return ResponseEntity.status(HttpStatus.OK).body(map);
-
-        }
-    }
-
-    ;
+//    @ApiOperation(value = "[완료] nabox 예약", notes = "roomType이 nabox인 경우! teamMate=[]로 보내주셔야 해여!")
+//    @PostMapping(value = "/nabox") // 현재 회의실 사용하는지 확인해야됨..;;;;
+//    public ResponseEntity<Map<String, Object>> naboxBooking(@RequestBody PostBookingDataDto naboxBookingDataDto) {
+//        // 같은 날 나박스를 사용했는지 확인
+//        boolean notUsedNabox = participantsService.checkBookingUser(naboxBookingDataDto.getUserId(), naboxBookingDataDto.getRoomType());
+//        Map<String, Object> map = new HashMap<>();
+//        Map<String, String> arr = new HashMap<>();
+//
+//        if (notUsedNabox && naboxBookingDataDto.getTeamMate().isEmpty()) {
+//            // 현재 동시간대 중복 예약 확인
+////            boolean checkUsing = participantsService.checkUsingBooking(naboxBookingDataDto);
+//            Set<String> checkUsing = participantsService.checkUsingBooking(naboxBookingDataDto);
+////            if(checkUsing){
+//            if (!checkUsing.isEmpty()) {
+//                System.out.println("현재 회의실 사용 중인 인재분 있음");
+//                arr.put("fail", "현재 다른 회의실을 이용중이세요!ㅠㅠ 동시간대 예약은 안됩니다!ㅠㅠ");
+//                map.put("message", arr);
+//                return ResponseEntity.status(HttpStatus.OK).body(map);
+//            }
+//            // 회의실이 예약되어있는지 확인
+//            boolean checkBooking = bookingService.findSameBooking(naboxBookingDataDto.getRoomId(), naboxBookingDataDto.getStartTime(), naboxBookingDataDto.getEndTime());
+//            if (checkBooking) {
+//                arr.put("fail", "이미 예약된 시간대의 나박스 입니다. ㅠㅠ");
+//                map.put("message", arr);
+//                return ResponseEntity.status(HttpStatus.OK).body(map);
+//            } else {
+//                // 예약하고 예약된 bookingId 반환
+//                int bookingId = bookingService.insertBooking(naboxBookingDataDto.getRoomId(), naboxBookingDataDto.getStartTime(), naboxBookingDataDto.getEndTime(), false);
+//                participantsService.insertNaboxApplicant(bookingId, naboxBookingDataDto.getUserId());
+//                arr.put("success", "예약 성공!");
+//                map.put("message", arr);
+//                return ResponseEntity.status(HttpStatus.OK).body(map);
+//            }
+//        } else {
+//            arr.put("fail", "NaBox 예약 횟수를 초과하였습니다.");
+//            map.put("message", arr);
+//            return ResponseEntity.status(HttpStatus.OK).body(map);
+//        }
+//    }
+//
+//    ;
+//
+//
+//    @PostMapping(value = "/conference1")
+//    public ResponseEntity<Map<String, Object>> conferenceRoomBooking1(@RequestBody PostBookingDataDto postBookingDataDto) {
+//        List<String> teamMateNames = postBookingDataDto.getTeamMate();
+//        Map<String, Object> map = new HashMap<>();
+//        Map<String, Object> arr = new HashMap<>();
+//        // 팀원 선택 되었는지 체크
+//        if (!teamMateNames.isEmpty()) {
+//            // 신청자 하루에 예약 한번 체크
+//            boolean checkBooking = participantsService.checkBookingUser(postBookingDataDto.getUserId(), postBookingDataDto.getRoomType());
+//            if (checkBooking) {
+//                // 예약 신청자들 중 회의실 사용중인 유저 체크
+//                Set<String> checkUsing = participantsService.checkUsingBooking(postBookingDataDto);
+//                if (!checkUsing.isEmpty()) {
+//                    System.out.println("현재 회의실 사용 중인 인재분이 있음");
+//                    arr.put("fail", "현재 회의실 사용 중인 인재분" + checkUsing + "이 포함되어 있어요!ㅠㅠ");
+//                    map.put("message", arr);
+//                    return ResponseEntity.status(HttpStatus.OK).body(map);
+//                } else {
+//                    // 신청하는 회의실이 예약 되었는지 확인
+//                    boolean usingBooking = bookingService.findSameBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
+//                    if (usingBooking) {
+//                        System.out.println("이미 예약이 완료된 회의실 입니다. ㅠㅠ");
+//                        arr.put("fail", "이미 예약이 완료된 회의실 입니다. ㅠㅠ");
+//                        map.put("message", arr);
+//                    } else {
+//                        // 회의실 예약
+//                        int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
+//                        // 참여자들 insert
+//                        List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
+//                        participantsService.insertParticipants(bookingId, users, teamMateNames);
+//                        arr.put("success", "예약 성공!");
+//                        map.put("message", arr);
+//                    }
+//                    return ResponseEntity.status(HttpStatus.OK).body(map);
+//                }
+//            } else {
+//                System.out.println("유저 applicant = true");
+//                arr.put("fail", "회의실 예약 횟수를 초과했어요!ㅠㅠ");
+//                map.put("message", arr);
+//                return ResponseEntity.status(HttpStatus.OK).body(map);
+//            }
+//        } else {
+//            System.out.println("회의실은 2인이상일 경우만 예약하실 수 있습니다.");
+//            arr.put("fail", "회의실은 2인이상일 경우만 예약할 수 있어요!ㅠㅠ");
+//            map.put("message", arr);
+//            return ResponseEntity.status(HttpStatus.OK).body(map);
+//
+//        }
+//    }
 
 
     @PostMapping(value = "/conference")
@@ -193,67 +191,94 @@ public class BookingController {
        }else{
            roomType = "나박스";
        }
-       LOGGER.info("roomType: " + roomType);
+        System.out.println("roomType: " + roomType);
 
+       if(postBookingDataDto.getClasses() != 0){
        // 신청자 하루에 한번만 예약 체크
        boolean checkBooking = participantsService.checkBookingUser(postBookingDataDto.getRoomType(), postBookingDataDto.getUserId());
        // 신청자가 예약이 안되어 있으면
-       if (checkBooking){
-           // 룸타입이 회의실일 경우인데 팀메이트가 비어있는 경우
-            if(roomType.equals("회의실") && teamMateNames.isEmpty()){
-               arr.put("fail", "회의실은 2인이상일 경우만 예약하실 수 있습니다.");
-                map.put("message", arr);
-                return ResponseEntity.status(HttpStatus.OK).body(map);
-            }else{
-                // 동시간대 회의실 사용자
-                Set<String> usingUsers = participantsService.checkUsingBooking(postBookingDataDto);
-                if(!usingUsers.isEmpty() && roomType.equals("회의실")){
-                    arr.put("fail", "현재 회의실을 사용 중인 " + usingUsers + "님이 포함되어 있어요!ㅠㅠ");
-                    map.put("message", arr);
-                    return ResponseEntity.status(HttpStatus.OK).body(map);
-                }else if(!usingUsers.isEmpty()){ //나박스일 때
-                    arr.put("fail", "현재 다른 회의실을 이용중이세요! ㅠㅠ 동시간대 예약은 불가합니다.");
+           if (checkBooking){
+               // 룸타입이 회의실일 경우인데 팀메이트가 비어있는 경우
+                if(roomType.equals("회의실") && teamMateNames.isEmpty()){
+                   arr.put("fail", "회의실은 2인이상일 경우만 예약하실 수 있습니다.");
                     map.put("message", arr);
                     return ResponseEntity.status(HttpStatus.OK).body(map);
                 }else{
-                // 신청하는 회의실 예약 확인
-                     boolean usingRoom = bookingService.findSameBooking(postBookingDataDto.getRoomId(),postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
-                    if(usingRoom) {
-                        arr.put("fail", "이미 예약이 완료된 회의실 입니다.ㅠㅠ");
+                    // 동시간대 회의실 사용자
+                    Set<String> usingUsers = participantsService.checkUsingBooking(postBookingDataDto);
+                    if(!usingUsers.isEmpty() && roomType.equals("회의실")){
+                        arr.put("fail", "현재 회의실을 사용 중인 " + usingUsers + "님이 포함되어 있어요!ㅠㅠ");
                         map.put("message", arr);
                         return ResponseEntity.status(HttpStatus.OK).body(map);
-                    }else {
-                        // 예약 O
-                        // 회의실 일때
-                        if(roomType.equals("회의실")){
-                            int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.isOfficial());
-                            LOGGER.info("예약 성공한 bookingId: " + bookingId);
-                            // 유저들 이름 종합
-                            List<User> users = userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames);
-                            participantsService.insertParticipants(bookingId, users, teamMateNames);
-//                            LOGGER.info("회의실 예약 유저 데이터: " + userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames));
-                            arr.put("success", roomType + " 예약 성공!");
+                    }else if(!usingUsers.isEmpty()){ //나박스일 때
+                        arr.put("fail", "현재 다른 회의실을 이용중이세요! ㅠㅠ 동시간대 예약은 불가합니다.");
+                        map.put("message", arr);
+                        return ResponseEntity.status(HttpStatus.OK).body(map);
+                    }else{
+                        // 신청하는 회의실 예약 확인
+                         boolean usingRoom = bookingService.findSameBooking(postBookingDataDto.getRoomId(),postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
+                        if(usingRoom) {
+                            arr.put("fail", "이미 예약이 완료된 회의실 입니다.ㅠㅠ");
                             map.put("message", arr);
                             return ResponseEntity.status(HttpStatus.OK).body(map);
-                        }else{ // 나박스일때
-                            int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.isOfficial());
-                            LOGGER.info("예약 성공한 bookingId: " + bookingId);
-                            participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId());
-//                            LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
-                            arr.put("success", roomType+" 예약 성공!");
-                            map.put("message", arr);
-                            return ResponseEntity.status(HttpStatus.OK).body(map);
+                        }else {
+                            // 예약 O
+                            // 회의실 일때
+                            if(roomType.equals("회의실")){
+                                int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
+                                LOGGER.info("예약 성공한 bookingId: " + bookingId);
+                                // 유저들 이름 종합
+                                List<User> users = userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames);
+                                participantsService.insertParticipants(bookingId, users, teamMateNames);
+                                //LOGGER.info("회의실 예약 유저 데이터: " + userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames));
+                                arr.put("success", roomType + " 예약 성공!");
+                                map.put("message", arr);
+                                return ResponseEntity.status(HttpStatus.OK).body(map);
+                            }else{ // 나박스일때
+                                int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
+                                LOGGER.info("예약 성공한 bookingId: " + bookingId);
+                                participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId());
+                                //LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
+                                arr.put("success", roomType+" 예약 성공!");
+                                map.put("message", arr);
+                                return ResponseEntity.status(HttpStatus.OK).body(map);
+                            }
                         }
                     }
                 }
             }
-        }
-        else{
-            arr.put("fail", roomType+"예약은 하루에 한번만 가능합니다!");
-            map.put("message", arr);
+            else{
+                arr.put("fail", roomType+"예약은 하루에 한번만 가능합니다!");
+                map.put("message", arr);
+               return ResponseEntity.status(HttpStatus.OK).body(map);
+            }
+       }else { // 매니저님들 공식일정 등록
+           String result = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
+           if (result.equals("success")) {
+               map.put(result, "공식 일정 등록 완료!");
+           } else {
+               map.put(result, "에러");
+           }
            return ResponseEntity.status(HttpStatus.OK).body(map);
-        }
-    }
+       }
+    }//
+
+
+//    @PostMapping(value = "/manager")
+//    public ResponseEntity<Map<String, Object>> OfficialSchedule(@RequestBody PostBookingDataDto postBookingDataDto){
+////        if(postBookingDataDto.getClasses() == 0){}
+//        System.out.println(postBookingDataDto);
+//        Map<String, Object> map = new HashMap<>();
+//        String result = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
+//        if(result.equals("success")){
+//            map.put(result, "공식 일정 등록 완료!");
+//        }else{
+//            map.put(result, "에러");
+//        }
+//        return ResponseEntity.status(HttpStatus.OK).body(map);
+//    }//
+
+
 
 
 
@@ -279,12 +304,6 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-//    @PostMapping(value = "/manager")
-//    public ResponseEntity<Map<String, Object>> forOfficialSchedule(OfficialBookingDataDto officialBookingDataDto){
-//        if(officialBookingDataDto.getClasses() == 0){
-//
-//        }
-//    }
 
 
 //    @ApiOperation(value = "[완료] 캘린더 상세 예약 정보")

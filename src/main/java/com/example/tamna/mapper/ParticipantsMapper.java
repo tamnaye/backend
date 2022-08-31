@@ -20,11 +20,11 @@ public interface ParticipantsMapper {
     List<BookingDataDto> selectBookingUser(@Param("today") Date today, @Param("roomType") String roomType, @Param("userId") String userId, @Param("userType") boolean userType);
 
     // 회의실예약 유저들 동시간대 회의실 사용 체크
-    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND CLASSES=#{classes} AND START_TIME BETWEEN #{startTime} AND #{endTime} AND USER_NAME IN (${usersName})")
+    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND CLASSES=#{classes} AND USER_NAME IN (${usersName}) AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime})")
     List<BookingDataDto> selectUsingUsers(@Param("today") Date today, @Param("classes") int classes, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("usersName") String usersName);
 
     // 나박스 예약시 유저 동시간대 회의실 사용 체크
-    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND USER_ID=#{userId} AND START_TIME BETWEEN #{startTime} AND #{endTime}")
+    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND USER_ID=#{userId} AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ")
     List<BookingDataDto> selectUsingOnlyUser(@Param("today")Date today, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("userId") String userId);
 
     // 예약 신청자와 멤버들 insert

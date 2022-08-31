@@ -19,5 +19,6 @@ public class DetailBookingDataDto {
     private String endTime;
     private Map<String, String> applicant;
     private List<String> participants;
+    private String mode;
     private boolean official;
 }

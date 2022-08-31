@@ -87,13 +87,13 @@ public class ParticipantsService {
 
         if(postBookingDataDto.getRoomType().equals("meeting")) {
             String usersName = userService.changeString(postBookingDataDto.getUserName(), postBookingDataDto.getTeamMate());
-            LOGGER.info("예약자 + 팀원들 이름: {}", usersName);
+            System.out.println("예약자 + 팀원들 이름: " + usersName);
             usingCheck = participantsMapper.selectUsingUsers(today, postBookingDataDto.getClasses(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), usersName);
         }else{
             usingCheck = participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId());
             System.out.println(participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId()));
         }
-        LOGGER.info("현재 회의실 사용중인 유저들: {}", usingCheck);
+        System.out.println("현재 회의실 사용중인 유저들: " + usingCheck);
 
         Set<String> usingUsers = new HashSet<>();
         if(usingCheck.isEmpty()){
