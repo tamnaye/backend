@@ -37,14 +37,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value="[완료] 같은 기수 유저들 이름 데이터 보내기")
-    @GetMapping("/all/names")
-    public ResponseEntity<Map<String, Object>> resUserNames(@RequestParam("classes") int classes){
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("userNames", userService.getUserNames(classes));
-        return ResponseEntity.status(HttpStatus.OK).body(map);
-    }
+//    @ApiOperation(value="[완료] 같은 기수 유저들 이름 데이터 보내기")
+//    @GetMapping("/all/names")
+//    public ResponseEntity<Map<String, Object>> resUserNames(@RequestParam("classes") int classes){
+//        Map<String, Object> map = new HashMap<>();
+//
+//        map.put("userNames", userService.getUserNames(classes));
+//        return ResponseEntity.status(HttpStatus.OK).body(map);
+//    }
 
     @ApiOperation(value = "[완료] 마이페이지 자기 예약 목록 보기")
     @GetMapping(value = "/mypage")

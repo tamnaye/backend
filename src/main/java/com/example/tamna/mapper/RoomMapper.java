@@ -16,4 +16,7 @@ public interface RoomMapper {
     // 층별 회의실 데이터
     @Select("SELECT * FROM ROOM WHERE FLOOR=#{floor}")
     List<Room> findFloorRoom(int floor);
+
+    @Select("SELECT * FROM ROOM WHERE ROOM_ID=#{roomId}")
+    Room findRoomId(int roomId);
 }

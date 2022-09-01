@@ -29,5 +29,10 @@ public class RoomService {
         return roomMapper.findFloorRoom(floor);
     }
 
+    public Room getRoomId(int roomId){
+        System.out.println(roomMapper.findRoomId(roomId));
+        return roomMapper.findRoomId(roomId);
+    }
+
 
 }

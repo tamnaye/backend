@@ -2,6 +2,7 @@ package com.example.tamna.config.jwt;
 
 import com.example.tamna.config.auth.PrincipalDetailsService;
 import com.example.tamna.mapper.AuthMapper;
+import com.example.tamna.model.Token;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -19,6 +20,7 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 // 토큰 생성, 유효성 검증
 @Component
@@ -103,6 +105,13 @@ public class JwtProvider implements InitializingBean {
         return refreshToken;
     }
 
+//    >> 리프레시 토큰 디비에서 가져와서 확인하기 !!!
+//    그래서 거기에 해당되는 유저아이디 받아서,~ 썅
+
+    // refresh DB 에서 검색
+    public Token checkRefresh(String refreshToken){
+        return authMapper.findToken(refreshToken);
+    }
 
     // access토큰에서 아이디 추출
     public String getUserIdFromJwt(String accessToken){
@@ -125,37 +134,48 @@ public class JwtProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
     }
 
-    // 헤더에서 가져오기
-    public List<String> getHeaderToken(HttpServletRequest request){
-        List<String> bearerToken = new ArrayList<>();
-
-        bearerToken.add(request.getHeader(AUTHORIZATION_HEADER));
-        bearerToken.add(request.getHeader(REAUTHORIZATION_HEADER));
-
-        for(int i=0; i < bearerToken.toArray().length; i++){
-            String token = bearerToken.get(i);
-            if (StringUtils.hasText(token) && token.startsWith("Bearer ")){
-                bearerToken.set(i, token.substring(7));
-            }
+    // 헤더에서 accessToken 가져오기
+    public String getHeaderAccessToken(HttpServletRequest request){
+        String bearerAccessToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerAccessToken) && bearerAccessToken.startsWith("Bearer ")){
+            bearerAccessToken = bearerAccessToken.substring(7);
         }
-        return bearerToken;
+        return bearerAccessToken;
     }
 
+    // 헤더에서 refreshToken 가져오기
+    public String getHeaderRefreshToken(HttpServletRequest request){
+        String bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
+            bearerRefreshToken = bearerRefreshToken.substring(7);
+        }
+
+        return bearerRefreshToken;
+    }
+
+
     // Jwt 유효성 검사
-    public boolean validateToken(String token){
+    public List<Object> validateToken(String token){
+        List<Object> result = new ArrayList<>();
         try{
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
-        }catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e){
-            System.out.println("잘못된 JWT 서명");
+            result.add(!claims.getBody().getExpiration().before(new Date()));
+            result.add("success");
+            return result;
         }catch (ExpiredJwtException e){
             System.out.println("만료된 JWT");
+            result.add(true);
+            result.add("fail");
+            return result;
+        }catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            System.out.println("잘못된 JWT 서명");
         }catch (UnsupportedJwtException e){
             System.out.println("지원되지 않는 JWT");
         }catch (IllegalStateException e){
             System.out.println("JWT 토큰 잘못됨");
         }
-        return false;
+        result.add(false);
+        return result;
     }
 
 

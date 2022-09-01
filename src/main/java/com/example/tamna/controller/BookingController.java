@@ -40,21 +40,38 @@ public class BookingController {
     }
 
 
-    @ApiOperation(value = "[완료]층수 회의실 데이터, 회의실별 예약 현황", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
-    @GetMapping(value = "")
-    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("floor") int floor, @RequestParam("roomId") int roomId) {
+    @ApiOperation(value = "[완료] 현정 내비", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
+    @GetMapping(value = "/room-data")
+    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("floor") int floor){
         Map<String, Object> map = new HashMap<>();
         if (floor == 2 || floor == 3) {
             map.put("roomData", roomService.getFloorRoom(floor));
         } else {
             map.put("roomData", roomService.roomList());
         }
-        map.put("bookingData", bookingService.roomBookingState(roomId));
         return ResponseEntity.status(HttpStatus.OK).body(map);
-    }
+    };
 
-    ;
+//
+//    @ApiOperation(value = "[완료] 현정 내비~", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
+//    @GetMapping(value = "/room-data")
+//    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("floor") int floor){
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("roomData", roomService.roomList());
+//        return ResponseEntity.status(HttpStatus.OK).body(map);
+//    };
 
+
+    @ApiOperation(value = "[완료] 층수 회의실 데이터, 회의실별 예약 현황", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
+    @GetMapping(value = "")
+    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("roomId") int roomId, @RequestParam("userId") String userId, @RequestParam("classes") int classes){
+        Map<String, Object> map = new HashMap<>();
+        map.put("userData", userService.getUserData(userId));
+        map.put("roomData", roomService.getRoomId(roomId));
+        map.put("bookingData", bookingService.roomBookingState(roomId));
+        map.put("namesData", userService.getUserNames(classes));
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    };
 
     @ApiOperation(value = " [완료] 메인 회의실, 예약 데이터 보내기", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
     @ResponseBody
@@ -69,9 +86,8 @@ public class BookingController {
             map.put("BookingData", bookingService.allRoomBookingState());
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
-    }
+    }//
 
-    ;
 
     @ApiOperation(value = " [완료] 예약 현황 페이지 데이터", notes = "@Param(floor)가 2,3층이면 각 층 데이터")
     @GetMapping(value = "/details-booking")
@@ -178,7 +194,7 @@ public class BookingController {
 //        }
 //    }
 
-
+    @ApiOperation(value = " [완료] 예약하기")
     @PostMapping(value = "/conference")
     public ResponseEntity<Map<String, Object>> conferenceRoomBooking(@RequestBody PostBookingDataDto postBookingDataDto) {
         List<String> teamMateNames = postBookingDataDto.getTeamMate();
@@ -255,7 +271,8 @@ public class BookingController {
        }else { // 매니저님들 공식일정 등록
            String result = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
            if (result.equals("success")) {
-               map.put(result, "공식 일정 등록 완료!");
+               arr.put(result, "공식 일정 등록 완료!");
+               map.put("message", arr);
            } else {
                map.put(result, "에러");
            }
@@ -279,9 +296,6 @@ public class BookingController {
 //    }//
 
 
-
-
-
     @Data
     static class BookingId{
         private int bookingId;
@@ -303,18 +317,5 @@ public class BookingController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
-
-
-
-//    @ApiOperation(value = "[완료] 캘린더 상세 예약 정보")
-//    @GetMapping(value = "/details-booking")
-//    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> detailsBookingData(@RequestParam("roomId") int roomId, @RequestParam("startTime") String startTime){
-//        Map<String, Object> map = new HashMap<>();
-//        DetailBookingDataDto detailData = bookingService.findDetailBookingData(roomId, startTime);
-//        map.put("detailBookingData", detailData);
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    }
-
 
 }
