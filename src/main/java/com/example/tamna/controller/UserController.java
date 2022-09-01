@@ -46,6 +46,7 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.OK).body(map);
 //    }
 
+
     @ApiOperation(value = "[완료] 마이페이지 자기 예약 목록 보기")
     @GetMapping(value = "/mypage")
     public ResponseEntity<Map<String, Object>> myBookingState(@RequestParam("userId") String userId){

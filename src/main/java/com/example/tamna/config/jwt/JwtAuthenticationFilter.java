@@ -1,8 +1,11 @@
 package com.example.tamna.config.jwt;
 
 import com.example.tamna.model.Token;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.*;
@@ -11,15 +14,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-
+@NoArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-//
+
+    private AntPathMatcher antPathMatcher;
+    private String pattern;
     private JwtProvider jwtProvider;
-//
-//    // response.addHeader 해더로 보내는 함수!!!
-//
-    public JwtAuthenticationFilter(JwtProvider jwtProvider){
+
+    @Autowired
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, String pattern){
         this.jwtProvider = jwtProvider;
+        this.antPathMatcher = new AntPathMatcher();
+        this.pattern = pattern;
     }
 
     @Override
@@ -43,6 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         if (refreshResult.toArray().length > 1 && refreshResult.get(1).equals("success")) {
                             // accessToken 재발급
 //                            jwtProvider.createAccessToken()
+                            //    // response.addHeader 해더로 보내는 함수!!!
                         }
                     }
 
@@ -51,6 +58,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         filterChain.doFilter(request, response);
         }
+
+
+
     }
 
 

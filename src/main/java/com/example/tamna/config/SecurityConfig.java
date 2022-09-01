@@ -1,5 +1,7 @@
 package com.example.tamna.config;
 
+import com.example.tamna.config.jwt.JwtAuthenticationFilter;
+import com.example.tamna.config.jwt.JwtProvider;
 import com.example.tamna.filter.MyFilter3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.filter.CorsFilter;
 
@@ -43,6 +46,7 @@ public class SecurityConfig {
 //                .antMatchers("/api/login/**").permitAll() // /api/auth/ 는 security 적용 x
 //                .anyRequest().authenticated()// 나머지 API 전부 인증 필요
                 .antMatchers("/api/**").permitAll(); // 403에러 임시 방편
+
         return http.build();
 
     }
