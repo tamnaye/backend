@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor // final이 붙거나 @NotNull이 붙은 필드의 생성자를 자동 생성해주는 어노테이션
+//@RequiredArgsConstructor // final이 붙거나 @NotNull이 붙은 필드의 생성자를 자동 생성해주는 어노테이션
 public class PrincipalDetailsService implements UserDetailsService {
 
     private UserService userService;
@@ -25,7 +25,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 
         System.out.println("PrincipalDetailsService: 진입");
         User user = userService.getUserData(userId);
-
+        System.out.println("user: " + user);
         return new PrincipalDetails(user);
     }
 

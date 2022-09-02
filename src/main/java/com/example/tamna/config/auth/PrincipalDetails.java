@@ -3,9 +3,12 @@ package com.example.tamna.config.auth;
 import com.example.tamna.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +17,7 @@ import java.util.List;
 // Security에서 사용자의 정보를 담는 인터페이스
 @Data
 @NoArgsConstructor
+@Component
 public class PrincipalDetails implements UserDetails {
 
     private User user;
@@ -25,6 +29,8 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
+        System.out.println(user.getUserId());
+        System.out.println(user.getRoles());
         if (user.getRoles().equals("MANAGER")){
             authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
         }else{

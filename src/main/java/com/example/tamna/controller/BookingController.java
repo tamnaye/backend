@@ -247,6 +247,7 @@ public class BookingController {
                                 List<User> users = userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames);
                                 participantsService.insertParticipants(bookingId, users, teamMateNames);
                                 //LOGGER.info("회의실 예약 유저 데이터: " + userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames));
+
                                 arr.put("success", roomType + " 예약 성공!");
                                 map.put("message", arr);
                                 return ResponseEntity.status(HttpStatus.OK).body(map);

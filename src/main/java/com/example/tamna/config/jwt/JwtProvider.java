@@ -105,9 +105,6 @@ public class JwtProvider implements InitializingBean {
         return refreshToken;
     }
 
-//    >> 리프레시 토큰 디비에서 가져와서 확인하기 !!!
-//    그래서 거기에 해당되는 유저아이디 받아서,~ 썅
-
     // refresh DB 에서 검색
     public Token checkRefresh(String refreshToken){
         return authMapper.findToken(refreshToken);
@@ -130,7 +127,7 @@ public class JwtProvider implements InitializingBean {
 
     // 인증 선공시 SecurityContextHolder에 저장할 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
-        UserDetails principalDetails = principalDetailsService.loadUserByUsername(getUserIdFromJwt(token));
+         UserDetails principalDetails = principalDetailsService.loadUserByUsername(getUserIdFromJwt(token));
         return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
     }
 

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,13 +23,12 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private final CorsFilter corsFilter;
+    private final AuthenticationConfiguration authConfiguration;
 
-//    @Bean
-//    public AuthenticationManager authenticationManager() throws Exception{
-//
-//        return
-//
-//    }
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception{
+        return authConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public SecurityFilterChain filterChain (HttpSecurity http) throws Exception {
@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .authorizeRequests()
 //                .antMatchers("/api/tamna/admin/**")
 //                .access("hasRole('ROLE_ADMIN')")
-//                .antMatchers("/api/login/**").permitAll() // /api/auth/ 는 security 적용 x
+                .antMatchers("/api/user/**").permitAll() // /api/auth/ 는 security 적용 x
 //                .anyRequest().authenticated()// 나머지 API 전부 인증 필요
                 .antMatchers("/api/**").permitAll(); // 403에러 임시 방편
 

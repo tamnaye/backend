@@ -229,7 +229,7 @@ public class BookingService {
 
     // 공식일정으로 인한 예약 수정
     public String updateBooking(int roomId, String userId, String startTime, String endTime, boolean official) {
-        System.out.println(startTime);
+//        System.out.println(startTime);
         List<Booking> sameBooking = bookingMapper.findSameBooking(today, roomId, startTime, endTime);
             System.out.println(sameBooking);
         if (!sameBooking.isEmpty()) {
