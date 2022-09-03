@@ -27,7 +27,7 @@ public class BookingService {
     private RoomMapper roomMapper;
     private BookingMapper bookingMapper;
     private ParticipantsMapper participantsMapper;
-    private Date today;
+    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
     @Autowired
     public BookingService(UserMapper userMapper, RoomMapper roomMapper, BookingMapper bookingMapper, ParticipantsMapper participantsMapper) {
@@ -35,7 +35,6 @@ public class BookingService {
         this.roomMapper = roomMapper;
         this.bookingMapper = bookingMapper;
         this.participantsMapper = participantsMapper;
-        this.today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
     }
 
 

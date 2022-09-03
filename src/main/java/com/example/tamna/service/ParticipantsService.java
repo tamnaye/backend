@@ -26,7 +26,7 @@ public class ParticipantsService {
 
     private ParticipantsMapper participantsMapper;
     private UserService userService;
-    private Date today;
+    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
 
 
@@ -35,7 +35,6 @@ public class ParticipantsService {
     public ParticipantsService(ParticipantsMapper participantsMapper, UserService userService){
         this.participantsMapper = participantsMapper;
         this.userService = userService;
-        this.today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
     }
 
     // 예약자 확인
