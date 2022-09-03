@@ -327,11 +327,11 @@ public class BookingController {
         if(!booking.isOfficial()){
             checkCancel = bookingService.deleteBooking(intBookingId);
         }else{
-            checkCancel = bookingService.deleteOfficialBooking(intBookingId);
+            checkCancel = bookingService.deleteOfficialBooking(intBookingId, booking);
         }
 
         if(checkCancel.equals("success")){
-            map.put(checkCancel, "예약 취소가 완료되었습니다.");
+            map.put(checkCancel, "예약 취소가 완료되었습니다ð");
         }
         else{
             map.put(checkCancel, "예약 취소에 실패하였습니다.");

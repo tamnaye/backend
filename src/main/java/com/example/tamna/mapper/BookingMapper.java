@@ -61,7 +61,7 @@ public interface BookingMapper {
     @Update("UPDATE BOOKING SET MODE=#{mode} WHERE BOOKING_ID IN (${bookingsId})")
     int updateBookingMode(@Param("bookingsId") String bookingsId, @Param("mode") String mode);
 
-    // 공식일정 취소시) 공식일정 조회
+    // bookingId만으로 조회
     @Select("SELECT *  FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
     Booking selectOfficial(int bookingId);
 

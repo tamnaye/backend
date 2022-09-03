@@ -117,8 +117,6 @@ public class BookingService {
         if(bookingId.toArray().length != 1){
             System.out.println(minBookingId);
             for(int i : bookingId){
-                System.out.println(i);
-                System.out.println(bookingId);
                 if(minBookingId != i){
                     bookingMapper.deleteBooking(i);
                     participantsMapper.deleteParticipants(i);
@@ -216,22 +214,19 @@ public class BookingService {
     }
 
     // 공식 일정 취소
-    public String deleteOfficialBooking(int bookingId) {
-        Booking officialBooking = bookingMapper.selectOfficial(bookingId);
-        if (officialBooking != null) {
-            List<Integer> canceledBooking = bookingMapper.selectCancelBooking(today, officialBooking.getRoomId(), officialBooking.getStartTime(), officialBooking.getEndTime());
-            if (!canceledBooking.isEmpty()) {
-                String bookingsIdString = addBookingId(canceledBooking);
-                System.out.println(bookingsIdString);
-                int updateResultCount = bookingMapper.updateBookingMode(bookingsIdString, null);
-                System.out.println("updateResultCount :" + updateResultCount);
-            }
-            int deleteBooking = bookingMapper.deleteBooking(bookingId);
-            int deleteParticipants = participantsMapper.deleteParticipants(bookingId);
-            System.out.println(deleteBooking + deleteParticipants);
-            if (deleteBooking == 1 && deleteParticipants >= 1) {
-                return "success";
-            }
+    public String deleteOfficialBooking(int bookingId, Booking booking) {
+        List<Integer> canceledBooking = bookingMapper.selectCancelBooking(today, booking.getRoomId(), booking.getStartTime(), booking.getEndTime());
+        if (!canceledBooking.isEmpty()) {
+            String bookingsIdString = addBookingId(canceledBooking);
+            System.out.println(bookingsIdString);
+            int updateResultCount = bookingMapper.updateBookingMode(bookingsIdString, null);
+            System.out.println("updateResultCount :" + updateResultCount);
+        }
+        int deleteBooking = bookingMapper.deleteBooking(bookingId);
+        int deleteParticipants = participantsMapper.deleteParticipants(bookingId);
+        System.out.println(deleteBooking + deleteParticipants);
+        if (deleteBooking == 1 && deleteParticipants >= 1) {
+            return "success";
         }
         return "fail";
     }
@@ -239,7 +234,6 @@ public class BookingService {
 
     // 공식일정으로 인한 예약 수정
     public int updateBooking(int roomId, String userId, String startTime, String endTime, boolean official) {
-//        System.out.println(startTime);
         List<Integer> sameBooking = bookingMapper.findSameBooking(today, roomId, startTime, endTime);
             System.out.println(sameBooking);
         if (!sameBooking.isEmpty()){
