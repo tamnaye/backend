@@ -44,7 +44,7 @@ public class BookingController {
     @GetMapping(value = "/room-data")
     public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("floor") int floor){
         Map<String, Object> map = new HashMap<>();
-        if (floor == 2 || floor == 3) {
+        if (floor == 2 || floor == 3 || floor == 4) {
             map.put("roomData", roomService.getFloorRoom(floor));
         } else {
             map.put("roomData", roomService.roomList());
@@ -78,7 +78,7 @@ public class BookingController {
     @GetMapping(value = "/main")
     public ResponseEntity<Map<String, Object>> getUsers(@RequestParam("floor") int floor) {
         Map<String, Object> map = new HashMap<>();
-        if (floor == 2 || floor == 3) {
+        if (floor == 2 || floor == 3 || floor == 4) {
             map.put("RoomData", roomService.getFloorRoom(floor));
             map.put("BookingData", bookingService.floorBookingData(floor));
         } else {

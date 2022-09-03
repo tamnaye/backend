@@ -141,11 +141,21 @@ public class BookingService {
 //    }
 
 
-    // 회의실 예약
+    // 회의실 예약 및 동시 예약 불가 처리
     public int insertBooking(int roomId, String startTime, String endTime, boolean official) {
         bookingMapper.insertBooking(today, roomId, startTime, endTime, official);
-        int bookingId = bookingMapper.selectResultInsert(today, roomId, startTime, endTime, official);
-        return bookingId;
+        List<Integer> bookingId = bookingMapper.selectResultInsert(today, roomId, startTime, endTime);
+        int minBookingId = Collections.min(bookingId);
+        System.out.println("최소 bookingId: " + minBookingId);
+        if(bookingId.toArray().length != 1){
+            System.out.println(minBookingId);
+            for(int i : bookingId){
+                if(minBookingId != i){
+                    bookingMapper.deleteBooking(i);
+                }
+            }
+        }
+        return minBookingId;
     }
 
     // bookingId들 한번에 검색
