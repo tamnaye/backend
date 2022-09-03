@@ -29,8 +29,6 @@ public class ParticipantsService {
     private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
 
-
-
     @Autowired
     public ParticipantsService(ParticipantsMapper participantsMapper, UserService userService){
         this.participantsMapper = participantsMapper;
@@ -71,7 +69,6 @@ public class ParticipantsService {
             List<BookingDataDto> user = participantsMapper.selectBookingUser(today, roomType, userId, true);
             System.out.println(participantsMapper.selectBookingUser(today, roomType, userId,true));
             if(user.isEmpty()){
-                System.out.println(user.isEmpty());
                 System.out.println(roomType +" 예약 한 적 없음. 예약 가능");
                 return true;
             }else{
