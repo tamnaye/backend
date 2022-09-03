@@ -16,7 +16,6 @@ public class FeedbackService {
     private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
     @Autowired
-
     public FeedbackService(FeedbackMapper feedbackMapper) {
         this.feedbackMapper = feedbackMapper;
     }

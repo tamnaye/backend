@@ -3,7 +3,6 @@ package com.example.tamna.mapper;
 import com.example.tamna.dto.BookingDataDto;
 import com.example.tamna.model.Participants;
 import org.apache.ibatis.annotations.*;
-import org.springframework.security.core.parameters.P;
 
 import java.sql.Date;
 import java.util.List;

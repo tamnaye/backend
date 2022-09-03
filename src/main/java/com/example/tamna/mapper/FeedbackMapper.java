@@ -1,11 +1,9 @@
 package com.example.tamna.mapper;
 
-import com.example.tamna.model.Feedback;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.security.core.parameters.P;
 
 import java.sql.Date;
 import java.util.List;

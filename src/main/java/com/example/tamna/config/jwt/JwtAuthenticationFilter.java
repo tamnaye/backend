@@ -64,9 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
 
-
-
-
 //public class JwtAuthenticationFilter extends GenericFilterBean {
 //
 //    private JwtProvider jwtProvider;

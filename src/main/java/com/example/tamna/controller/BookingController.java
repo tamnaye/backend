@@ -2,12 +2,9 @@ package com.example.tamna.controller;
 
 import com.example.tamna.dto.*;
 
-import com.example.tamna.model.Feedback;
 import com.example.tamna.model.User;
 import com.example.tamna.service.*;
 
-import com.fasterxml.jackson.databind.deser.std.ObjectArrayDeserializer;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -51,15 +48,6 @@ public class BookingController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     };
-
-//
-//    @ApiOperation(value = "[완료] 현정 내비~", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
-//    @GetMapping(value = "/room-data")
-//    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("floor") int floor){
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("roomData", roomService.roomList());
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    };
 
 
     @ApiOperation(value = "[완료] 층수 회의실 데이터, 회의실별 예약 현황", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
@@ -270,13 +258,12 @@ public class BookingController {
                return ResponseEntity.status(HttpStatus.OK).body(map);
             }
        }else { // 매니저님들 공식일정 등록
-           String result = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
-           if (result.equals("success")) {
-               arr.put(result, "공식 일정 등록 완료!");
-               map.put("message", arr);
-           } else {
-               map.put(result, "에러");
-           }
+           int resultBookingId = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
+           List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
+           participantsService.insertParticipants(resultBookingId, users, postBookingDataDto.getTeamMate());
+           arr.put("success", "공식 일정 등록 완료!");
+           map.put("message", arr);
+
            return ResponseEntity.status(HttpStatus.OK).body(map);
        }
     }//

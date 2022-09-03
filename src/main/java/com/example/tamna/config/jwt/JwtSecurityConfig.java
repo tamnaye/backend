@@ -1,6 +1,5 @@
 package com.example.tamna.config.jwt;
 
-import io.jsonwebtoken.Jwt;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

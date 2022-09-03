@@ -2,7 +2,6 @@ package com.example.tamna.config.auth;
 
 import com.example.tamna.model.User;
 import com.example.tamna.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

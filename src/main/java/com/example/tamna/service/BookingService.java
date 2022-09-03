@@ -107,40 +107,6 @@ public class BookingService {
 
     }
 
-//    // 회의실별 예약된 디테일 정보
-//    public DetailBookingDataDto findDetailBookingData(int roomId, String startTime){
-//        List<JoinBooking> detailData = bookingMapper.findDetailBookingData(today, roomId, startTime);
-//        System.out.println(bookingMapper.findDetailBookingData(today, roomId, startTime));
-//        DetailBookingDataDto combineData = new DetailBookingDataDto();
-//        if(!detailData.isEmpty()) {
-//            Map<String, String> applicants = new HashMap<>();
-//            List<String> teamMate = new ArrayList<>();
-//            for (int i = 0; i < detailData.toArray().length; i++) {
-//                if (detailData.get(i).isUserType()) {
-//                    applicants.put("userId", detailData.get(i).getUserId());
-//                    applicants.put("userName", detailData.get(i).getUserName());
-//                    combineData.setApplicant(applicants);
-//                } else {
-//                    teamMate.add(detailData.get(i).getUserName());
-//                }
-//            }
-//            combineData.setBookingId(detailData.get(0).getBookingId());
-//            combineData.setRoomId(detailData.get(0).getRoomId());
-//            combineData.setRoomName(detailData.get(0).getRoomName());
-//            combineData.setStartTime(detailData.get(0).getStartTime());
-//            combineData.setEndTime(detailData.get(0).getEndTime());
-//            combineData.setRoomType(detailData.get(0).getRoomType());
-//            combineData.setOfficial(detailData.get(0).isOfficial());
-//            combineData.setParticipants(teamMate);
-//
-//            return combineData;
-//        }else{
-//            combineData = null;
-//            return combineData;
-//        }
-//    }
-
-
     // 회의실 예약 및 동시 예약 불가 처리
     public int insertBooking(int roomId, String startTime, String endTime, boolean official) {
         bookingMapper.insertBooking(today, roomId, startTime, endTime, official);
@@ -223,6 +189,7 @@ public class BookingService {
         return allMyBookingData;
     };
 
+
     // 예약 취소
     public String deleteBooking(int bookingId){
         int checkBookingDelete = bookingMapper.deleteBooking(bookingId);
@@ -237,7 +204,7 @@ public class BookingService {
 
 
     // 공식일정으로 인한 예약 수정
-    public String updateBooking(int roomId, String userId, String startTime, String endTime, boolean official) {
+    public int updateBooking(int roomId, String userId, String startTime, String endTime, boolean official) {
 //        System.out.println(startTime);
         List<Booking> sameBooking = bookingMapper.findSameBooking(today, roomId, startTime, endTime);
             System.out.println(sameBooking);
@@ -252,10 +219,7 @@ public class BookingService {
             System.out.println("updateCount" + updateResultCount);
         }
         int resultBookingId = insertBooking(roomId, startTime, endTime, official);
-        int resultParticipant = participantsMapper.insertParticipants(resultBookingId, userId, true);
-        System.out.println(resultBookingId + " + " + resultParticipant);
-        return "success";
-
+        return resultBookingId;
     }
 
 
