@@ -2,6 +2,7 @@ package com.example.tamna.controller;
 
 import com.example.tamna.dto.*;
 
+import com.example.tamna.model.Booking;
 import com.example.tamna.model.User;
 import com.example.tamna.service.*;
 
@@ -236,7 +237,7 @@ public class BookingController {
                                 participantsService.insertParticipants(bookingId, users, teamMateNames);
                                 //LOGGER.info("회의실 예약 유저 데이터: " + userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames));
 
-                                arr.put("success", roomType + " 예약 성공!");
+                                arr.put("success", roomType + " 예약 성공!✅");
                                 map.put("message", arr);
                                 return ResponseEntity.status(HttpStatus.OK).body(map);
                             }else{ // 나박스일때
@@ -258,12 +259,39 @@ public class BookingController {
                return ResponseEntity.status(HttpStatus.OK).body(map);
             }
        }else { // 매니저님들 공식일정 등록
-           int resultBookingId = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
-           List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
-           participantsService.insertParticipants(resultBookingId, users, postBookingDataDto.getTeamMate());
-           arr.put("success", "공식 일정 등록 완료!");
-           map.put("message", arr);
+           // 4층이 아닐경우 공식일정
+//           if(postBookingDataDto.getRoomId() / 100 != 4) {
+           List<Boolean> checkOfficial = bookingService.checkOfficial(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
+           if(!checkOfficial.isEmpty()){
+               arr.put("fail", "이미 공식일정이 등록되어있습니다!ㅠㅠ");
+               map.put("message", arr);
+           }else {
+               int resultBookingId = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
+               List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
+               System.out.println(users);
+               participantsService.insertParticipants(resultBookingId, users, postBookingDataDto.getTeamMate());
 
+               arr.put("success", "공식 일정 등록 완료!");
+               map.put("message", arr);
+           }
+//           }
+//           else{ // 4층일 경우
+//               boolean usingRoom = bookingService.findSameBooking(postBookingDataDto.getRoomId(),postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
+//               if(usingRoom) {
+//                   arr.put("fail", "이미 예약이 완료된 회의실 입니다.ㅠㅠ");
+//                   map.put("message", arr);
+//               }else {
+//                   int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
+//                   LOGGER.info("예약 성공한 bookingId: " + bookingId);
+//                   // 유저들 이름 종합
+//                   List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
+//                   participantsService.insertParticipants(bookingId, users, teamMateNames);
+//                   //LOGGER.info("회의실 예약 유저 데이터: " + userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames));
+//
+//                   arr.put("success", roomType + "예약 성공!✅");
+//                   map.put("message", arr);
+//               }
+//           }
            return ResponseEntity.status(HttpStatus.OK).body(map);
        }
     }//
@@ -294,15 +322,21 @@ public class BookingController {
     public ResponseEntity<Map<String, Object>> cancelBooking(@RequestBody BookingId bookingId){
         Map<String, Object> map = new HashMap<>();
         int intBookingId = bookingId.bookingId;
-        System.out.println(bookingId);
-        System.out.println(intBookingId);
-        String checkCancel = bookingService.deleteBooking(intBookingId);
+        Booking booking = bookingService.selectBookingId(intBookingId);
+        String checkCancel;
+        if(!booking.isOfficial()){
+            checkCancel = bookingService.deleteBooking(intBookingId);
+        }else{
+            checkCancel = bookingService.deleteOfficialBooking(intBookingId);
+        }
+
         if(checkCancel.equals("success")){
             map.put(checkCancel, "예약 취소가 완료되었습니다.");
         }
         else{
             map.put(checkCancel, "예약 취소에 실패하였습니다.");
         }
+
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 

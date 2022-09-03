@@ -37,7 +37,6 @@ public class UserService {
 
     // 같은 기수 유저들 이름 모두 가져오기
     public List<String> getUserNames(int classes) {
-        System.out.println(userMapper.findUserNamesByClasses(classes).getClass().getName());
         return userMapper.findUserNamesByClasses(classes);
     }
 

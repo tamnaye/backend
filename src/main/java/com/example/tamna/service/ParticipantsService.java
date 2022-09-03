@@ -53,10 +53,11 @@ public class ParticipantsService {
 
     // 회의실 예약 신청자와 멤버 구분하여 insert
     public void insertParticipants(int bookingId, List<User> usersData, List<String> teamMate){
+        System.out.println(usersData);
         for(int i=0; i< usersData.toArray().length; i++){
             User user = usersData.get(i);
             if(!teamMate.contains(user.getUserName())){
-                participantsMapper.insertParticipants(bookingId, user.getUserId(), true);
+                participantsMapper.insertParticipants(bookingId, user.getUserId(), true);;
             } else{
                 participantsMapper.insertParticipants(bookingId, user.getUserId(), false);
             }
