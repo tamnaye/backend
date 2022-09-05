@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 //@RequiredArgsConstructor // final이 붙거나 @NotNull이 붙은 필드의 생성자를 자동 생성해주는 어노테이션
 public class PrincipalDetailsService implements UserDetailsService {
 
+    @Autowired
     private UserService userService;
 
     @Autowired

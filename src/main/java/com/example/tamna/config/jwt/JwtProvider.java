@@ -17,10 +17,11 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 // 토큰 생성, 유효성 검증
 @Component
@@ -28,6 +29,7 @@ public class JwtProvider implements InitializingBean {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String REAUTHORIZATION_HEADER = "reAuthorization";
+    private java.sql.Date today = java.sql.Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -100,7 +102,7 @@ public class JwtProvider implements InitializingBean {
 
         System.out.println("refreshToken" + refreshToken);
 
-        int success = authMapper.insertToken(userId, refreshToken);
+        int success = authMapper.insertToken(today, userId, refreshToken);
         System.out.println(success);
         return refreshToken;
     }

@@ -13,7 +13,9 @@ import java.util.List;
 public class FeedbackService {
 
     private FeedbackMapper feedbackMapper;
-    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
+    private static long miliseconds = System.currentTimeMillis();
+    private final Date today = new Date(miliseconds);
+//    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
     @Autowired
     public FeedbackService(FeedbackMapper feedbackMapper) {

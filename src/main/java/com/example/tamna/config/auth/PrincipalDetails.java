@@ -3,8 +3,6 @@ package com.example.tamna.config.auth;
 import com.example.tamna.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +18,9 @@ import java.util.List;
 @Component
 public class PrincipalDetails implements UserDetails {
 
+    private List<GrantedAuthority> authorities;
     private User user;
+    private String userId;
 
     public PrincipalDetails(User user) {
         this.user = user;
@@ -28,8 +28,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        System.out.println(user.getUserId());
+        authorities = new ArrayList<>();
         System.out.println(user.getRoles());
         if (user.getRoles().equals("MANAGER")){
             authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));

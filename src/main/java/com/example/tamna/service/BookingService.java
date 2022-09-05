@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -27,7 +25,9 @@ public class BookingService {
     private RoomMapper roomMapper;
     private BookingMapper bookingMapper;
     private ParticipantsMapper participantsMapper;
-    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
+    private long miliseconds = System.currentTimeMillis();
+    private Date today = new Date(miliseconds);
+//    private Date today =  Date.valueOf(new LocalDate.(ZoneId.of("Asia/Seoul")));
 
     @Autowired
     public BookingService(UserMapper userMapper, RoomMapper roomMapper, BookingMapper bookingMapper, ParticipantsMapper participantsMapper) {
@@ -70,6 +70,7 @@ public class BookingService {
     public List<DetailBookingDataDto> floorDetailBookingData(int floor){
         List<DetailBookingDataDto> floorDetailBooking = new ArrayList<>();
         List<Booking> floorBooking = bookingMapper.findByFloor(today, floor);
+        System.out.println(today);
         System.out.println("floorBooking: " + floorBooking);
         for(int k=0; k < floorBooking.toArray().length; k ++){
             int roomId = floorBooking.get(k).getRoomId();
@@ -113,9 +114,8 @@ public class BookingService {
         List<Integer> bookingId = bookingMapper.selectResultInsert(today, roomId, startTime, endTime);
         System.out.println(bookingId);
         int minBookingId = Collections.min(bookingId);
-        System.out.println("최소 bookingId: " + minBookingId);
         if(bookingId.toArray().length != 1){
-            System.out.println(minBookingId);
+            System.out.println("최소 bookingId: " + minBookingId);
             for(int i : bookingId){
                 if(minBookingId != i){
                     bookingMapper.deleteBooking(i);
@@ -152,7 +152,7 @@ public class BookingService {
         if(bookingIdString != null){
             // bookingId들 문자열로 변환 후 한번에 데이터들 모두 조회
             List<JoinBooking> myBookingList = bookingMapper.findMyBookingData(bookingIdString);
-            System.out.println(bookingMapper.findMyBookingData(addBookingId(bookingIdList)));
+//            System.out.println(bookingMapper.findMyBookingData(addBookingId(bookingIdList)));
 
             if(!myBookingList.isEmpty()){
                 for(int i : bookingIdList){

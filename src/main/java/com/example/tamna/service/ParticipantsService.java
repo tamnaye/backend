@@ -26,7 +26,9 @@ public class ParticipantsService {
 
     private ParticipantsMapper participantsMapper;
     private UserService userService;
-    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
+    private long miliseconds = System.currentTimeMillis();
+    private Date today = new Date(miliseconds);
+//    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
 
     @Autowired
@@ -66,9 +68,9 @@ public class ParticipantsService {
 
     // 회의실 횟수 한번 제한을 위한 체크
     public boolean checkBookingUser(String roomType, String userId){
-            List<BookingDataDto> user = participantsMapper.selectBookingUser(today, roomType, userId, true);
-            System.out.println(participantsMapper.selectBookingUser(today, roomType, userId,true));
-            if(user.isEmpty()){
+        int sameRoomTypeBookingCount = participantsMapper.selectBookingUser(today, roomType, userId, true);
+        System.out.println("@#@#@$@@$@$@$@$@$@$@ $@$ @#$ #@$ @#$ @" + sameRoomTypeBookingCount);
+            if(sameRoomTypeBookingCount == 0){
                 System.out.println(roomType +" 예약 한 적 없음. 예약 가능");
                 return true;
             }else{

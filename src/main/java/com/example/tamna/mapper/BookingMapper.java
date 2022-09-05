@@ -2,9 +2,7 @@ package com.example.tamna.mapper;
 
 import com.example.tamna.model.Booking;
 import com.example.tamna.model.JoinBooking;
-import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.*;
-import org.springframework.security.core.parameters.P;
 
 
 import java.sql.Date;
