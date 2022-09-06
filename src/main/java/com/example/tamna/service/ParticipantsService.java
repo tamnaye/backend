@@ -26,10 +26,6 @@ public class ParticipantsService {
 
     private ParticipantsMapper participantsMapper;
     private UserService userService;
-    private long miliseconds = System.currentTimeMillis();
-    private final Date today = new Date(miliseconds);
-//    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
-
 
     @Autowired
     public ParticipantsService(ParticipantsMapper participantsMapper, UserService userService){
@@ -37,8 +33,14 @@ public class ParticipantsService {
         this.userService = userService;
     }
 
+    public Date time() {
+        long miliseconds = System.currentTimeMillis();
+        return new Date(miliseconds);
+    }
+
     // 예약자 확인
     public List<Participants> checkBookingUser(String userId, List<UserDto> users){
+        Date today = time();
         List<String> teamMateId = new ArrayList<>();
         users.stream().filter(m -> teamMateId.add(m.getUserId()));
         String usersIdData = userService.changeString(userId, teamMateId);
@@ -68,8 +70,10 @@ public class ParticipantsService {
 
     // 회의실 횟수 한번 제한을 위한 체크
     public boolean checkBookingUser(String roomType, String userId){
+        Date today = time();
+        System.out.println(today);
         int sameRoomTypeBookingCount = participantsMapper.selectBookingUser(today, roomType, userId, true);
-        System.out.println("@#@#@$@@$@$@$@$@$@$@ $@$ @#$ #@$ @#$ @" + sameRoomTypeBookingCount);
+        System.out.println("@#@#@$@@ :" + sameRoomTypeBookingCount);
             if(sameRoomTypeBookingCount == 0){
                 System.out.println(roomType +" 예약 한 적 없음. 예약 가능");
                 return true;
@@ -82,6 +86,7 @@ public class ParticipantsService {
 
     // 회의실 예약시, 동시간대 예약 체크
     public Set<String> checkUsingBooking(PostBookingDataDto postBookingDataDto){
+        Date today = time();
         List<BookingDataDto> usingCheck;
 
         if(postBookingDataDto.getRoomType().equals("meeting")) {

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class CancelDto {
     private int bookingId;
     private String userId;
-
+    private Boolean userType;
 }

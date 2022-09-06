@@ -5,6 +5,7 @@ import com.example.tamna.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -18,7 +19,7 @@ public class UserService {
     }
 
     // 한번에 select 하기 위한 유저들 데이터 문자열 변환
-    public String changeString(String userData, List<String> teamMateData){
+    public String changeString(String userData, Collection<String> teamMateData){
         StringBuilder sb = new StringBuilder();
         if(userData != null) {
             System.out.println("스트링 변환시 유저 아이디 있음!!");

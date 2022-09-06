@@ -17,7 +17,7 @@ public interface BookingMapper {
     List<Booking> findAllRoomState(Date today);
 
     // 층수별 예약 현황
-    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND MODE is null AND ROOM_ID LIKE '${floor}__' ORDER BY ROOM_ID ASC")
+    @Select("SELECT * FROM BOOKING WHERE DATES=#{today} AND MODE is null AND ROOM_ID LIKE '${floor}__' ORDER BY ROOM_ID ASC, START_TIME ASC")
     List<Booking> findByFloor(@Param("today") Date today, @Param("floor") int floor);
 
     // 회의실별 예약 현황
@@ -33,11 +33,11 @@ public interface BookingMapper {
     // 예약 결과 확인
 //    @Select("SELECT BOOKING_ID FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND START_TIME=#{startTime} AND END_TIME=#{endTime} AND OFFICIAL=#{official}")
 //    List<Integer> selectResultInsert(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("official") boolean official);
-    @Select("SELECT BOOKING_ID FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ORDER BY BOOKING_ID ASC")
+    @Select("SELECT BOOKING_ID FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME) ORDER BY BOOKING_ID ASC")
     List<Integer> selectResultInsert(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 회의실 예약 확인
-    @Select("SELECT BOOKING_ID FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ORDER BY BOOKING_ID ASC")
+    @Select("SELECT BOOKING_ID FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME) ORDER BY BOOKING_ID ASC")
     List<Integer> findSameBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 마이페이지를 위한 내가 포함된 예약 bookingId 조회
@@ -45,8 +45,11 @@ public interface BookingMapper {
     List<Integer> findMyBookingId(@Param("today") Date today, @Param("userId") String userId);
 
     // 공식일정을 취소시 중복예약을 피하기 위한 같은 userId의 cancel이 아닌 예약 조회
-    @Select("SELECT USER_ID FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN ROOM USING(ROOM_ID) where DATES=#{today} AND ROOM_TYPE='meeting' AND MODE is null AND USER_ID IN (${usersIdString})")
-    List<String> findNotCancelMyBooking(@Param("today") Date today, @Param("usersIdString") String usersIdString);
+    @Select("SELECT USER_ID FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN ROOM USING(ROOM_ID) where DATES=#{today} AND ROOM_TYPE='meeting' AND MODE is null AND USER_TYPE=true AND USER_ID IN (${applicantsIdString})")
+    List<String> findNotCancelMyBooking(@Param("today") Date today, @Param("applicantsIdString") String applicantsIdString);
+
+    @Select("SELECT USER_ID FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN ROOM USING(ROOM_ID) where DATES=#{today} AND MODE is null AND USER_ID IN (${usersIdString}) AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME)")
+    List<String> findCancelSameBooking(@Param("today") Date today, @Param("usersIdString") String usersIdString, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 내가 포함된 bookingId를 통해 예약관련 모두 조회
     @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where BOOKING_ID IN (${bookingIdList}) ORDER BY START_TIME ASC, USER_TYPE DESC")
@@ -69,11 +72,11 @@ public interface BookingMapper {
     Booking selectOfficial(int bookingId);
 
     // 공식일정 확인
-    @Select("SELECT OFFICIAL FROM BOOKING  WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND OFFICIAL=true AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ORDER BY BOOKING_ID ASC")
+    @Select("SELECT * FROM BOOKING  WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND OFFICIAL=true AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME) ORDER BY BOOKING_ID ASC")
     List<Boolean> findSameTimeOfficial(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 취소되었던 예약 조회
-    @Select("SELECT * FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE='cancel' AND USER_TYPE=true AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ORDER BY BOOKING_ID ASC")
+    @Select("SELECT * FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE='cancel' AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME) ORDER BY BOOKING_ID ASC")
     List<CancelDto> selectCancelBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 

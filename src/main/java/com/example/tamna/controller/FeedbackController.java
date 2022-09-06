@@ -3,24 +3,24 @@ package com.example.tamna.controller;
 import com.example.tamna.model.Feedback;
 import com.example.tamna.service.FeedbackService;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/")
+@RequiredArgsConstructor
 public class FeedbackController {
 
-    private FeedbackService feedbackService;
+    private final FeedbackService feedbackService;
 
-    public FeedbackController(FeedbackService feedbackService) {
-        this.feedbackService = feedbackService;
-    }
 
     @ApiOperation(value = "[완료] 피드백 내용 보내기")
     @PostMapping(value = "/feedback")
