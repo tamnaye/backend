@@ -148,8 +148,11 @@ public class BookingController {
                                 List<UserDto> users = userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames);
                                 participantsService.insertParticipants(bookingId, users, teamMateNames);
                                 //LOGGER.info("회의실 예약 유저 데이터: " + userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames));
-
-                                arr.put("success", roomType + " 예약 성공! ♥ ");
+                                if(roomType.equals("회의실")){
+                                    arr.put("success", "회의실 예약 성공! ♥ ");
+                                }else{
+                                    arr.put("success", "스튜디오 예약 성공! 비밀번호는 매니저님께 요청해주세요! ♥");
+                                }
                                 map.put("message", arr);
                                 return ResponseEntity.status(HttpStatus.OK).body(map);
                             }else{ // 나박스일때
