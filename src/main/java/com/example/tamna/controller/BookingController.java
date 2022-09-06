@@ -151,7 +151,7 @@ public class BookingController {
                                 if(roomType.equals("회의실")){
                                     arr.put("success", "회의실 예약 성공! ♥ ");
                                 }else{
-                                    arr.put("success", "스튜디오 예약 성공! 비밀번호는 매니저님께 요청해주세요! ♥");
+                                    arr.put("success", "스튜디오 예약 성공! 비밀번호는 매니저님께 문의해주세요! ♥");
                                 }
                                 map.put("message", arr);
                                 return ResponseEntity.status(HttpStatus.OK).body(map);
@@ -190,7 +190,7 @@ public class BookingController {
                    System.out.println(users);
                    participantsService.insertParticipants(resultBookingId, users, postBookingDataDto.getTeamMate());
 
-                   arr.put("success", "공식 일정 등록 완료 ✅");
+                   arr.put("success", roomType + " 공식 일정 등록 완료 ✅");
                    map.put("message", arr);
                }
            }
@@ -244,7 +244,7 @@ public class BookingController {
         if(!booking.isOfficial()){
             checkCancel = bookingService.deleteBooking(intBookingId);
         }else{
-            checkCancel = bookingService.deleteOfficialBooking(intBookingId, booking);
+            checkCancel = bookingService.deleteOfficialBooking(booking);
         }
 
         if(checkCancel.equals("success")){

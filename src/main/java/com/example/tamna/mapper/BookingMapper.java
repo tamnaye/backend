@@ -1,5 +1,6 @@
 package com.example.tamna.mapper;
 
+import com.example.tamna.dto.CancelDto;
 import com.example.tamna.model.Booking;
 import com.example.tamna.model.JoinBooking;
 import org.apache.ibatis.annotations.*;
@@ -39,9 +40,13 @@ public interface BookingMapper {
     @Select("SELECT BOOKING_ID FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ORDER BY BOOKING_ID ASC")
     List<Integer> findSameBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
-    // 내가 포함된 예약 bookingId 조회
+    // 마이페이지를 위한 내가 포함된 예약 bookingId 조회
     @Select("SELECT BOOKING_ID FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) where DATES=#{today} AND USER_ID=#{userId} ORDER BY START_TIME ASC")
     List<Integer> findMyBookingId(@Param("today") Date today, @Param("userId") String userId);
+
+    // 공식일정을 취소시 중복예약을 피하기 위한 같은 userId의 cancel이 아닌 예약 조회
+    @Select("SELECT USER_ID FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN ROOM USING(ROOM_ID) where DATES=#{today} AND ROOM_TYPE='meeting' AND MODE is null AND USER_ID IN (${usersIdString})")
+    List<String> findNotCancelMyBooking(@Param("today") Date today, @Param("usersIdString") String usersIdString);
 
     // 내가 포함된 bookingId를 통해 예약관련 모두 조회
     @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where BOOKING_ID IN (${bookingIdList}) ORDER BY START_TIME ASC, USER_TYPE DESC")
@@ -68,8 +73,8 @@ public interface BookingMapper {
     List<Boolean> findSameTimeOfficial(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 취소되었던 예약 조회
-    @Select("SELECT BOOKING_ID FROM BOOKING WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE='cancel' AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ORDER BY BOOKING_ID ASC")
-    List<Integer> selectCancelBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+    @Select("SELECT * FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE='cancel' AND USER_TYPE=true AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime}) ORDER BY BOOKING_ID ASC")
+    List<CancelDto> selectCancelBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 
 

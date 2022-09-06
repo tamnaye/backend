@@ -1,5 +1,6 @@
 package com.example.tamna.service;
 
+import com.example.tamna.dto.CancelDto;
 import com.example.tamna.dto.DetailBookingDataDto;
 import com.example.tamna.model.Booking;
 import com.example.tamna.mapper.BookingMapper;
@@ -15,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -26,16 +29,18 @@ public class BookingService {
     private RoomMapper roomMapper;
     private BookingMapper bookingMapper;
     private ParticipantsMapper participantsMapper;
+    private UserService userService;
     private long miliseconds = System.currentTimeMillis();
     private final Date today = new Date(miliseconds);
-//    private Date today =  Date.valueOf(new LocalDate.(ZoneId.of("Asia/Seoul")));
+//    private Date today =  Date.valueOf(LocalDate(ZoneId.of("Asia/Seoul")));
 
     @Autowired
-    public BookingService(UserMapper userMapper, RoomMapper roomMapper, BookingMapper bookingMapper, ParticipantsMapper participantsMapper) {
+    public BookingService(UserMapper userMapper, RoomMapper roomMapper, BookingMapper bookingMapper, ParticipantsMapper participantsMapper, UserService userService) {
         this.userMapper = userMapper;
         this.roomMapper = roomMapper;
         this.bookingMapper = bookingMapper;
         this.participantsMapper = participantsMapper;
+        this.userService = userService;
     }
 
 
@@ -211,17 +216,56 @@ public class BookingService {
         return "fail";
     }
 
-    // 공식 일정 취소
-    public String deleteOfficialBooking(int bookingId, Booking booking) {
-        List<Integer> canceledBooking = bookingMapper.selectCancelBooking(today, booking.getRoomId(), booking.getStartTime(), booking.getEndTime());
+
+
+    // 공식 일정 취소시 인재분들 예약 살리기
+    public String deleteOfficialBooking(Booking booking) {
+        // 동시간대 cancel된 예약 가져오기
+        List<CancelDto> canceledBooking = bookingMapper.selectCancelBooking(today, booking.getRoomId(), booking.getStartTime(), booking.getEndTime());
+
         if (!canceledBooking.isEmpty()) {
-            String bookingsIdString = addBookingId(canceledBooking);
+            List<Integer> bookingIdList = new ArrayList<>();
+            List<String> userIdList = new ArrayList<>();
+
+            for (int i=0; i < canceledBooking.toArray().length; i++){
+                bookingIdList.add(canceledBooking.get(i).getBookingId());
+                userIdList.add(canceledBooking.get(i).getUserId());
+            }
+
+            // 유저 아이디들로 한번에 검색하기 위한 스트링 변환
+            String usersIdString = userService.changeString(null, userIdList);
+            System.out.println(usersIdString);
+            System.out.println(today);
+
+            // 유저 아이디로 다른 예약 확인
+            List<String> otherBookingUserId = bookingMapper.findNotCancelMyBooking(today, usersIdString);
+            System.out.println("cancel된거 말고 다른 예약 있는 유저 : " + otherBookingUserId);
+            if(!otherBookingUserId.isEmpty()){
+                for (String sameUserId : otherBookingUserId){
+                    System.out.println("sameUserId" + sameUserId);
+                    for(int i=0; i < canceledBooking.toArray().length; i++){
+                        if(canceledBooking.get(i).getUserId().equals(sameUserId)){
+                            System.out.println(bookingMapper.deleteBooking(bookingIdList.get(i)));
+                            bookingMapper.deleteBooking(bookingIdList.get(i));
+                            participantsMapper.deleteParticipants(bookingIdList.get(i));
+                            bookingIdList.remove(i);
+                            System.out.println(bookingIdList);
+                        }
+
+                    }
+                }
+            }
+            System.out.println("중요한 bookingIdList" + bookingIdList);
+            String bookingsIdString = addBookingId(bookingIdList);
             System.out.println(bookingsIdString);
-            int updateResultCount = bookingMapper.updateBookingMode(bookingsIdString, null);
-            System.out.println("updateResultCount :" + updateResultCount);
+            if(bookingsIdString != null){
+                int updateResultCount = bookingMapper.updateBookingMode(bookingsIdString, null);
+                System.out.println("updateResultCount :" + updateResultCount);
+            }
         }
-        int deleteBooking = bookingMapper.deleteBooking(bookingId);
-        int deleteParticipants = participantsMapper.deleteParticipants(bookingId);
+
+        int deleteBooking = bookingMapper.deleteBooking(booking.getBookingId());
+        int deleteParticipants = participantsMapper.deleteParticipants(booking.getBookingId());
         System.out.println(deleteBooking + deleteParticipants);
         if (deleteBooking == 1 && deleteParticipants >= 1) {
             return "success";
