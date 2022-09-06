@@ -3,16 +3,15 @@ package com.example.tamna.service;
 import com.example.tamna.dto.BookingDataDto;
 import com.example.tamna.dto.PostBookingDataDto;
 import com.example.tamna.model.Participants;
-import com.example.tamna.model.User;
+import com.example.tamna.model.UserDto;
 import com.example.tamna.mapper.ParticipantsMapper;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +19,7 @@ import java.util.Set;
 
 
 @Service
+@RequiredArgsConstructor
 public class ParticipantsService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ParticipantsService.class);
@@ -27,7 +27,7 @@ public class ParticipantsService {
     private ParticipantsMapper participantsMapper;
     private UserService userService;
     private long miliseconds = System.currentTimeMillis();
-    private Date today = new Date(miliseconds);
+    private final Date today = new Date(miliseconds);
 //    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
 
@@ -38,7 +38,7 @@ public class ParticipantsService {
     }
 
     // 예약자 확인
-    public List<Participants> checkBookingUser(String userId, List<User> users){
+    public List<Participants> checkBookingUser(String userId, List<UserDto> users){
         List<String> teamMateId = new ArrayList<>();
         users.stream().filter(m -> teamMateId.add(m.getUserId()));
         String usersIdData = userService.changeString(userId, teamMateId);
@@ -52,10 +52,10 @@ public class ParticipantsService {
 
 
     // 회의실 예약 신청자와 멤버 구분하여 insert
-    public void insertParticipants(int bookingId, List<User> usersData, List<String> teamMate){
+    public void insertParticipants(int bookingId, List<UserDto> usersData, List<String> teamMate){
         System.out.println(usersData);
         for(int i=0; i< usersData.toArray().length; i++){
-            User user = usersData.get(i);
+            UserDto user = usersData.get(i);
             if(!teamMate.contains(user.getUserName())){
                 participantsMapper.insertParticipants(bookingId, user.getUserId(), true);;
             } else{

@@ -3,7 +3,7 @@ package com.example.tamna.controller;
 import com.example.tamna.dto.*;
 
 import com.example.tamna.model.Booking;
-import com.example.tamna.model.User;
+import com.example.tamna.model.UserDto;
 import com.example.tamna.service.*;
 
 import io.swagger.annotations.ApiOperation;
@@ -145,7 +145,7 @@ public class BookingController {
                                 int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
                                 LOGGER.info("예약 성공한 bookingId: " + bookingId);
                                 // 유저들 이름 종합
-                                List<User> users = userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames);
+                                List<UserDto> users = userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames);
                                 participantsService.insertParticipants(bookingId, users, teamMateNames);
                                 //LOGGER.info("회의실 예약 유저 데이터: " + userService.getUsersData(postBookingDataDto.getClasses(),postBookingDataDto.getUserName(), teamMateNames));
 
@@ -183,7 +183,7 @@ public class BookingController {
                    // 기존 인재들 예약 cancel상태로 변경 및 공식 일정 예약
                    int resultBookingId = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
                    // 누가 예약하고 쓰는지 참석자 등록
-                   List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
+                   List<UserDto> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
                    System.out.println(users);
                    participantsService.insertParticipants(resultBookingId, users, postBookingDataDto.getTeamMate());
 
@@ -200,7 +200,7 @@ public class BookingController {
                    int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
                    LOGGER.info("예약 성공한 bookingId: " + bookingId);
                    // 유저들 이름 종합
-                   List<User> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
+                   List<UserDto> users = userService.getUsersData(postBookingDataDto.getClasses(), postBookingDataDto.getUserName(), teamMateNames);
                    participantsService.insertParticipants(bookingId, users, teamMateNames);
                    arr.put("success", roomType + "예약 성공! ♥ ");
                    map.put("message", arr);

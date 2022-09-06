@@ -1,8 +1,9 @@
 package com.example.tamna.config.auth;
 
-import com.example.tamna.model.User;
+import com.example.tamna.model.UserDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,26 +15,25 @@ import java.util.List;
 
 // Security에서 사용자의 정보를 담는 인터페이스
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class PrincipalDetails implements UserDetails {
 
     private List<GrantedAuthority> authorities;
-    private User user;
-    private String userId;
+    private UserDto userDto;
 
-    public PrincipalDetails(User user) {
-        this.user = user;
+    public PrincipalDetails(UserDto userDto) {
+        this.userDto = userDto;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         authorities = new ArrayList<>();
-        System.out.println(user.getRoles());
-        if (user.getRoles().equals("MANAGER")){
-            authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
-        }else{
+        System.out.println(userDto.getRoles());
+        if (userDto.getRoles().equals("USER")){
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        }else{
+            authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
         }
         return authorities;
     }
@@ -46,7 +46,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUserId();
+        return userDto.getUserId();
     }
 
     @Override

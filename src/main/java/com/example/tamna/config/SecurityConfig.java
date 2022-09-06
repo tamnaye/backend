@@ -1,31 +1,25 @@
 package com.example.tamna.config;
 
 import com.example.tamna.config.auth.CustomAuthenticationManager;
-import com.example.tamna.config.auth.CustomAuthenticationProcessingFilter;
-import com.example.tamna.config.jwt.JwtAuthenticationFilter;
-import com.example.tamna.config.jwt.JwtProvider;
-import com.example.tamna.filter.MyFilter3;
-import com.example.tamna.service.UserService;
-import jdk.jshell.spi.ExecutionControlProvider;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
+
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.CorsFilter;
 
 //시큐리티 관련 설정
 @Configuration //IoC
 @EnableWebSecurity // Security 활성화
 @RequiredArgsConstructor
+@Component
 public class SecurityConfig {
 
     private final CorsFilter corsFilter;
@@ -48,8 +42,6 @@ public class SecurityConfig {
                 .formLogin().disable()// formLogin 사용 x
                 .httpBasic().disable() // 기본 http basic 인증방식 사용 x
                 .authorizeRequests()
-//                .antMatchers("/api/**")
-//                .access("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
 //                .antMatchers("/api/auth/**").permitAll() // /api/auth/ 는 security 적용 x
 //                .anyRequest().authenticated();// 나머지 API 전부 인증 필요
                 .antMatchers("/api/**").permitAll();// 403에러 임시 방편
@@ -57,26 +49,26 @@ public class SecurityConfig {
         return http.build();
     }
 
-    public void configure(WebSecurity webSecurity) throws Exception{
-        System.out.println("여긴가");
-        webSecurity.ignoring().antMatchers(HttpMethod.POST, "/api/auth/login");
-    }
-
-        @Bean
-        public CustomAuthenticationProcessingFilter customAuthenticationProcessingFilter(){
-            System.out.println("여긴가");
-            CustomAuthenticationProcessingFilter filter = new CustomAuthenticationProcessingFilter("/api/auth/login");
-            System.out.println("filter");
-            filter.setAuthenticationManager(customAuthenticationManager());
-
-            return filter;
-        }
-
-        @Bean
-        public CustomAuthenticationManager customAuthenticationManager(){
-
-        return new CustomAuthenticationManager();
-        }
+//    public void configure(WebSecurity webSecurity) throws Exception{
+//        System.out.println("여긴가");
+//        webSecurity.ignoring().antMatchers(HttpMethod.POST, "/api/auth/login");
+//    }
+//
+//        @Bean
+//        public CustomAuthenticationProcessingFilter customAuthenticationProcessingFilter(){
+//            System.out.println("여긴가");
+//            CustomAuthenticationProcessingFilter filter = new CustomAuthenticationProcessingFilter("/api/auth/login");
+//            System.out.println("filter");
+//            filter.setAuthenticationManager(customAuthenticationManager());
+//
+//            return filter;
+//        }
+//
+//        @Bean
+//        public CustomAuthenticationManager customAuthenticationManager(){
+//
+//        return new CustomAuthenticationManager();
+//        }
 
 
 

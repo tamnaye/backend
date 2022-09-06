@@ -8,6 +8,7 @@ import com.example.tamna.mapper.RoomMapper;
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.model.JoinBooking;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class BookingService {
     private BookingMapper bookingMapper;
     private ParticipantsMapper participantsMapper;
     private long miliseconds = System.currentTimeMillis();
-    private Date today = new Date(miliseconds);
+    private final Date today = new Date(miliseconds);
 //    private Date today =  Date.valueOf(new LocalDate.(ZoneId.of("Asia/Seoul")));
 
     @Autowired
@@ -71,12 +72,9 @@ public class BookingService {
         List<DetailBookingDataDto> floorDetailBooking = new ArrayList<>();
         List<Booking> floorBooking = bookingMapper.findByFloor(today, floor);
         System.out.println(today);
-        System.out.println("floorBooking: " + floorBooking);
         for(int k=0; k < floorBooking.toArray().length; k ++){
             int roomId = floorBooking.get(k).getRoomId();
-            System.out.println("roomId: " + roomId);
             String startTime = floorBooking.get(k).getStartTime();
-            System.out.println("startTime: " + startTime);
             List<JoinBooking> detailData = bookingMapper.findDetailBookingData(today, roomId, startTime);
             System.out.println("detailData: " + detailData);
             DetailBookingDataDto combineData = new DetailBookingDataDto();

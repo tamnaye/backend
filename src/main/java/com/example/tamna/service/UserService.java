@@ -1,6 +1,6 @@
 package com.example.tamna.service;
 
-import com.example.tamna.model.User;
+import com.example.tamna.model.UserDto;
 import com.example.tamna.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class UserService {
     }
 
     // 유저 아이디로 정보조회
-    public User getUserData(String userId){
+    public UserDto getUserData(String userId){
         return userMapper.findByUserId(userId);
     }
 
@@ -41,7 +41,7 @@ public class UserService {
     }
 
     // 같은 기수의 유저들 이름으로 정보 조회
-    public List<User> getUsersData(int classes, String userData, List<String> teamMateData){
+    public List<UserDto> getUsersData(int classes, String userData, List<String> teamMateData){
         String users = changeString(userData, teamMateData);
         return userMapper.findByUserName(classes, users);
     }
