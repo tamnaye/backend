@@ -14,8 +14,6 @@ import java.util.List;
 public class FeedbackService {
 
     private final FeedbackMapper feedbackMapper;
-//    private long miliseconds = System.currentTimeMillis();
-//    private final Date today = new Date(miliseconds);
 
 
     public Date time() {

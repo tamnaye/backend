@@ -1,6 +1,7 @@
 package com.example.tamna.service;
 
 import com.example.tamna.mapper.StaticDataMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;

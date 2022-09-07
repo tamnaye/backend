@@ -24,14 +24,8 @@ public class ParticipantsService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ParticipantsService.class);
 
-    private ParticipantsMapper participantsMapper;
-    private UserService userService;
-
-    @Autowired
-    public ParticipantsService(ParticipantsMapper participantsMapper, UserService userService){
-        this.participantsMapper = participantsMapper;
-        this.userService = userService;
-    }
+    private final ParticipantsMapper participantsMapper;
+    private final UserService userService;
 
     public Date time() {
         long miliseconds = System.currentTimeMillis();

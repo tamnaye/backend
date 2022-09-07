@@ -11,4 +11,6 @@ public class CancelDto {
     private int bookingId;
     private String userId;
     private Boolean userType;
+    private String StartTime;
+    private String EndTime;
 }

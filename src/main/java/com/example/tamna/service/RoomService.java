@@ -2,20 +2,17 @@ package com.example.tamna.service;
 
 import com.example.tamna.model.Room;
 import com.example.tamna.mapper.RoomMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RoomService {
 
-    private RoomMapper roomMapper;
-
-    @Autowired
-    public RoomService(RoomMapper roomMapper) {
-        this.roomMapper = roomMapper;
-    }
+    private final RoomMapper roomMapper;
 
 
     // 회의실 목록 데이터

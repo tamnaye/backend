@@ -8,35 +8,27 @@ import com.example.tamna.service.*;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+
 @RestController
 @RequestMapping("/api/booking")
+@RequiredArgsConstructor
 public class BookingController {
 
     private final Logger LOGGER = LoggerFactory.getLogger(BookingController.class);
 
     private final BookingService bookingService;
-    private RoomService roomService;
-    private UserService userService;
-    private ParticipantsService participantsService;
-
-
-    @Autowired
-    public BookingController(BookingService bookingService, RoomService roomService, UserService userService, ParticipantsService participantsService) {
-        this.bookingService = bookingService;
-        this.roomService = roomService;
-        this.userService = userService;
-        this.participantsService = participantsService;
-    }
-
+    private final RoomService roomService;
+    private final UserService userService;
+    private final ParticipantsService participantsService;
 
     @ApiOperation(value = "[완료] 현정 내비", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
     @GetMapping(value = "/room-data")
@@ -88,7 +80,6 @@ public class BookingController {
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
-
 
 
 
@@ -212,21 +203,6 @@ public class BookingController {
            return ResponseEntity.status(HttpStatus.OK).body(map);
        }
     }//
-
-
-//    @PostMapping(value = "/manager")
-//    public ResponseEntity<Map<String, Object>> OfficialSchedule(@RequestBody PostBookingDataDto postBookingDataDto){
-////        if(postBookingDataDto.getClasses() == 0){}
-//        System.out.println(postBookingDataDto);
-//        Map<String, Object> map = new HashMap<>();
-//        String result = bookingService.updateBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getUserId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), true);
-//        if(result.equals("success")){
-//            map.put(result, "공식 일정 등록 완료!");
-//        }else{
-//            map.put(result, "에러");
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    }//
 
 
     @Data
