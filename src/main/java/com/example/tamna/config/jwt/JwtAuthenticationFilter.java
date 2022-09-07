@@ -3,6 +3,7 @@ package com.example.tamna.config.jwt;
 import com.example.tamna.model.Token;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
@@ -20,6 +21,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private AntPathMatcher antPathMatcher;
     private String pattern;
     private JwtProvider jwtProvider;
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String REAUTHORIZATION_HEADER = "reAuthorization";
 
     @Autowired
     public JwtAuthenticationFilter(JwtProvider jwtProvider, String pattern){
@@ -48,11 +51,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     if(refreshToken != null && refreshResult.toArray().length!=0 && refreshResult.get(0).equals(true)) {
                         if (refreshResult.toArray().length > 1 && refreshResult.get(1).equals("success")) {
                             // accessToken 재발급
-//                            jwtProvider.createAccessToken()
-                            //    // response.addHeader 해더로 보내는 함수!!!
-                        }
+                            String newAccessToken = jwtProvider.createAccessToken(tokenData.getUserId());
+                             response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
+                        }else{
+                            // 로그아웃
+                            jwtProvider.deleteToken(tokenData.getUserId());
+                        } 
                     }
-
                     }}// 로그아웃
 //                jwtProvider.validateToken()
             }

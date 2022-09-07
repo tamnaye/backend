@@ -2,10 +2,7 @@ package com.example.tamna.mapper;
 
 
 import com.example.tamna.model.Token;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.sql.Date;
 
@@ -17,5 +14,8 @@ public interface AuthMapper {
 
     @Select("SELECT * FROM TOKEN WHERE REFRESH_TOKEN=#{refreshToken}")
     Token findToken(String refreshToken);
+
+    @Delete("DELETE FROM TOKEN WHERE USER_ID=#{userId}")
+    int deleteToken(String userId);
 
 }

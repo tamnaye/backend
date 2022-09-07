@@ -64,11 +64,9 @@ public class JwtProvider implements InitializingBean {
 
 
     // accessToken 생성
-    public String createAccessToken(String userId, String userRole){
+    public String createAccessToken(String userId){
         Claims claims = Jwts.claims().setSubject(userId);
-        claims.put("role", userRole);
         System.out.println("id: "+ userId);
-        System.out.println("role: " + userRole);
 
         long now = (new Date()).getTime();
         System.out.println("now: " + now);
@@ -179,6 +177,13 @@ public class JwtProvider implements InitializingBean {
 
     // 토큰 재발급
 
-
+    // refresh토큰 DB 삭제
+    public String deleteToken(String userId){
+        int result = authMapper.deleteToken(userId);
+        if(result != 0){
+            return "success";
+        }
+        return "fail";
+    }
 
 }

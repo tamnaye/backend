@@ -2,9 +2,7 @@ package com.example.tamna.config.auth;
 
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.model.UserDto;
-import com.example.tamna.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class PrincipalDetailsService implements UserDetailsService {
 
 
-    private static UserMapper userMapper;
+    private final UserMapper userMapper;
 
 
     @Override

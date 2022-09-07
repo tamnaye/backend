@@ -2,6 +2,7 @@ package com.example.tamna.service;
 
 import com.example.tamna.config.auth.PrincipalDetails;
 import com.example.tamna.config.jwt.JwtProvider;
+import com.example.tamna.mapper.AuthMapper;
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class AuthService {
 
 
     private final UserMapper userMapper;
+    private final AuthMapper authMapper;
     private final JwtProvider jwtProvider;
 
     // 로그인 시 토큰 생성
@@ -33,7 +35,7 @@ public class AuthService {
             Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
             System.out.println(authentication);
             // accessToken 생성
-            String access = jwtProvider.createAccessToken(user.getUserId(), user.getRoles());
+            String access = jwtProvider.createAccessToken(user.getUserId());
             //refreshToken 생성
             String refresh = jwtProvider.createRefreshToken(user.getUserId());
             map.put("access", access);
@@ -50,8 +52,13 @@ public class AuthService {
     // 2) 로그인 유지
     //refreshtoken 유효시 access 재발급
 
-//    // 로그아웃
-//    public Map<String, Object> logOut(String userId){
-//
-//    }
+    // 로그아웃
+    public String logOut(String userId){
+
+        int result = authMapper.deleteToken(userId);
+        if(result != 0){
+            return "success";
+        }
+        return "fail";
+    }
 }

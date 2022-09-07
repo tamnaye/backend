@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper
 public interface FeedbackMapper {
 
-    @Select("SELECT CONTENT FROM FEEDBACK")
+    @Select("SELECT CONTENT FROM FEEDBACK ORDER BY DATES DESC")
     List<String> findAll();
 
     @Insert("INSERT INTO FEEDBACK(USER_ID, DATES, CONTENT) VALUES(#{userId}, #{today}, #{content})")
