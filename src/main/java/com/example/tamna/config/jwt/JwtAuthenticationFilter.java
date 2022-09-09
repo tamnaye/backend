@@ -1,12 +1,8 @@
 package com.example.tamna.config.jwt;
 
 import com.example.tamna.model.Token;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.*;
@@ -15,34 +11,35 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@NoArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+//@RequiredArgsConstructor
+public class  JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private AntPathMatcher antPathMatcher;
-    private String pattern;
     private JwtProvider jwtProvider;
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String REAUTHORIZATION_HEADER = "reAuthorization";
+    private static String AUTHORIZATION_HEADER = "Authorization";
+    private static String REAUTHORIZATION_HEADER = "reAuthorization";
 
-    @Autowired
-    public JwtAuthenticationFilter(JwtProvider jwtProvider, String pattern){
+//    @Autowired
+    public JwtAuthenticationFilter(JwtProvider jwtProvider){
         this.jwtProvider = jwtProvider;
-        this.antPathMatcher = new AntPathMatcher();
-        this.pattern = pattern;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
+        System.out.println("$#%#^$$$$$$$$$$$$$$$토큰 검증 필터를 !!!! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         // 해더에서 accessToken 가져옴
         String accessToken = jwtProvider.getHeaderAccessToken(request);
+        System.out.println("accessToken: " + accessToken);
+        if(accessToken != null){ // << 오류때문에 임시로
         // 토큰 유효성 검증
         List<Object> accessResult = jwtProvider.validateToken(accessToken);
+        System.out.println("accessReuslt"+accessResult);
         if(accessToken != null && accessResult.toArray().length != 0 && accessResult.get(0).equals(true)){
             if(accessResult.toArray().length > 1 && accessResult.get(1).equals("success")){
                 Authentication authentication = jwtProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }else{// accessToken 만료시
                 // 해더에서 refreshToken 가져옴
+                System.out.println("여기로 오냐");
                 String refreshToken = jwtProvider.getHeaderRefreshToken(request);
                 // DB에 저장된 refreshToken 가져옴
                 Token tokenData = jwtProvider.checkRefresh(refreshToken);
@@ -53,43 +50,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             // accessToken 재발급
                             String newAccessToken = jwtProvider.createAccessToken(tokenData.getUserId());
                              response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
+                             response.setHeader(REAUTHORIZATION_HEADER, refreshToken);
                         }else{
                             // 로그아웃
                             jwtProvider.deleteToken(tokenData.getUserId());
-                        } 
+                        }
                     }
-                    }}// 로그아웃
+                    }}//
 //                jwtProvider.validateToken()
             }
+        } else{
+            response.sendError(403);
+        }
         filterChain.doFilter(request, response);
         }
 
 
 
     }
-
-
-//public class JwtAuthenticationFilter extends GenericFilterBean {
-//
-//    private JwtProvider jwtProvider;
-//
-//    // response.addHeader 해더로 보내는 함수!!!
-//
-//    public JwtAuthenticationFilter(JwtProvider jwtProvider){
-//        this.jwtProvider = jwtProvider;
-//    }
-//
-//
-//    @Override
-//    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-//        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-//
-////        String accessToken = getAccessToken(httpServletRequest);
-////        String requestURI = httpServletRequest.getRequestURI();
-////        System.out.println("requestURI: " + requestURI);
-////        if(StringUtils.hasText(accessToken) && jwtProvider.validateToken(accessToken)){
-//////            Authentication authentication = JwtProvider
-////        String token = jwtProvider.
-////        }
-//
-//    }

@@ -1,7 +1,7 @@
 package com.example.tamna.config.jwt;
 
 import com.example.tamna.config.auth.PrincipalDetailsService;
-import com.example.tamna.mapper.AuthMapper;
+import com.example.tamna.mapper.TokenMapper;
 import com.example.tamna.model.Token;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -42,13 +42,13 @@ public class JwtProvider implements InitializingBean {
 
     private PrincipalDetailsService principalDetailsService;
 
-    private AuthMapper authMapper;
+    private TokenMapper authMapper;
     private Key key;
 
 
     @Autowired
     public JwtProvider(PrincipalDetailsService principalDetailsService,
-             AuthMapper authMapper){
+             TokenMapper authMapper){
         this.principalDetailsService = principalDetailsService;
         this.authMapper = authMapper;
     }
@@ -143,6 +143,7 @@ public class JwtProvider implements InitializingBean {
     // 헤더에서 refreshToken 가져오기
     public String getHeaderRefreshToken(HttpServletRequest request){
         String bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
+        System.out.println(bearerRefreshToken);
         if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
             bearerRefreshToken = bearerRefreshToken.substring(7);
         }

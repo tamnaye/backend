@@ -30,13 +30,12 @@ public class BookingService {
 
 
     public Date time() {
-        long miliseconds = System.currentTimeMillis();
+        final long miliseconds = System.currentTimeMillis();
         return new Date(miliseconds);
     }
 
     // 전체 회의실 예약 현황 가져오기
     public List<Booking> allRoomBookingState() {
-
         Date today = time();
         return bookingMapper.findAllRoomState(today);
     }
