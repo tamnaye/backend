@@ -70,13 +70,12 @@ public class AuthService implements InitializingBean {
         Claims claims = Jwts.claims().setSubject(userId);
         System.out.println("id: " + userId);
 
-        long now = (new java.util.Date()).getTime();
-        System.out.println("now: " + now);
-
-        java.util.Date accessValidity = new java.util.Date(now + accessTokenValidityInMilliSeconds * 1000);
+        java.util.Date now = new java.util.Date();
+        java.util.Date accessValidity = new java.util.Date(now.getTime() + accessTokenValidityInMilliSeconds * 1000);
 
         String accessToken = Jwts.builder()
                 .setClaims(claims) // user 정보
+                .setIssuedAt(now)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .setExpiration(accessValidity) // 만료시간 설정
                 .compact();
@@ -88,14 +87,15 @@ public class AuthService implements InitializingBean {
     // refreshToken 생성
     public String createRefreshToken(String userId){
 
-
-        long now = (new java.util.Date()).getTime();
+        java.util.Date now = new java.util.Date();
+//        long now = (new java.util.Date()).getTime();
         System.out.println("now: " + now);
 
-        java.util.Date refreshValidity = new java.util.Date(now + refreshTokenValidityInMilliSeconds * 1000);
+        java.util.Date refreshValidity = new java.util.Date(now.getTime() + refreshTokenValidityInMilliSeconds * 1000);
 
         String refreshToken = Jwts.builder()
                 .setSubject("") // 유저 데이터 x
+                .setIssuedAt(now)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .setExpiration(refreshValidity)
                 .compact();
@@ -115,7 +115,6 @@ public class AuthService implements InitializingBean {
 
     // access토큰에서 아이디 추출
     public String getUserIdFromJwt(String accessToken){
-
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -216,6 +215,13 @@ public class AuthService implements InitializingBean {
 
         }
         return map;
+    }
+
+    // 유저 확인
+    public UserDto checkUser(HttpServletRequest request){
+        String accessToken = getHeaderAccessToken(request);
+        String userId = getUserIdFromJwt(accessToken);
+        return userMapper.findByUserId(userId);
     }
 
 }

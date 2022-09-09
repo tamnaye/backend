@@ -1,6 +1,7 @@
 package com.example.tamna.service;
 
 import com.example.tamna.dto.BookingDataDto;
+import com.example.tamna.dto.PostBookingDataD;
 import com.example.tamna.dto.PostBookingDataDto;
 import com.example.tamna.model.Participants;
 import com.example.tamna.model.UserDto;
@@ -8,7 +9,6 @@ import com.example.tamna.mapper.ParticipantsMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -79,17 +79,43 @@ public class ParticipantsService {
 
 
     // 회의실 예약시, 동시간대 예약 체크
-    public Set<String> checkUsingBooking(PostBookingDataDto postBookingDataDto){
+//    public Set<String> checkUsingBooking(PostBookingDataD postBookingDataDto){
+//        Date today = time();
+//        List<BookingDataDto> usingCheck;
+//
+//        if(postBookingDataDto.getRoomType().equals("meeting")) {
+//            String usersName = userService.changeString(postBookingDataDto.getUserName(), postBookingDataDto.getTeamMate());
+//            System.out.println("예약자 + 팀원들 이름: " + usersName);
+//            usingCheck = participantsMapper.selectUsingUsers(today, postBookingDataDto.getClasses(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), usersName);
+//        }else{
+//            usingCheck = participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId());
+//            System.out.println(participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId()));
+//        }
+//        System.out.println("현재 회의실 사용중인 유저들: " + usingCheck);
+//
+//        Set<String> usingUsers = new HashSet<>();
+//        if(usingCheck.isEmpty()){
+//            System.out.println("사용중인 사람 x -> 회의실 사용 가능");
+//
+//        }else{
+//            usingCheck.forEach(m -> usingUsers.add(m.getUserName()));
+//            System.out.println(usingUsers + "현재 회의실 사용 중");
+//        }
+//        return usingUsers;
+//        }
+
+    // 회의실 예약시, 동시간대 예약 체크
+    public Set<String> checkUsingBooking(UserDto user, PostBookingDataDto postBookingDataDto){
         Date today = time();
         List<BookingDataDto> usingCheck;
 
         if(postBookingDataDto.getRoomType().equals("meeting")) {
-            String usersName = userService.changeString(postBookingDataDto.getUserName(), postBookingDataDto.getTeamMate());
+            String usersName = userService.changeString(user.getUserName(), postBookingDataDto.getTeamMate());
             System.out.println("예약자 + 팀원들 이름: " + usersName);
-            usingCheck = participantsMapper.selectUsingUsers(today, postBookingDataDto.getClasses(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), usersName);
+            usingCheck = participantsMapper.selectUsingUsers(today, user.getClasses(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), usersName);
         }else{
-            usingCheck = participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId());
-            System.out.println(participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId()));
+            usingCheck = participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), user.getUserId());
+            System.out.println(participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), user.getUserId()));
         }
         System.out.println("현재 회의실 사용중인 유저들: " + usingCheck);
 
@@ -102,7 +128,8 @@ public class ParticipantsService {
             System.out.println(usingUsers + "현재 회의실 사용 중");
         }
         return usingUsers;
-        }
+    }
+
 
 
 };
