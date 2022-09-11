@@ -50,13 +50,11 @@ public class BookingController {
 //    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("roomId") int roomId, @RequestParam("userId") String userId, @RequestParam("classes") int classes){
     public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("roomId") int roomId, HttpServletRequest request) {
             UserDto user = authService.checkUser(request);
-            int classes = user.getClasses();
-            String userId = user.getUserId();
             Map<String, Object> map = new HashMap<>();
-            map.put("userData", userService.getUserData(userId));
+            map.put("userData", userService.getUserData(user.getUserId()));
             map.put("roomData", roomService.getRoomId(roomId));
             map.put("bookingData", bookingService.roomBookingState(roomId));
-            map.put("namesData", userService.getUserNames(classes));
+            map.put("namesData", userService.getUserNames(user.getClasses()));
             return ResponseEntity.status(HttpStatus.OK).body(map);
     };
 
@@ -229,11 +227,10 @@ public class BookingController {
         System.out.println("roomType: " + roomType);
 
         if(user.getClasses() != 0 ){
-//       if(postBookingDataDto.getClasses() != 0 ){
-            // 신청자 하루에 한번만 예약 체크
-            boolean checkBooking = participantsService.checkBookingUser(postBookingDataDto.getRoomType(), user.getUserId());
-            // 신청자가 예약이 안되어 있으면
-            if (checkBooking){
+            // 신청자 회의실 하루에 한번만 예약 체크 or 나박스 최대 시간 예약 체크
+            Map<Boolean, String> checkBooking = participantsService.checkBookingUser(postBookingDataDto.getRoomType(), user.getUserId());
+            // 신청자가 예약이 안되어 있으면 or 나박스 최대 시간 안채웠으면
+            if (checkBooking.keySet().contains(true)){
                 // 룸타입이 회의실일 경우인데 팀메이트가 비어있는 경우
                 if(roomType.equals("회의실") && teamMateNames.isEmpty()){
                     arr.put("fail", "회의실은 2인이상일 경우만 예약하실 수 있습니다️.");
@@ -274,12 +271,19 @@ public class BookingController {
                                 map.put("message", arr);
                                 return ResponseEntity.status(HttpStatus.OK).body(map);
                             }else{ // 나박스일때
-                                int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
-                                LOGGER.info("예약 성공한 bookingId: " + bookingId);
-                                participantsService.insertNaboxApplicant(bookingId, user.getUserId());
-                                //LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
-                                arr.put("success", roomType+" 예약 성공! ♥ ");
-                                map.put("message", arr);
+                                boolean timeResult = participantsService.checkUsingTime(postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
+                                if(checkBooking.values().contains("add") && !timeResult) {
+                                    arr.put("fail", "나박스 하루 최대 이용시간은 2시간 입니다.");
+                                    map.put("message", arr);
+                                }
+                                else {
+                                    int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
+                                    LOGGER.info("예약 성공한 bookingId: " + bookingId);
+                                    participantsService.insertNaboxApplicant(bookingId, user.getUserId());
+                                    //LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
+                                    arr.put("success", roomType + " 예약 성공! ♥ ");
+                                    map.put("message", arr);
+                                }
                                 return ResponseEntity.status(HttpStatus.OK).body(map);
                             }
                         }
@@ -287,7 +291,12 @@ public class BookingController {
                 }
             }
             else{
-                arr.put("fail",  roomType+"예약은 하루에 한번만 가능합니다.");
+                if(roomType.equals("나박스")){
+                    arr.put("fail", roomType + "예약은 하루 최대 두시간만 가능합니다.");
+                }
+                else{
+                    arr.put("fail",  roomType+"예약은 하루에 한번만 가능합니다.");
+                }
                 map.put("message", arr);
                 return ResponseEntity.status(HttpStatus.OK).body(map);
             }

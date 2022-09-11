@@ -3,6 +3,7 @@ package com.example.tamna.service;
 import com.example.tamna.dto.BookingDataDto;
 import com.example.tamna.dto.PostBookingDataD;
 import com.example.tamna.dto.PostBookingDataDto;
+import com.example.tamna.model.Booking;
 import com.example.tamna.model.Participants;
 import com.example.tamna.model.UserDto;
 import com.example.tamna.mapper.ParticipantsMapper;
@@ -12,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -61,21 +59,33 @@ public class ParticipantsService {
         }
     }//
 
+    // 나박스 시간 차이
+    public boolean checkUsingTime(String getStartTime, String getEndTime){
+        int endTime = Integer.parseInt(getEndTime.substring(0,2));
+        int startTime = Integer.parseInt(getStartTime.substring(0,2));
+        int usingTime = endTime - startTime;
+        return usingTime == 1;
+    }
 
     // 회의실 횟수 한번 제한을 위한 체크
-    public boolean checkBookingUser(String roomType, String userId){
+    public Map<Boolean, String> checkBookingUser(String roomType, String userId){
+        Map<Boolean, String> map = new HashMap<>();
         Date today = time();
-        System.out.println(today);
-        int sameRoomTypeBookingCount = participantsMapper.selectBookingUser(today, roomType, userId, true);
-        System.out.println("@#@#@$@@ :" + sameRoomTypeBookingCount);
-            if(sameRoomTypeBookingCount == 0){
+        List<Booking> sameRoomTypeBookingCount = participantsMapper.selectBookingUser(today, roomType, userId, true);
+            if(sameRoomTypeBookingCount.isEmpty()){
                 System.out.println(roomType +" 예약 한 적 없음. 예약 가능");
-                return true;
+                map.put(true, "success");
             }else{
-                System.out.println(roomType + " 예약한 적 있음 예약 불가능");
-                return false;
+                if(roomType.equals("nabox") && sameRoomTypeBookingCount.toArray().length == 1){
+                    String endTime = sameRoomTypeBookingCount.get(0).getEndTime();
+                    String startTime = sameRoomTypeBookingCount.get(0).getStartTime();
+                    map.put(checkUsingTime(startTime, endTime), "add");
+                    return map;
+                }
+                map.put(false, "fail");
             }
-        }//
+        return map;
+    }//
 
 
     // 회의실 예약시, 동시간대 예약 체크

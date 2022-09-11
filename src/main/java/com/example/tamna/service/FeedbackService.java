@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -20,8 +18,6 @@ public class FeedbackService {
         long miliseconds = System.currentTimeMillis();
         return new Date(miliseconds);
     }
-
-//    private Date today = Date.valueOf(LocalDate.now(ZoneId.of("Asia/Seoul")));
 
     public int insertFeedback(String userId, String content){
         Date today = time();
