@@ -115,15 +115,17 @@ public class AuthService implements InitializingBean {
 
     // access토큰에서 아이디 추출
     public String getUserIdFromJwt(String accessToken){
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(accessToken)
-                .getBody();
+        if(accessToken!=null) {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody();
 
-        System.out.println("claims= " + claims);
+            System.out.println("claims= " + claims);
 
-        return claims.getSubject();
+            return claims.getSubject();
+        } return "fail";
     }
 
 
@@ -144,50 +146,7 @@ public class AuthService implements InitializingBean {
         return bearerAccessToken;
     }
 
-    // 헤더에서 refreshToken 가져오기
-    public String getHeaderRefreshToken(HttpServletRequest request){
-        String bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
-        System.out.println(bearerRefreshToken);
-        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
-            bearerRefreshToken = bearerRefreshToken.substring(7);
-        }
 
-        return bearerRefreshToken;
-    }
-
-
-    // Jwt 유효성 검사
-    public List<Object> validateToken(String token){
-        List<Object> result = new ArrayList<>();
-        try{
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            result.add(!claims.getBody().getExpiration().before(new java.util.Date()));
-            result.add("success");
-            return result;
-        }catch (ExpiredJwtException e){
-            System.out.println("만료된 JWT");
-            result.add(true);
-            result.add("fail");
-            return result;
-        }catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            System.out.println("잘못된 JWT 서명");
-        }catch (UnsupportedJwtException e){
-            System.out.println("지원되지 않는 JWT");
-        }catch (IllegalStateException e){
-            System.out.println("JWT 토큰 잘못됨");
-        }
-        result.add(false);
-        return result;
-    }
-
-    // refresh토큰 DB 삭제
-    public String deleteToken(String userId){
-        int result = tokenMapper.deleteToken(userId);
-        if(result != 0){
-            return "success";
-        }
-        return "fail";
-    }
 
 
 
@@ -195,6 +154,7 @@ public class AuthService implements InitializingBean {
     public Map<String, String> login(String userId) {
         Map<String, String> map = new HashMap<>();
 
+        System.out.println(userId);
 
         UserDto user = userMapper.findByUserId(userId);
         if (user != null) {

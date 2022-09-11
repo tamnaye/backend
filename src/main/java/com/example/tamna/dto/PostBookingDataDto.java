@@ -11,5 +11,4 @@ public class PostBookingDataDto {
     private String startTime;
     private String endTime;
     private List<String> teamMate;
-//    private boolean official;
 }

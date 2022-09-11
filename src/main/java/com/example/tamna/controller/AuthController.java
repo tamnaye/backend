@@ -53,48 +53,48 @@ public class AuthController {
     }
 
 
-    @GetMapping(value = "/authentication")
-    public ResponseEntity<String> authentication(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("$#%#^$$$$$$$$$$$$$$$토큰 검증 필터를 !!!! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-
-        // 해더에서 accessToken 가져옴
-        String accessToken = authService.getHeaderAccessToken(request);
-        System.out.println("accessToken: " + accessToken);
-        if (accessToken != null) { // << 오류때문에 임시로
-            // 토큰 유효성 검증
-            List<Object> accessResult = authService.validateToken(accessToken);
-            System.out.println("accessReuslt" + accessResult);
-            if (accessToken != null && accessResult.toArray().length != 0 && accessResult.get(0).equals(true)) {
-                if (accessResult.toArray().length > 1 && accessResult.get(1).equals("success")) {
-                    Authentication authentication = authService.getAuthentication(accessToken);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {// accessToken 만료시
-                    // 해더에서 refreshToken 가져옴
-                    System.out.println("여기로 오냐");
-                    String refreshToken = authService.getHeaderRefreshToken(request);
-                    // DB에 저장된 refreshToken 가져옴
-                    Token tokenData = authService.checkRefresh(refreshToken);
-                    List<Object> refreshResult = authService.validateToken(refreshToken);
-                    if (tokenData != null) {
-                        if (refreshToken != null && refreshResult.toArray().length != 0 && refreshResult.get(0).equals(true)) {
-                            if (refreshResult.toArray().length > 1 && refreshResult.get(1).equals("success")) {
-                                // accessToken 재발급
-                                String newAccessToken = authService.createAccessToken(tokenData.getUserId());
-                                response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
-                                response.setHeader(REAUTHORIZATION_HEADER, refreshToken);
-                            } else {
-                                // 로그아웃
-                                authService.deleteToken(tokenData.getUserId());
-                                return ResponseEntity.status(403).body("logout");
-                            }
-                        }
-                    }
-                }//
-//                jwtProvider.validateToken()
-            }
-        }
-        return ResponseEntity.status(403).body("logout");
-
-    }
+//    @GetMapping(value = "/authentication")
+//    public ResponseEntity<String> authentication(HttpServletRequest request, HttpServletResponse response) {
+//        System.out.println("$#%#^$$$$$$$$$$$$$$$토큰 검증 필터를 !!!! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//
+//        // 해더에서 accessToken 가져옴
+//        String accessToken = authService.getHeaderAccessToken(request);
+//        System.out.println("accessToken: " + accessToken);
+//        if (accessToken != null) { // << 오류때문에 임시로
+//            // 토큰 유효성 검증
+//            List<Object> accessResult = authService.validateToken(accessToken);
+//            System.out.println("accessReuslt" + accessResult);
+//            if (accessToken != null && accessResult.toArray().length != 0 && accessResult.get(0).equals(true)) {
+//                if (accessResult.toArray().length > 1 && accessResult.get(1).equals("success")) {
+//                    Authentication authentication = authService.getAuthentication(accessToken);
+//
+//                } else {// accessToken 만료시
+//                    // 해더에서 refreshToken 가져옴
+//                    System.out.println("여기로 오냐");
+//                    String refreshToken = authService.getHeaderRefreshToken(request);
+//                    // DB에 저장된 refreshToken 가져옴
+//                    Token tokenData = authService.checkRefresh(refreshToken);
+//                    List<Object> refreshResult = authService.validateToken(refreshToken);
+//                    if (tokenData != null) {
+//                        if (refreshToken != null && refreshResult.toArray().length != 0 && refreshResult.get(0).equals(true)) {
+//                            if (refreshResult.toArray().length > 1 && refreshResult.get(1).equals("success")) {
+//                                // accessToken 재발급
+//                                String newAccessToken = authService.createAccessToken(tokenData.getUserId());
+//                                response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
+//                                response.setHeader(REAUTHORIZATION_HEADER, refreshToken);
+//                            } else {
+//                                // 로그아웃
+//                                authService.deleteToken(tokenData.getUserId());
+//                                return ResponseEntity.status(403).body("logout");
+//                            }
+//                        }
+//                    }
+//                }//
+////                jwtProvider.validateToken()
+//            }
+//        }
+//        return ResponseEntity.status(403).body("logout");
+//
+//    }
 
 }
