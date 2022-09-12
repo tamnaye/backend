@@ -47,8 +47,11 @@ public class AuthService {
     // 유저 확인
     public UserDto checkUser(HttpServletRequest request){
         String accessToken = jwtProvider.getHeaderAccessToken(request);
-        String userId = jwtProvider.getUserIdFromJwt(accessToken);
-        return userMapper.findByUserId(userId);
+        if(accessToken!= null) {
+            String userId = jwtProvider.getUserIdFromJwt(accessToken);
+            return userMapper.findByUserId(userId);
+        }
+        return null;
     }
 
 }

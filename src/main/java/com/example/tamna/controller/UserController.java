@@ -43,10 +43,12 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> resUserData(HttpServletRequest request){
         UserDto user = authService.checkUser(request);
         Map<String, Object> map = new HashMap<>();
-
-        map.put("maxClasses", userService.getMaxClasses());
-        map.put("userData", user);
-        return ResponseEntity.status(HttpStatus.OK).body(map);
+        if(user != null) {
+            map.put("maxClasses", userService.getMaxClasses());
+            map.put("userData", user);
+            return ResponseEntity.status(HttpStatus.OK).body(map);
+        } map.put("message", "tokenFail");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
     }
 
 
@@ -67,13 +69,17 @@ public class UserController {
     @GetMapping(value = "/mypage")
     public ResponseEntity<Map<String, Object>> myBookingState(HttpServletRequest request){
         UserDto user = authService.checkUser(request);
-
         Map<String, Object> map = new HashMap<>();
-        map.put("userData", user);
-        List<DetailBookingDataDto> myBookingDetailDataList = bookingService.userIncludedBooking(user.getUserId());
-        System.out.println(myBookingDetailDataList);
-        map.put("myBookingDetailDataList", myBookingDetailDataList);
-        return ResponseEntity.status(HttpStatus.OK).body(map);
+        if(user != null) {
+            map.put("userData", user);
+            List<DetailBookingDataDto> myBookingDetailDataList = bookingService.userIncludedBooking(user.getUserId());
+            System.out.println(myBookingDetailDataList);
+            map.put("myBookingDetailDataList", myBookingDetailDataList);
+            return ResponseEntity.status(HttpStatus.OK).body(map);
+        }else{
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+        }
     }
 
 

@@ -113,16 +113,15 @@ public class JwtProvider implements InitializingBean {
 
     // access토큰에서 아이디 추출
     public String getUserIdFromJwt(String accessToken){
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody();
 
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(accessToken)
-                .getBody();
+            System.out.println("claims= " + claims);
 
-        System.out.println("claims= " + claims);
-
-        return claims.getSubject();
+            return claims.getSubject();
     }
 
 

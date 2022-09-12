@@ -51,11 +51,16 @@ public class BookingController {
     public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("roomId") int roomId, HttpServletRequest request) {
             UserDto user = authService.checkUser(request);
             Map<String, Object> map = new HashMap<>();
+        if (user != null) {
             map.put("userData", userService.getUserData(user.getUserId()));
             map.put("roomData", roomService.getRoomId(roomId));
             map.put("bookingData", bookingService.roomBookingState(roomId));
             map.put("namesData", userService.getUserNames(user.getClasses()));
             return ResponseEntity.status(HttpStatus.OK).body(map);
+        }else{
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+        }
     };
 
     @ApiOperation(value = " [완료] 메인 회의실, 예약 데이터 보내기", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
@@ -209,11 +214,13 @@ public class BookingController {
     @ApiOperation(value = " [완료] 예약하기")
     @PostMapping(value = "/conference")
     public ResponseEntity<Map<String, Object>> conferenceRoomBooking(@RequestBody PostBookingDataDto postBookingDataDto, HttpServletRequest request){
-        UserDto user = authService.checkUser(request);
 
-        List<String> teamMateNames = postBookingDataDto.getTeamMate();
+        UserDto user = authService.checkUser(request);
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> arr = new HashMap<>();
+
+        if(user!= null){
+        List<String> teamMateNames = postBookingDataDto.getTeamMate();
 
         String roomType;
 
@@ -337,6 +344,10 @@ public class BookingController {
                 }
             }
             return ResponseEntity.status(HttpStatus.OK).body(map);
+        }
+        }else{
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
         }
     }//
 

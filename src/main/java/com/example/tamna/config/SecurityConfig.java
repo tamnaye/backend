@@ -37,7 +37,8 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/login").permitAll();// 403에러 임시 방편
+                .antMatchers("/auth/login").permitAll();
+//                .antMatchers("/api/**");
 
         return http.build();
     }
