@@ -7,12 +7,12 @@
 <br/>
 
 ### 📌 목차 
-1. [프로젝트 배경](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system/edit/master/README.md#1-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EB%B0%B0%EA%B2%BD)
-2. [프로젝트 소개](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system/edit/master/README.md#2-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%86%8C%EA%B0%9C)
-3. [기술스택](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system/edit/master/README.md#3-%EA%B8%B0%EC%88%A0%EC%8A%A4%ED%83%9D)
-4. [DB구조](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system/edit/master/README.md#4-db-%EA%B5%AC%EC%A1%B0)
-5. [페이지별 구현기능](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system/edit/master/README.md#5-%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84-%EA%B5%AC%ED%98%84%EA%B8%B0%EB%8A%A5)
-6. [개발 및 기획](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system/edit/master/README.md#6-%EA%B0%9C%EB%B0%9C-%EB%B0%8F-%EA%B8%B0%ED%9A%8D)
+1. [프로젝트 배경](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#1-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EB%B0%B0%EA%B2%BD)
+2. [프로젝트 소개](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#2-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%86%8C%EA%B0%9C)
+3. [기술스택](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#3-%EA%B8%B0%EC%88%A0%EC%8A%A4%ED%83%9D)
+4. [DB구조](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#4-db-%EA%B5%AC%EC%A1%B0)
+5. [페이지별 구현기능](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#5-%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84-%EA%B5%AC%ED%98%84%EA%B8%B0%EB%8A%A5)
+6. [개발 및 기획](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#6-%EA%B0%9C%EB%B0%9C-%EB%B0%8F-%EA%B8%B0%ED%9A%8D)
 
 <br/>
 
