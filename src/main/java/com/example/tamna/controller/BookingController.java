@@ -285,7 +285,7 @@ public class BookingController {
                                 }
                                 else {
                                     int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
-                                    LOGGER.info("예약 성공한 bookingId: " + bookingId);
+//                                    LOGGER.info("예약 성공한 bookingId: " + bookingId);
                                     participantsService.insertNaboxApplicant(bookingId, user.getUserId());
                                     //LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
                                     arr.put("success", roomType + " 예약 성공! ♥ ");

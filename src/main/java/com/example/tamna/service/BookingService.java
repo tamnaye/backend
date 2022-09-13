@@ -182,14 +182,13 @@ public class BookingService {
                         continue;
                     }
                     combineData.setParticipants(teamMate);
-                    System.out.println(combineData);
+//                    System.out.println(combineData);
                     allMyBookingData.add(combineData);
                 }
             } else {
                 allMyBookingData.add(null);
             }
         }
-        System.out.println("allMyBookingData: {}" + allMyBookingData.isEmpty());
         return allMyBookingData;
     }
 
@@ -203,7 +202,7 @@ public class BookingService {
     // 공식일정인지 결과 확인
     public List<Boolean> checkOfficial(int roomId, String startTime, String endTime) {
         Date today = time();
-        System.out.println("dsalfjsklfjsjf : " + bookingMapper.findSameTimeOfficial(today, roomId, startTime, endTime));
+//        System.out.println(": " + bookingMapper.findSameTimeOfficial(today, roomId, startTime, endTime));
         return bookingMapper.findSameTimeOfficial(today, roomId, startTime, endTime);
     }
 
