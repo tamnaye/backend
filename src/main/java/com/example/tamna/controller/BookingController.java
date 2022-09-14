@@ -267,12 +267,13 @@ public class BookingController {
                             if(roomType.equals("회의실") || roomType.equals("스튜디오")){
                                 int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
                                 LOGGER.info("예약 성공한 bookingId: " + bookingId);
-                                // 유저들 이름 종합
-                                List<UserDto> users = userService.getUsersData(user.getClasses(),user.getUserName(), teamMateNames);
-                                participantsService.insertParticipants(bookingId, users, teamMateNames);
                                 if(roomType.equals("회의실")){
+                                    // 유저들 이름 종합
+                                    List<UserDto> users = userService.getUsersData(user.getClasses(),user.getUserName(), teamMateNames);
+                                    participantsService.insertParticipants(bookingId, users, teamMateNames);
                                     arr.put("success", "회의실 예약 성공! ♥ ");
                                 }else{
+                                    participantsService.insertApplicant(bookingId, user.getUserId());
                                     arr.put("success", "스튜디오 예약 성공! 비밀번호는 매니저님께 문의해주세요! ♥");
                                 }
                                 map.put("message", arr);
@@ -286,7 +287,7 @@ public class BookingController {
                                 else {
                                     int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
 //                                    LOGGER.info("예약 성공한 bookingId: " + bookingId);
-                                    participantsService.insertNaboxApplicant(bookingId, user.getUserId());
+                                    participantsService.insertApplicant(bookingId, user.getUserId());
                                     //LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
                                     arr.put("success", roomType + " 예약 성공! ♥ ");
                                     map.put("message", arr);

@@ -25,15 +25,19 @@ public class FeedbackController {
     @ApiOperation(value = "[완료] 피드백 내용 보내기")
     @PostMapping(value = "/feedback")
     public ResponseEntity<Map<String, Object>> feedback(@RequestBody Feedback feedback){
-        int result = feedbackService.insertFeedback(feedback.getUserId(), feedback.getContent());
-        Map<String, Object> map = new HashMap<>();
-        if(result == 1) {
-            map.put("message", "success");
-            return ResponseEntity.status(HttpStatus.OK).body(map);
-        }
-        else{
-            map.put("message", "fail");
-            return ResponseEntity.status(HttpStatus.OK).body(map);
+            Map<String, Object> map = new HashMap<>();
+        if(feedback.getUserId()!= null) {
+            int result = feedbackService.insertFeedback(feedback.getUserId(), feedback.getContent());
+            if (result == 1) {
+                map.put("message", "success");
+                return ResponseEntity.status(HttpStatus.OK).body(map);
+            } else {
+                map.put("message", "fail");
+                return ResponseEntity.status(HttpStatus.OK).body(map);
+            }
+        } else{
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
         }
     }
 

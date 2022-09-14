@@ -1,18 +1,50 @@
 package com.example.tamna.service;
 
 import com.example.tamna.mapper.StaticDataMapper;
+import io.swagger.annotations.Authorization;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @Service
 public class StaticDataService {
     private static StaticDataMapper staticDataMapper;
-    public StaticDataService(StaticDataMapper staticDataMapper){this.staticDataMapper = staticDataMapper;}
+//    private final Environment env;
+//    private final Path fileLocaion;
+
+    @Autowired
+    public StaticDataService(StaticDataMapper staticDataMapper) throws IOException {
+        this.staticDataMapper = staticDataMapper;
+//        this.env = env;
+//        this.fileLocaion = Paths.get(env.getProperty("file.uploadDir")).toAbsolutePath().normalize();
+//
+//        Files.createDirectories(this.fileLocaion);
+
+
+    }
+
+//    public String storeFile(MultipartFile file) throws IOException {
+//        // cleanPath : 역슬래시를 /슬래시로 바꿔줌
+//        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+//
+//            if (fileName.contains("..")) {
+//            // 저장할 fileStorageLocation 경로 뒤에 파일명을 붙여준다. (경로 조합)
+//            Path targetLocation = this.fileLocaion.resolve(fileName);
+//            //업로드할 file을 targetLocation에 복사한다. (동일한 이름일 경우 replace)
+//            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+//            return fileName;
+//        }
+//    }
+
 
     public static void userCsv() throws IOException {
 //        String path = new ClassPathResource("/data/userData.csv").getFile().getAbsolutePath();

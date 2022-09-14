@@ -59,9 +59,12 @@ public interface BookingMapper {
     @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND START_TIME=#{startTime}")
     List<JoinBooking> findDetailBookingData(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime);
 
-    // 예약 취소
+    // 예약 한건 취소
     @Delete("DELETE FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
     int deleteBooking(int bookingId);
+
+    @Delete("DELETE FROM BOOKING WHERE BOOKING_ID IN (${bookingsId})")
+    int deleteBookings(String bookingsId);
 
     // 공식일정으로 인한 인재들 예약 취소 및 예약취소 취소
     @Update("UPDATE BOOKING SET MODE=#{mode} WHERE BOOKING_ID IN (${bookingsId})")
