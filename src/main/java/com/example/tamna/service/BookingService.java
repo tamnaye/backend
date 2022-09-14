@@ -301,41 +301,42 @@ public class BookingService {
                 // 남은 cancel되었던 예약들 중 같은 시간대 예약자 존재 시 삭제
                 if (restCanceledBooking.isEmpty()) {
                     restCanceledBooking = newCanceledBooking;
-                    if (!allBookingId.isEmpty()) {
-                        for (int bookingId : allBookingId) {
-                            String startTime = null;
-                            String endTime = null;
-                            List<String> userIds = new ArrayList<>();
+                }
 
-                            for (int i = 0; i < restCanceledBooking.toArray().length; i++) {
-                                if (restCanceledBooking.get(i).getBookingId() == bookingId) {
-                                    userIds.add(restCanceledBooking.get(i).getUserId());
-                                    startTime = restCanceledBooking.get(i).getStartTime();
-                                    endTime = restCanceledBooking.get(i).getEndTime();
-                                    System.out.println(userIds + " " + startTime + " " + endTime);
-                                }
-                            } // for 문 끝
+                if (!allBookingId.isEmpty()) {
+                    for (int bookingId : allBookingId) {
+                        String startTime = null;
+                        String endTime = null;
+                        List<String> userIds = new ArrayList<>();
 
-                            if (!userIds.isEmpty()) { // 같은 시간대 예약되었는지 확인 후 있을 경우 기존 취소되었던 예약 목록에서 삭제
-                                String usersIdString = userService.changeString(null, userIds);
-                                int existSameTimeBooking = bookingMapper.findCancelSameBooking(today, usersIdString, startTime, endTime);
-                                if (existSameTimeBooking != 0) {
-                                    finalBookingId.remove(Integer.valueOf(bookingId));
-                                }
+                        for (int i = 0; i < restCanceledBooking.toArray().length; i++) {
+                            if (restCanceledBooking.get(i).getBookingId() == bookingId) {
+                                userIds.add(restCanceledBooking.get(i).getUserId());
+                                startTime = restCanceledBooking.get(i).getStartTime();
+                                endTime = restCanceledBooking.get(i).getEndTime();
+                                System.out.println(userIds + " " + startTime + " " + endTime);
+                            }
+                        } // for 문 끝
+
+                        if (!userIds.isEmpty()) { // 같은 시간대 예약되었는지 확인 후 있을 경우 기존 취소되었던 예약 목록에서 삭제
+                            String usersIdString = userService.changeString(null, userIds);
+                            int existSameTimeBooking = bookingMapper.findCancelSameBooking(today, usersIdString, startTime, endTime);
+                            if (existSameTimeBooking != 0) {
+                                finalBookingId.remove(Integer.valueOf(bookingId));
                             }
                         }
-
-                        System.out.println("최종 bookingIdList" + finalBookingId);
-
-                        // 위의 조건에 모두 부합할 경우 취소되었던 예약 활성화
-                        String SelectForBookingsId = addBookingId(finalBookingId);
-                        System.out.println(SelectForBookingsId);
-                        if (SelectForBookingsId != null) {
-                            int updateResultCount = bookingMapper.updateBookingMode(bookingsIdString, null);
-                            System.out.println("updateResultCount :" + updateResultCount);
-                        }
-
                     }
+
+                    System.out.println("최종 bookingIdList" + finalBookingId);
+
+                    // 위의 조건에 모두 부합할 경우 취소되었던 예약 활성화
+                    String SelectForBookingsId = addBookingId(finalBookingId);
+                    System.out.println(SelectForBookingsId);
+                    if (SelectForBookingsId != null) {
+                        int updateResultCount = bookingMapper.updateBookingMode(bookingsIdString, null);
+                        System.out.println("updateResultCount :" + updateResultCount);
+                    }
+
                 }
             }
         }
