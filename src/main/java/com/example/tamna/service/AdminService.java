@@ -35,7 +35,7 @@ public class AdminService {
 
     // 최신 인재들 업데이트
     public String updateUser(File dest) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(dest), "utf-8"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(dest), "euc-kr"));
         String line;
         int result = 0;
         if((line= br.readLine())!=null) {
