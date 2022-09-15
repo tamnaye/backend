@@ -58,7 +58,8 @@
 <br/>
 
 ## 4. DB 구조 
-<img width="567" alt="스크린샷 2022-09-12 오후 9 23 06" src="https://user-images.githubusercontent.com/85235063/189786156-9f12c71c-a7db-4d2e-8577-db439c28b5ec.png">
+<img width="567" alt="스크린샷 2022-09-15 오후 10 30 58" src="https://user-images.githubusercontent.com/85235063/190417066-38b44421-91e1-4920-9ed8-43b7fca56720.png">
+
 
 <br/>
 
