@@ -1,7 +1,6 @@
 package com.example.tamna.service;
 
 import com.example.tamna.dto.BookingDataDto;
-import com.example.tamna.dto.PostBookingDataD;
 import com.example.tamna.dto.PostBookingDataDto;
 import com.example.tamna.model.Booking;
 import com.example.tamna.model.Participants;
@@ -40,7 +39,7 @@ public class ParticipantsService {
     }//
 
     // 나박스 회의실 예약자 insert
-    public int insertNaboxApplicant(int bookingId, String userId){
+    public int insertApplicant(int bookingId, String userId){
         return participantsMapper.insertParticipants(bookingId, userId, true);
     }//
 

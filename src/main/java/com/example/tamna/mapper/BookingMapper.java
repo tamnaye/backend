@@ -59,17 +59,23 @@ public interface BookingMapper {
     @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND ROOM_ID=#{roomId} AND MODE is null AND START_TIME=#{startTime}")
     List<JoinBooking> findDetailBookingData(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime);
 
-    // 예약 취소
+    // 예약 한건 취소
     @Delete("DELETE FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
     int deleteBooking(int bookingId);
+
+
+    // 예약들 한번에 취소
+    @Delete("DELETE FROM BOOKING WHERE BOOKING_ID IN (${bookingsIdString})")
+    int deleteBookings(String bookingsIdString);
+
 
     // 공식일정으로 인한 인재들 예약 취소 및 예약취소 취소
     @Update("UPDATE BOOKING SET MODE=#{mode} WHERE BOOKING_ID IN (${bookingsId})")
     int updateBookingMode(@Param("bookingsId") String bookingsId, @Param("mode") String mode);
 
     // bookingId만으로 조회
-    @Select("SELECT *  FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
-    Booking selectOfficial(int bookingId);
+    @Select("SELECT * FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) WHERE BOOKING_ID=#{bookingId} AND USER_TYPE=true")
+    CancelDto selectOfficial(int bookingId);
 
 
     // 공식일정 확인
@@ -79,10 +85,6 @@ public interface BookingMapper {
     // 취소되었던 예약 조회
     @Select("SELECT * FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE='cancel' AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME) ORDER BY BOOKING_ID ASC")
     List<CancelDto> selectCancelBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
-
-
-
-
 
 }
 

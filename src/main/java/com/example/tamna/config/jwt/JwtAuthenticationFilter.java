@@ -46,6 +46,7 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
                     Map<Boolean, String> refreshResult = jwtProvider.validateToken(refreshToken);
                     if(!refreshResult.isEmpty() && refreshResult.keySet().contains(true) && refreshResult.values().contains("success")){
                         String newAccessToken = jwtProvider.createAccessToken(checkRefresh.getUserId());
+                        System.out.println("newAccessToken: " + newAccessToken);
                         response.setHeader(AUTHORIZATION_HEADER, newAccessToken);
                         response.setHeader(REAUTHORIZATION_HEADER, refreshToken);
                     }else{

@@ -211,6 +211,8 @@ public class BookingController {
 //           return ResponseEntity.status(HttpStatus.OK).body(map);
 //       }
 //    }//
+
+
     @ApiOperation(value = " [완료] 예약하기")
     @PostMapping(value = "/conference")
     public ResponseEntity<Map<String, Object>> conferenceRoomBooking(@RequestBody PostBookingDataDto postBookingDataDto, HttpServletRequest request){
@@ -267,12 +269,13 @@ public class BookingController {
                             if(roomType.equals("회의실") || roomType.equals("스튜디오")){
                                 int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
                                 LOGGER.info("예약 성공한 bookingId: " + bookingId);
-                                // 유저들 이름 종합
-                                List<UserDto> users = userService.getUsersData(user.getClasses(),user.getUserName(), teamMateNames);
-                                participantsService.insertParticipants(bookingId, users, teamMateNames);
                                 if(roomType.equals("회의실")){
+                                    // 유저들 이름 종합
+                                    List<UserDto> users = userService.getUsersData(user.getClasses(),user.getUserName(), teamMateNames);
+                                    participantsService.insertParticipants(bookingId, users, teamMateNames);
                                     arr.put("success", "회의실 예약 성공! ♥ ");
                                 }else{
+                                    participantsService.insertApplicant(bookingId, user.getUserId());
                                     arr.put("success", "스튜디오 예약 성공! 비밀번호는 매니저님께 문의해주세요! ♥");
                                 }
                                 map.put("message", arr);
@@ -286,7 +289,7 @@ public class BookingController {
                                 else {
                                     int bookingId = bookingService.insertBooking(postBookingDataDto.getRoomId(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), false);
 //                                    LOGGER.info("예약 성공한 bookingId: " + bookingId);
-                                    participantsService.insertNaboxApplicant(bookingId, user.getUserId());
+                                    participantsService.insertApplicant(bookingId, user.getUserId());
                                     //LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
                                     arr.put("success", roomType + " 예약 성공! ♥ ");
                                     map.put("message", arr);
@@ -358,25 +361,41 @@ public class BookingController {
 
     @ApiOperation(value = "[완료] 예약 취소")
     @PostMapping(value ="/cancellation")
-    public ResponseEntity<Map<String, Object>> cancelBooking(@RequestBody BookingId bookingId){
+    public ResponseEntity<Map<String, Object>> cancelBooking(@RequestBody BookingId bookingId, HttpServletRequest request){
         Map<String, Object> map = new HashMap<>();
-        int intBookingId = bookingId.bookingId;
-        Booking booking = bookingService.selectBookingId(intBookingId);
-        String checkCancel;
-        if(!booking.isOfficial()){
-            checkCancel = bookingService.deleteBooking(intBookingId);
+
+        UserDto user = authService.checkUser(request);
+
+        if(user!= null) {
+            int intBookingId = bookingId.bookingId;
+            CancelDto booking = bookingService.selectBookingId(intBookingId, user.getUserId());
+            String checkCancel;
+
+            if(booking != null) {
+                if (!booking.isOfficial()) {
+                    // 인재 예약 삭제
+                    checkCancel = bookingService.deleteBooking(intBookingId);
+                } else {
+                    // 공식 일정 삭제
+                    checkCancel = bookingService.deleteOfficialBooking(booking);
+                }
+
+                // 결과 반환
+                if (checkCancel.equals("success")) {
+                    map.put(checkCancel, "예약 취소가 완료되었습니다");
+                } else {
+                    map.put(checkCancel, "예약 취소에 실패하였습니다.");
+                }
+
+                return ResponseEntity.status(HttpStatus.OK).body(map);
+            }else{
+                map.put("message", "예약 취소 오류");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+            }
         }else{
-            checkCancel = bookingService.deleteOfficialBooking(booking);
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
         }
-
-        if(checkCancel.equals("success")){
-            map.put(checkCancel, "예약 취소가 완료되었습니다ð");
-        }
-        else{
-            map.put(checkCancel, "예약 취소에 실패하였습니다.");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
 

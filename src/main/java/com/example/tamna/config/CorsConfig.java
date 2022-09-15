@@ -1,5 +1,7 @@
 package com.example.tamna.config;
 
+import com.example.tamna.config.jwt.JwtProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -9,6 +11,12 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CorsConfig {
 
+    @Value("${AUTHORIZATION_HEADER}")
+    private String ACCESSTOKEN_HEADER;
+
+    @Value("${REAUTHORIZATION_HEADER}")
+    private String REFRESHTOKEN_HEADER;
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -17,6 +25,8 @@ public class CorsConfig {
         config.addAllowedOriginPattern("*"); //  모든 ip에 응답 허용
         config.addAllowedHeader("*"); // 모든 header에 응답 허용
         config.addAllowedMethod("*"); // 모든 메소드(get, post, put, delete) 허용
+        config.addExposedHeader(ACCESSTOKEN_HEADER);
+        config.addExposedHeader(REFRESHTOKEN_HEADER);
         source.registerCorsConfiguration("/api/**", config);
         source.registerCorsConfiguration("/auth/**", config);
         return new CorsFilter(source);

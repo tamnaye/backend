@@ -65,7 +65,7 @@ public class JwtProvider implements InitializingBean {
     //accessToken 생성
     public String createAccessToken(String userId) {
         Claims claims = Jwts.claims().setSubject(userId);
-        System.out.println("id: " + userId);
+//        System.out.println("id: " + userId);
 
         Date now = new Date();
         Date accessValidity = new Date(now.getTime() + accessTokenValidityInMilliSeconds * 1000);
@@ -77,7 +77,7 @@ public class JwtProvider implements InitializingBean {
                 .setExpiration(accessValidity) // 만료시간 설정
                 .compact();
 
-        System.out.println(accessToken);
+//        System.out.println(accessToken);
         return accessToken;
     }
 

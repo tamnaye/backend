@@ -32,8 +32,13 @@ public interface ParticipantsMapper {
     @Insert("INSERT INTO PARTICIPANTS VALUES (#{bookingId}, #{userId}, #{userType})")
     int insertParticipants( @Param("bookingId") int bookingId, @Param("userId") String userId, @Param("userType") boolean userType);
 
-    // 예약 취소시 예약자들 삭제
+    // 예약 취소시 예약자 삭제
     @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID=#{bookingId}")
     int deleteParticipants(int bookingId);
+
+
+    // 여러 예약 예약자들 삭제
+    @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID IN (${bookingsIdString})")
+    int deleteSeveralParticipants(String bookingsIdString);
 
 }
