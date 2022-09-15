@@ -36,7 +36,9 @@ public interface ParticipantsMapper {
     @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID=#{bookingId}")
     int deleteParticipants(int bookingId);
 
-    // 여러개 예약의 예약자 삭제
-    @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID IN (${bookingsId})")
-    int deleteSeveralParticipants(String bookingsId);
+
+    // 여러 예약 예약자들 삭제
+    @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID IN (${bookingsIdString})")
+    int deleteSeveralParticipants(String bookingsIdString);
+
 }

@@ -63,8 +63,11 @@ public interface BookingMapper {
     @Delete("DELETE FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
     int deleteBooking(int bookingId);
 
-    @Delete("DELETE FROM BOOKING WHERE BOOKING_ID IN (${bookingsId})")
-    int deleteBookings(String bookingsId);
+
+    // 예약들 한번에 취소
+    @Delete("DELETE FROM BOOKING WHERE BOOKING_ID IN (${bookingsIdString})")
+    int deleteBookings(String bookingsIdString);
+
 
     // 공식일정으로 인한 인재들 예약 취소 및 예약취소 취소
     @Update("UPDATE BOOKING SET MODE=#{mode} WHERE BOOKING_ID IN (${bookingsId})")
@@ -82,10 +85,6 @@ public interface BookingMapper {
     // 취소되었던 예약 조회
     @Select("SELECT * FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) WHERE DATES=#{today} AND ROOM_ID=#{roomId} AND MODE='cancel' AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME) ORDER BY BOOKING_ID ASC")
     List<CancelDto> selectCancelBooking(@Param("today") Date today, @Param("roomId") int roomId, @Param("startTime") String startTime, @Param("endTime") String endTime);
-
-
-
-
 
 }
 
