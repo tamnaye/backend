@@ -74,8 +74,8 @@ public interface BookingMapper {
     int updateBookingMode(@Param("bookingsId") String bookingsId, @Param("mode") String mode);
 
     // bookingId만으로 조회
-    @Select("SELECT *  FROM BOOKING WHERE BOOKING_ID=#{bookingId}")
-    Booking selectOfficial(int bookingId);
+    @Select("SELECT * FROM BOOKING INNER JOIN PARTICIPANTS USING(BOOKING_ID) WHERE BOOKING_ID=#{bookingId} AND USER_TYPE=true")
+    CancelDto selectOfficial(int bookingId);
 
 
     // 공식일정 확인

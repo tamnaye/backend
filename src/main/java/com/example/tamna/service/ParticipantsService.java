@@ -1,7 +1,6 @@
 package com.example.tamna.service;
 
 import com.example.tamna.dto.BookingDataDto;
-import com.example.tamna.dto.PostBookingDataD;
 import com.example.tamna.dto.PostBookingDataDto;
 import com.example.tamna.model.Booking;
 import com.example.tamna.model.Participants;

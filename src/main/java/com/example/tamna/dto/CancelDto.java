@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CancelDto {
     private int bookingId;
+    private int roomId;
     private String userId;
     private Boolean userType;
-    private String StartTime;
-    private String EndTime;
+    private String startTime;
+    private String endTime;
+    private boolean official;
 }

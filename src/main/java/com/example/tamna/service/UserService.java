@@ -3,7 +3,6 @@ package com.example.tamna.service;
 import com.example.tamna.model.UserDto;
 import com.example.tamna.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

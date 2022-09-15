@@ -196,8 +196,13 @@ public class BookingService {
     ;
 
     // bookingId를 통한 공식일정 검색
-    public Booking selectBookingId(int bookingId) {
-        return bookingMapper.selectOfficial(bookingId);
+    public CancelDto selectBookingId(int bookingId, String userId) {
+        CancelDto result =  bookingMapper.selectOfficial(bookingId);
+        System.out.println(result);
+        if(result.getUserId().equals(userId)){
+            return result;
+        }
+        return null;
     }
 
     // 공식일정인지 결과 확인
@@ -227,8 +232,8 @@ public class BookingService {
         return hour;
     }
 
-    //     공식 일정 취소시 인재분들 예약 살리기
-    public String deleteOfficialBooking(Booking booking) {
+    // 공식 일정 취소시 인재분들 예약 살리기
+    public String deleteOfficialBooking(CancelDto booking) {
         Date today = time();
         int hour = nowHour();
 
@@ -344,13 +349,7 @@ public class BookingService {
         }
         // 공식일정 취소
         return deleteBooking(booking.getBookingId());
-//        int deleteBooking = bookingMapper.deleteBooking(booking.getBookingId());
-//        int deleteParticipants = participantsMapper.deleteParticipants(booking.getBookingId());
-//        System.out.println(deleteBooking + deleteParticipants);
-//        if (deleteBooking == 1 && deleteParticipants >= 1) {
-//            return "success";
-//        }
-//        return "fail";
+//
 
     }
 
