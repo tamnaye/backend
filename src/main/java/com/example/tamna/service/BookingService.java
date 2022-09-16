@@ -235,8 +235,7 @@ public class BookingService {
     // 공식 일정 취소시 인재분들 예약 살리기
     public String deleteOfficialBooking(CancelDto booking) {
         Date today = time();
-//        int hour = nowHour();
-        int hour = 12;
+        int hour = nowHour();
         List<CancelDto> canceledBooking = bookingMapper.selectCancelBooking(today, booking.getRoomId(), booking.getStartTime(), booking.getEndTime());
         System.out.println(canceledBooking);
 

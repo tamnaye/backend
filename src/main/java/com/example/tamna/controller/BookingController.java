@@ -89,7 +89,7 @@ public class BookingController {
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
-    
+
 
     @ApiOperation(value = " [완료] 예약하기")
     @PostMapping(value = "/conference")
