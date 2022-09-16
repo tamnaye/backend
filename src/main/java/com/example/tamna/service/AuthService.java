@@ -33,8 +33,10 @@ public class AuthService {
             System.out.println(authentication);
             // accessToken 생성
             String access = jwtProvider.createAccessToken(user.getUserId());
+            System.out.println("로그인 에세스: "+access);
             //refreshToken 생성
             String refresh = jwtProvider.createRefreshToken(user.getUserId());
+            System.out.println("로그엔 리프레쉬: " + refresh);
             map.put("access", access);
             map.put("refresh", refresh);
         } else {
