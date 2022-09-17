@@ -113,15 +113,15 @@ public class JwtProvider implements InitializingBean {
 
     // access토큰에서 아이디 추출
     public String getUserIdFromJwt(String accessToken){
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(accessToken)
-                    .getBody();
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
 
-            System.out.println("claims= " + claims);
+        System.out.println("claims= " + claims);
 
-            return claims.getSubject();
+        return claims.getSubject();
     }
 
 
@@ -134,6 +134,7 @@ public class JwtProvider implements InitializingBean {
     // 헤더에서 accessToken 가져오기
     public String getHeaderAccessToken(HttpServletRequest request){
         String bearerAccessToken = request.getHeader(AUTHORIZATION_HEADER);
+        System.out.println("헤더 토큰: " + bearerAccessToken);
         if (StringUtils.hasText(bearerAccessToken) && bearerAccessToken.startsWith("Bearer ")){
             bearerAccessToken = bearerAccessToken.substring(7);
         }

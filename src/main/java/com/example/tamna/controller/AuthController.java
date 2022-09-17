@@ -28,6 +28,9 @@ public class AuthController {
     @Value("${REAUTHORIZATION_HEADER}")
     private String REAUTHORIZATION_HEADER;
 
+    @Value("${jwt.token-prefix}")
+    private String tokenPrefix;
+
     private final AuthService authService;
 
     @Data
@@ -47,8 +50,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(tokenMap);
 
         }else{
-            response.addHeader(AUTHORIZATION_HEADER, tokenMap.get("access"));
-            response.addHeader(REAUTHORIZATION_HEADER, tokenMap.get("refresh"));
+            response.addHeader(AUTHORIZATION_HEADER, tokenPrefix + tokenMap.get("access"));
+            response.addHeader(REAUTHORIZATION_HEADER, tokenPrefix + tokenMap.get("refresh"));
             Map<String, String> map = new HashMap<>();
             map.put("message", "success");
             return ResponseEntity.status(HttpStatus.OK).body(map);

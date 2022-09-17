@@ -9,18 +9,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 //시큐리티 관련 설정
 @Configuration //IoC
 @EnableWebSecurity // Security 활성화
 @RequiredArgsConstructor
-//@Component
 public class SecurityConfig {
 
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,8 +39,6 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .anyRequest().permitAll();
-//                .antMatchers("/auth/login").permitAll();
-//                .antMatchers("/api/**");
 
         return http.build();
     }
