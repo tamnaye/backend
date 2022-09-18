@@ -56,4 +56,13 @@ public class AuthService {
         return null;
     }
 
+
+    public UserDto checkUserInformation(String accessToken){
+        if(accessToken!= null) {
+            String userId = jwtProvider.getUserIdFromJwt(accessToken);
+            return userMapper.findByUserId(userId);
+        }
+        return null;
+    }
+
 }
