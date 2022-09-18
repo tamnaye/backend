@@ -7,10 +7,18 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/admin")
@@ -18,6 +26,25 @@ import java.util.Map;
 public class AdminController {
 
     private final AdminService adminService;
+
+    @ApiOperation(value="최신기수 업데이트")
+    @PostMapping("/update/user")
+    public ResponseEntity<Map<String, Object>> insertUserData(@RequestPart(required = false) MultipartFile file, HttpServletRequest request) throws IOException {
+        File originalFileName = new File(Objects.requireNonNull(file.getOriginalFilename()));
+        System.out.println(originalFileName);
+        String resourceSrc = request.getServletContext().getRealPath("/data/");
+        File dest = new File(resourceSrc + originalFileName);
+        System.out.println(dest);
+        file.transferTo(dest);
+        String result = adminService.updateUser(dest);
+        Map<String, Object> map = new HashMap<>();
+        if(result.equals("success")){
+            map.put("message", "최신기수 업로드가 완료되었습니다.");
+        }else{
+            map.put("message", "파일 오류<빈 파일인지, 파일 양식이 옳은지 확인 혹은 파일명을 바꿔주세요!>");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
 
     @ApiOperation(value = "기수별 층수 보기")
     @GetMapping("/view/class&floor")
