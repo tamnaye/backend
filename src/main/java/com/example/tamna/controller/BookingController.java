@@ -2,7 +2,6 @@ package com.example.tamna.controller;
 
 import com.example.tamna.dto.*;
 
-import com.example.tamna.model.Booking;
 import com.example.tamna.model.UserDto;
 import com.example.tamna.service.*;
 

@@ -76,6 +76,7 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
 //                // accessToken이 null일 경우
 //                response.sendError(403);
 //            }
-        } filterChain.doFilter(request, response);
+        }
+        filterChain.doFilter(request, response);
     }
 }

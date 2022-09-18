@@ -88,32 +88,6 @@ public class ParticipantsService {
 
 
     // 회의실 예약시, 동시간대 예약 체크
-//    public Set<String> checkUsingBooking(PostBookingDataD postBookingDataDto){
-//        Date today = time();
-//        List<BookingDataDto> usingCheck;
-//
-//        if(postBookingDataDto.getRoomType().equals("meeting")) {
-//            String usersName = userService.changeString(postBookingDataDto.getUserName(), postBookingDataDto.getTeamMate());
-//            System.out.println("예약자 + 팀원들 이름: " + usersName);
-//            usingCheck = participantsMapper.selectUsingUsers(today, postBookingDataDto.getClasses(), postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), usersName);
-//        }else{
-//            usingCheck = participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId());
-//            System.out.println(participantsMapper.selectUsingOnlyUser(today, postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime(), postBookingDataDto.getUserId()));
-//        }
-//        System.out.println("현재 회의실 사용중인 유저들: " + usingCheck);
-//
-//        Set<String> usingUsers = new HashSet<>();
-//        if(usingCheck.isEmpty()){
-//            System.out.println("사용중인 사람 x -> 회의실 사용 가능");
-//
-//        }else{
-//            usingCheck.forEach(m -> usingUsers.add(m.getUserName()));
-//            System.out.println(usingUsers + "현재 회의실 사용 중");
-//        }
-//        return usingUsers;
-//        }
-
-    // 회의실 예약시, 동시간대 예약 체크
     public Set<String> checkUsingBooking(UserDto user, PostBookingDataDto postBookingDataDto){
         Date today = time();
         List<BookingDataDto> usingCheck;
