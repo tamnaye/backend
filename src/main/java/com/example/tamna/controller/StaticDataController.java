@@ -4,6 +4,7 @@ import com.example.tamna.service.StaticDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
@@ -16,7 +17,11 @@ public class StaticDataController {
 
 //    @GetMapping(value = "/user")
     @PostMapping(value = "/user")
-    public String insertUserData(@RequestBody MultipartFile file) throws IOException {
+    public String insertUserData(@RequestPart(required = false) MultipartFile file) throws IOException {
+        File converFile = new File(file.getOriginalFilename());
+        file.transferTo(converFile);
+        System.out.println(converFile);
+
         System.out.println("여기왔냐");
         System.out.println("32r24254 2525  : " + file);
 
