@@ -80,8 +80,8 @@ public class AdminService {
 
 
     // 모든 유저 데이터
-    public List<UserDto> allUserData(){
-        return adminMapper.allSelectUser();
+    public List<UserDto> allUserData(int classes){
+        return adminMapper.allSelectUser(classes);
     }
 
     // 모든 기수 리스트

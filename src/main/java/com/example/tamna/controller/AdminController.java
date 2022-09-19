@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/admin")
@@ -29,13 +28,20 @@ public class AdminController {
     @ApiOperation(value="최신기수 업데이트")
     @PostMapping("/update/user")
     public ResponseEntity<Map<String, Object>> insertUserData(@RequestPart(required = false) MultipartFile file, HttpServletRequest request) throws IOException {
-        File originalFileName = new File(Objects.requireNonNull(file.getOriginalFilename()));
-        System.out.println(originalFileName);
+//        File originalFileName = new File(Objects.requireNonNull(file.getOriginalFilename()));
+//        originalFileName.delete();
         String resourceSrc = request.getServletContext().getRealPath("/data/");
-        System.out.println(resourceSrc);
-        File dest = new File(resourceSrc + originalFileName);
+//        System.out.println(resourceSrc);
+        File dest = new File(resourceSrc + file.getOriginalFilename());
+//        origindest.delete();
+//        File dest = new File(resourceSrc + originalFileName);
+        if(dest.exists()){
+            System.out.println("여기로 오나");
+            dest.delete();
+//            dest = new File(resourceSrc + file.getOriginalFilename());
+        }
         System.out.println(dest);
-        file.transferTo(dest);
+//        file.transferTo(dest);
         String result = adminService.updateUser(dest);
         Map<String, Object> map = new HashMap<>();
         if(result.equals("success")){
@@ -63,6 +69,7 @@ public class AdminController {
         Map<String, Object> map = new HashMap<>();
         String result = adminService.updateClassOfFloorData(changeFloorDto);
         if(result.equals("success")){
+            System.out.println(changeFloorDto.getClasses() + "기 가 " + changeFloorDto.getFloor() + "로 변경되었음.");
             map.put("message", "층수 변경이 완료되었습니다!");
         }else{
             map.put("message", "fail");
@@ -100,13 +107,21 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value="전체 유저데이터 보내기")
-    @GetMapping("/view/user")
-    public ResponseEntity<Map<String, Object>> getAllUserData() {
+
+    @ApiOperation(value = "전체 기수리스트 보내기")
+    @GetMapping("/view/class-list")
+    public ResponseEntity<Map<String, Object>> getAllClassList(){
         Map<String, Object> map = new HashMap<>();
-        List<UserDto> result = adminService.allUserData();
         List<Integer> classListResult = adminService.allUserClass();
         map.put("ClassList", classListResult);
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+    @ApiOperation(value="기수별 유저데이터 보내기")
+    @GetMapping("/view/user")
+    public ResponseEntity<Map<String, Object>> getAllUserData(@RequestParam("classes") int classes) {
+        Map<String, Object> map = new HashMap<>();
+        List<UserDto> result = adminService.allUserData(classes);
         map.put("AllUserData", result);
        return ResponseEntity.status(HttpStatus.OK).body(map);
     }

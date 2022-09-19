@@ -76,6 +76,7 @@ public class BookingController {
     }//
 
 
+
     @ApiOperation(value = " [완료] 예약 현황 페이지 데이터", notes = "@Param(floor)가 2,3층이면 각 층 데이터")
     @GetMapping(value = "/details-booking")
     @ResponseBody
@@ -85,6 +86,32 @@ public class BookingController {
         map.put("BookingData", bookingService.floorDetailBookingData(floor));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+
+    @ApiOperation(value = " [완료] 메인 회의실, 예약 데이터 보내기", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
+    @GetMapping(value = "/main2")
+    public ResponseEntity<Map<String, Object>> getMainData(HttpServletResponse response){
+        Map<String, Object> map = new HashMap<>();
+
+        UserDto user = authService.checkUser(response);
+        if(user != null){
+            if(user.getFloor() == 2 || user.getFloor() == 3) {
+                map.put("floor", user.getFloor());
+                map.put("RoomData", roomService.getFloorRoom(user.getFloor()));
+                map.put("BookingData", bookingService.floorBookingData(user.getFloor()));
+            }else{
+                map.put("floor", user.getFloor());
+                map.put("RoomData", roomService.roomList());
+                map.put("BookingData", bookingService.allRoomBookingState());
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(map);
+
+        }else{
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+        }
     }
 
 

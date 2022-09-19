@@ -34,7 +34,13 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
         if(request.getRequestURI().startsWith("/auth/")){
             System.out.println("토큰검증없이 로그인");
             log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
-        } else{ // /auth/로 시작하는 라우터가 아닌경우 토큰 검증
+        }
+        else if(request.getRequestURI().startsWith("/admin")){
+            // 어드민 페이지 개발을 위한 임시 방편
+            System.out.println("토큰검증없이 어드민페이지");
+            log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
+        }
+        else{ // /auth/로 시작하는 라우터가 아닌경우 토큰 검증
             System.out.println("########토큰 검증 필터###########");
             // 헤더에서 access토큰 & refresh토큰 가져옴
             String accessToken = jwtProvider.getHeaderAccessToken(request);

@@ -30,8 +30,8 @@ public interface AdminMapper {
     int updateTime(@Param("maxTime") int maxTime, @Param("roomName") String roomName);
 
     // 모든 유저 데이터 보내기
-    @Select("SELECT * FROM USER ORDER BY CLASSES DESC")
-    List<UserDto> allSelectUser();
+    @Select("SELECT * FROM USER WHERE CLASSES=#{classes}")
+    List<UserDto> allSelectUser(int classes);
 
     // 기수 리스트
     @Select("SELECT DISTINCT CLASSES FROM USER")
