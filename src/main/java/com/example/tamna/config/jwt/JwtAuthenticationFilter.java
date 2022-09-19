@@ -1,6 +1,8 @@
 package com.example.tamna.config.jwt;
 
 import com.example.tamna.model.Token;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,34 +45,40 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
             if (accessToken != null && refreshToken != null) {
                 Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);
-                if (!accessResult.isEmpty() && accessResult.keySet().contains(true) && accessResult.values().contains("success")) {
-                    System.out.println("accessToken 유효함");
-                    response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + accessToken);
-                    response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
-                } else if (!accessResult.isEmpty() && accessResult.keySet().contains(true) && accessResult.values().contains("fail")) {
-                    System.out.println("accessToken 만료됨");
-                    // refreshToken 디비랑 같은지 확인
-                    Token checkRefresh = jwtProvider.checkRefresh(refreshToken);
-                    System.out.println(checkRefresh);
-                    if (checkRefresh != null) {
-                        Map<Boolean, String> refreshResult = jwtProvider.validateToken(refreshToken);
-                        if (!refreshResult.isEmpty() && refreshResult.keySet().contains(true) && refreshResult.values().contains("success")) {
-                            String newAccessToken = jwtProvider.createAccessToken(checkRefresh.getUserId());
-                            System.out.println("newAccessToken: " + newAccessToken);
-                            response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + newAccessToken);
-                            response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
-                        } else {
-                            // 로그아웃
-                            jwtProvider.deleteToken(refreshToken);
-                            response.sendError(403);
+//                try{
+                    if (!accessResult.isEmpty() && accessResult.keySet().contains(true) && accessResult.values().contains("success")) {
+                        System.out.println("accessToken 유효함");
+                        response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + accessToken);
+                        response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
+                    } else if (!accessResult.isEmpty() && accessResult.keySet().contains(true) && accessResult.values().contains("fail")) {
+                        System.out.println("accessToken 만료됨");
+                        // refreshToken 디비랑 같은지 확인
+                        Token checkRefresh = jwtProvider.checkRefresh(refreshToken);
+                        System.out.println(checkRefresh);
+                        if (checkRefresh != null) {
+                            Map<Boolean, String> refreshResult = jwtProvider.validateToken(refreshToken);
+                            if (!refreshResult.isEmpty() && refreshResult.keySet().contains(true) && refreshResult.values().contains("success")) {
+                                String newAccessToken = jwtProvider.createAccessToken(checkRefresh.getUserId());
+                                System.out.println("newAccessToken: " + newAccessToken);
+                                response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + newAccessToken);
+                                response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
+
+                            } else {
+                                // 로그아웃
+                                jwtProvider.deleteToken(refreshToken);
+                                response.sendError(403);
+                            }
                         }
+                        else{
+                            // refreshToken 오류
+                            response.sendError(403);}
+                    } else {
+                        // accessToken 오류
+                        response.sendError(403);
                     }
-                    // refreshToken 오류
-                    response.sendError(403);
-                } else {
-                    // accessToken 오류
-                    response.sendError(403);
-                }
+//                }catch (ExpiredJwtException e){
+//                response.sendError(403);
+//                }
             }
 //            else {
 //                // accessToken이 null일 경우

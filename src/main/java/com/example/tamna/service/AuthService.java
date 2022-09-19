@@ -10,7 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -26,11 +28,11 @@ public class AuthService {
         UserDto user = userMapper.findByUserId(userId);
         if (user != null) {
             System.out.println(user + "토큰 발급 성공");
-            PrincipalDetails principalDetails = new PrincipalDetails(user);
-            System.out.println(principalDetails);
-            System.out.println(principalDetails.getAuthorities());
-            Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
-            System.out.println(authentication);
+//            PrincipalDetails principalDetails = new PrincipalDetails(user);
+//            System.out.println(principalDetails);
+//            System.out.println(principalDetails.getAuthorities());
+//            Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
+//            System.out.println(authentication);
             // accessToken 생성
             String access = jwtProvider.createAccessToken(user.getUserId());
             System.out.println("로그인 에세스: "+access);
@@ -46,9 +48,17 @@ public class AuthService {
         return map;
     }
 
-    // 유저 확인
     public UserDto checkUser(HttpServletRequest request){
         String accessToken = jwtProvider.getHeaderAccessToken(request);
+        if(accessToken!= null) {
+            String userId = jwtProvider.getUserIdFromJwt(accessToken);
+            return userMapper.findByUserId(userId);
+        }
+        return null;
+    }
+    // 유저 확인
+    public UserDto checkUser(HttpServletResponse response){
+        String accessToken = jwtProvider.getResHeaderAccessToken(response);
         if(accessToken!= null) {
             String userId = jwtProvider.getUserIdFromJwt(accessToken);
             return userMapper.findByUserId(userId);
@@ -64,5 +74,6 @@ public class AuthService {
         }
         return null;
     }
+
 
 }

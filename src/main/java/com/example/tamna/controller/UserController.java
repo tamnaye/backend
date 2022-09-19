@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,8 @@ public class UserController {
 
     @ApiOperation(value="[완료] 현재 최대기수와 유저 데이터 보내기")
     @GetMapping("/data")
-    public ResponseEntity<Map<String, Object>> resUserData(HttpServletRequest request){
-        UserDto user = authService.checkUser(request);
+    public ResponseEntity<Map<String, Object>> resUserData(HttpServletResponse response){
+        UserDto user = authService.checkUser(response);
         Map<String, Object> map = new HashMap<>();
         if(user != null) {
             map.put("maxClasses", userService.getMaxClasses());
@@ -67,8 +68,9 @@ public class UserController {
 
     @ApiOperation(value = "[완료] 마이페이지 자기 예약 목록 보기")
     @GetMapping(value = "/mypage")
-    public ResponseEntity<Map<String, Object>> myBookingState(HttpServletRequest request){
-        UserDto user = authService.checkUser(request);
+    public ResponseEntity<Map<String, Object>> myBookingState(HttpServletResponse response){
+        UserDto user = authService.checkUser(response);
+        System.out.println(user);
         Map<String, Object> map = new HashMap<>();
         if(user != null) {
             map.put("userData", user);

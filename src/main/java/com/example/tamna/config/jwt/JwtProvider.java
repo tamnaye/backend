@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Key;
 import java.util.*;
 
@@ -134,6 +135,15 @@ public class JwtProvider implements InitializingBean {
     // 헤더에서 accessToken 가져오기
     public String getHeaderAccessToken(HttpServletRequest request){
         String bearerAccessToken = request.getHeader(AUTHORIZATION_HEADER);
+        System.out.println("헤더 토큰: " + bearerAccessToken);
+        if (StringUtils.hasText(bearerAccessToken) && bearerAccessToken.startsWith("Bearer ")){
+            bearerAccessToken = bearerAccessToken.substring(7);
+        }
+        return bearerAccessToken;
+    }
+
+    public String getResHeaderAccessToken(HttpServletResponse response){
+        String bearerAccessToken = response.getHeader(AUTHORIZATION_HEADER);
         System.out.println("헤더 토큰: " + bearerAccessToken);
         if (StringUtils.hasText(bearerAccessToken) && bearerAccessToken.startsWith("Bearer ")){
             bearerAccessToken = bearerAccessToken.substring(7);

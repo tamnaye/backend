@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 
@@ -47,8 +48,8 @@ public class BookingController {
     @ApiOperation(value = "[완료] 층수 회의실 데이터, 회의실별 예약 현황", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
     @GetMapping(value = "")
 //    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("roomId") int roomId, @RequestParam("userId") String userId, @RequestParam("classes") int classes){
-    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("roomId") int roomId, HttpServletRequest request) {
-            UserDto user = authService.checkUser(request);
+    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("roomId") int roomId, HttpServletResponse response) {
+            UserDto user = authService.checkUser(response);
             Map<String, Object> map = new HashMap<>();
         if (user != null) {
             map.put("userData", userService.getUserData(user.getUserId()));
@@ -92,9 +93,9 @@ public class BookingController {
 
     @ApiOperation(value = " [완료] 예약하기")
     @PostMapping(value = "/conference")
-    public ResponseEntity<Map<String, Object>> conferenceRoomBooking(@RequestBody PostBookingDataDto postBookingDataDto, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> conferenceRoomBooking(@RequestBody PostBookingDataDto postBookingDataDto, HttpServletResponse response){
 
-        UserDto user = authService.checkUser(request);
+        UserDto user = authService.checkUser(response);
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> arr = new HashMap<>();
 
@@ -238,10 +239,10 @@ public class BookingController {
 
     @ApiOperation(value = "[완료] 예약 취소")
     @PostMapping(value ="/cancellation")
-    public ResponseEntity<Map<String, Object>> cancelBooking(@RequestBody BookingId bookingId, HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> cancelBooking(@RequestBody BookingId bookingId, HttpServletResponse response){
         Map<String, Object> map = new HashMap<>();
 
-        UserDto user = authService.checkUser(request);
+        UserDto user = authService.checkUser(response);
 
         if(user!= null) {
             int intBookingId = bookingId.bookingId;
