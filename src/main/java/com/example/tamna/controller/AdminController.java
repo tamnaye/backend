@@ -2,19 +2,18 @@ package com.example.tamna.controller;
 
 import com.example.tamna.dto.ClassFloorDto;
 import com.example.tamna.dto.RoomTimeDto;
+import com.example.tamna.model.UserDto;
 import com.example.tamna.service.AdminService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ public class AdminController {
         File originalFileName = new File(Objects.requireNonNull(file.getOriginalFilename()));
         System.out.println(originalFileName);
         String resourceSrc = request.getServletContext().getRealPath("/data/");
+        System.out.println(resourceSrc);
         File dest = new File(resourceSrc + originalFileName);
         System.out.println(dest);
         file.transferTo(dest);
@@ -99,5 +99,18 @@ public class AdminController {
         map.put("message", "2,3층만 변경 가능합니다.");
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
+
+    @ApiOperation(value="전체 유저데이터 보내기")
+    @GetMapping("/view/user")
+    public ResponseEntity<Map<String, Object>> getAllUserData() {
+        Map<String, Object> map = new HashMap<>();
+        List<UserDto> result = adminService.allUserData();
+        List<Integer> classListResult = adminService.allUserClass();
+        map.put("ClassList", classListResult);
+        map.put("AllUserData", result);
+       return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+
 
 }

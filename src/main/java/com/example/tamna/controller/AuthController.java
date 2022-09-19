@@ -1,20 +1,14 @@
 package com.example.tamna.controller;
 
-import com.example.tamna.model.Token;
 import com.example.tamna.service.AuthService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -48,7 +42,6 @@ public class AuthController {
         System.out.println(tokenMap.get("message"));
         if(tokenMap.get("message") != null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(tokenMap);
-
         }else{
             response.addHeader(AUTHORIZATION_HEADER, tokenPrefix + tokenMap.get("access"));
             response.addHeader(REAUTHORIZATION_HEADER, tokenPrefix + tokenMap.get("refresh"));

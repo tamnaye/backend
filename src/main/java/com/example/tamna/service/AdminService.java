@@ -3,6 +3,7 @@ package com.example.tamna.service;
 import com.example.tamna.dto.ClassFloorDto;
 import com.example.tamna.dto.RoomTimeDto;
 import com.example.tamna.mapper.AdminMapper;
+import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 public class AdminService {
 
     private final AdminMapper adminMapper;
+
 
     // 최신 인재들 업데이트
     public String updateUser(File dest) throws IOException {
@@ -47,11 +49,8 @@ public class AdminService {
 
     // 기수별 층수 데이터
     public List<ClassFloorDto> getClassOfFloorData(){
-        List<ClassFloorDto> result = adminMapper.getClassOfFloor();
-        System.out.println(result);
-        result.remove(result.get(0));
-        System.out.println(result);
-        return result;
+        return adminMapper.getClassOfFloor();
+
     }
 
     // 기수별 층수 데이터 수정
@@ -80,6 +79,13 @@ public class AdminService {
     }
 
 
+    // 모든 유저 데이터
+    public List<UserDto> allUserData(){
+        return adminMapper.allSelectUser();
+    }
 
-
+    // 모든 기수 리스트
+    public List<Integer> allUserClass(){
+        return adminMapper.getAllClass();
+    }
 }

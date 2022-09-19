@@ -28,16 +28,6 @@ public class UserController {
     private final BookingService bookingService;
     private final AuthService authService;
 
-//
-//    @ApiOperation(value="[완료] 현재 최대기수와 유저 데이터 보내기")
-//    @GetMapping("/data")
-//    public ResponseEntity<Map<String, Object>> resUserData(@RequestParam("userId") String userId){
-//        Map<String, Object> map = new HashMap<>();
-//
-//        map.put("maxClasses", userService.getMaxClasses());
-//        map.put("userData", userService.getUserData(userId));
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    }
 
     @ApiOperation(value="[완료] 현재 최대기수와 유저 데이터 보내기")
     @GetMapping("/data")
@@ -51,19 +41,6 @@ public class UserController {
         } map.put("message", "tokenFail");
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
     }
-
-
-//    @ApiOperation(value = "[완료] 마이페이지 자기 예약 목록 보기")
-//    @GetMapping(value = "/mypage")
-//    public ResponseEntity<Map<String, Object>> myBookingState(@RequestParam("userId") String userId){
-//        System.out.println(userId);
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("userData", userService.getUserData(userId));
-//        List<DetailBookingDataDto> myBookingDetailDataList = bookingService.userIncludedBooking(userId);
-//        System.out.println(myBookingDetailDataList);
-//        map.put("myBookingDetailDataList", myBookingDetailDataList);
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    }
 
 
     @ApiOperation(value = "[완료] 마이페이지 자기 예약 목록 보기")

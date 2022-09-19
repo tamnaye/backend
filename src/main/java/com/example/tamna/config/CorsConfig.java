@@ -1,6 +1,5 @@
 package com.example.tamna.config;
 
-import com.example.tamna.config.jwt.JwtProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +28,7 @@ public class CorsConfig {
         config.addExposedHeader(REFRESHTOKEN_HEADER);
         source.registerCorsConfiguration("/api/**", config);
         source.registerCorsConfiguration("/auth/**", config);
+        source.registerCorsConfiguration("/admin/**", config);
         return new CorsFilter(source);
     }
 }

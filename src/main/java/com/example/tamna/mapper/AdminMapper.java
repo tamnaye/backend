@@ -2,6 +2,7 @@ package com.example.tamna.mapper;
 
 import com.example.tamna.dto.ClassFloorDto;
 import com.example.tamna.dto.RoomTimeDto;
+import com.example.tamna.model.UserDto;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface AdminMapper {
     int insertUser (@Param("classes") int classes, @Param("userId") String userId, @Param("userName") String name);
 
     // 기수별 층수 조회
-    @Select("SELECT DISTINCT CLASSES, FLOOR FROM USER ORDER BY CLASSES ASC")
+    @Select("SELECT DISTINCT CLASSES, FLOOR FROM USER WHERE CLASSES NOT IN (0) ORDER BY CLASSES ASC")
     List<ClassFloorDto> getClassOfFloor();
 
     // 기수별 층수 수정
@@ -27,5 +28,14 @@ public interface AdminMapper {
 
     @Update("UPDATE ROOM SET MAX_TIME=#{maxTime} WHERE ROOM_NAME=#{roomName}")
     int updateTime(@Param("maxTime") int maxTime, @Param("roomName") String roomName);
+
+    // 모든 유저 데이터 보내기
+    @Select("SELECT * FROM USER ORDER BY CLASSES DESC")
+    List<UserDto> allSelectUser();
+
+    // 기수 리스트
+    @Select("SELECT DISTINCT CLASSES FROM USER")
+    List<Integer> getAllClass();
+
 
 }
