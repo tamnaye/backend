@@ -2,6 +2,7 @@ package com.example.tamna.mapper;
 
 import com.example.tamna.dto.ClassFloorDto;
 import com.example.tamna.dto.RoomTimeDto;
+import com.example.tamna.model.Room;
 import com.example.tamna.model.UserDto;
 import org.apache.ibatis.annotations.*;
 
@@ -23,19 +24,30 @@ public interface AdminMapper {
     int updateFloor(@Param("floor") int floor, @Param("classes") int classes);
 
     // 회의실 별 시간 제한 가져오기
-    @Select("SELECT FLOOR, ROOM_NAME, MAX_TIME FROM ROOM WHERE FLOOR=#{floor}")
-    List<RoomTimeDto> getFloorRoomData(int floor);
+    @Select("SELECT * FROM ROOM WHERE FLOOR=#{floor}")
+    List<Room> getFloorRoomData(int floor);
 
-    @Update("UPDATE ROOM SET MAX_TIME=#{maxTime} WHERE ROOM_NAME=#{roomName}")
-    int updateTime(@Param("maxTime") int maxTime, @Param("roomName") String roomName);
+    @Update("UPDATE ROOM SET MAX_TIME=#{maxTime} WHERE ROOM_ID=#{roomId}")
+    int updateTime(@Param("maxTime") int maxTime, @Param("roomId") int roomId);
 
     // 모든 유저 데이터 보내기
-    @Select("SELECT * FROM USER WHERE CLASSES=#{classes}")
+    @Select("SELECT * FROM USER WHERE CLASSES=#{classes} ORDER BY USER_ID")
     List<UserDto> allSelectUser(int classes);
 
     // 기수 리스트
     @Select("SELECT DISTINCT CLASSES FROM USER")
     List<Integer> getAllClass();
 
+    // 유저 삭제
+    @Delete("DELETE FROM USER WHERE USER_ID=#{userId}")
+    int deleteUser(String userId);
+
+    // 유저 업데이트
+    @Update("UPDATE USER SET USER_NAME=#{userName}, ROLES=#{roles}, FLOOR=#{floor} WHERE USER_ID=#{userId}")
+    int updateUserData(@Param("userName") String userName, @Param("roles") String roles, @Param("floor") int floor, @Param("userId") String userId);
+
+    // 유저 삽입
+    @Insert("INSERT INTO USER VALUES(#{classes}, #{userId}, #{userName}, #{roles}, #{floor})")
+    int insertUserData(@Param("classes") int classes, @Param("userId") String userId, @Param("userName") String userName, @Param("roles") String roles, @Param("floor") int floor);
 
 }

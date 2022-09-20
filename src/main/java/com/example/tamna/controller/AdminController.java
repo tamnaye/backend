@@ -2,9 +2,12 @@ package com.example.tamna.controller;
 
 import com.example.tamna.dto.ClassFloorDto;
 import com.example.tamna.dto.RoomTimeDto;
+import com.example.tamna.mapper.AdminMapper;
+import com.example.tamna.model.Room;
 import com.example.tamna.model.UserDto;
 import com.example.tamna.service.AdminService;
 import io.swagger.annotations.ApiOperation;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +27,10 @@ import java.util.Map;
 public class AdminController {
 
     private final AdminService adminService;
+    private final AdminMapper adminMapper;
 
     @ApiOperation(value="최신기수 업데이트")
-    @PostMapping("/update/user")
+    @PostMapping("/insert/user")
     public ResponseEntity<Map<String, Object>> insertUserData(@RequestPart(required = false) MultipartFile file, HttpServletRequest request) throws IOException {
         String resourceSrc = request.getServletContext().getRealPath("/data/");
         Map<String, Object> map = new HashMap<>();
@@ -52,7 +56,7 @@ public class AdminController {
     @GetMapping("/view/class&floor")
     public ResponseEntity<Map<String, Object>> getClassOfFloor(){
         Map<String, Object> map = new HashMap<>();
-        List<ClassFloorDto> result = adminService.getClassOfFloorData();
+        List<ClassFloorDto> result =  adminMapper.getClassOfFloor();;
         if(!result.isEmpty()) {
             map.put("ClassOfFloorData", result);
         }
@@ -73,33 +77,29 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value = "회의실별 최대시간", notes = "floor가 2,3이 아닌경우 fail 처리")
+    @ApiOperation(value = "회의실별 최대시간 조회", notes = "floor가 2,3,4가 아닌경우 fail 처리")
     @GetMapping("/view/room")
     public ResponseEntity<Map<String, Object>> getRoomData(@RequestParam("floor")int floor){
         Map<String, Object> map = new HashMap<>();
-        if(floor == 2 || floor == 3){
-            adminService.getRoomData(floor);
-            map.put("RoomData", adminService.getRoomData(floor));
-        }else{
-            map.put("RoomData", "fail");
-        }
+        List<Room> result = adminMapper.getFloorRoomData(floor);
+            if(!result.isEmpty()){
+                map.put("RoomData", result);
+            }else{
+                map.put("message", "회의실 데이터 불러오기 실패");
+            }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value = "회의실별 최대 시간 수정", notes = "floor가 2,3,4이 아닌경우 변경불가 메시지")
+    @ApiOperation(value = "회의실별 최대 시간 수정", notes = "floor가 2,3,4가  아닌경우 변경불가 메시지")
     @PostMapping("/change/maxtime")
     public ResponseEntity<Map<String, Object>> updateRoomTIme(@RequestBody RoomTimeDto roomTimeDto){
         Map<String, Object> map = new HashMap<>();
-        if(roomTimeDto.getFloor() == 2 || roomTimeDto.getFloor() == 3 || roomTimeDto.getFloor() == 4) {
-            String result = adminService.updateRoomTime(roomTimeDto);
-            if (result.equals("success")) {
-                map.put("message", "최대 시간 변경이 완료되었습니다.");
-            } else {
-                map.put("message", result);
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(map);
+        int result = adminMapper.updateTime(roomTimeDto.getMaxTime(), roomTimeDto.getRoomId());
+        if (result != 0) {
+            map.put("message", "최대 시간 변경이 완료되었습니다.");
+        } else {
+            map.put("message", "최대 시간 변경 실패");
         }
-        map.put("message", "fail");
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
@@ -108,7 +108,7 @@ public class AdminController {
     @GetMapping("/view/class-list")
     public ResponseEntity<Map<String, Object>> getAllClassList(){
         Map<String, Object> map = new HashMap<>();
-        List<Integer> classListResult = adminService.allUserClass();
+        List<Integer> classListResult = adminMapper.getAllClass();
         map.put("ClassList", classListResult);
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
@@ -117,9 +117,57 @@ public class AdminController {
     @GetMapping("/view/user")
     public ResponseEntity<Map<String, Object>> getAllUserData(@RequestParam("classes") int classes) {
         Map<String, Object> map = new HashMap<>();
-        List<UserDto> result = adminService.allUserData(classes);
+        List<UserDto> result = adminMapper.allSelectUser(classes);
         map.put("AllUserData", result);
        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+    @ApiOperation(value="유저 데이터 수정")
+    @PostMapping("/update/user")
+    public ResponseEntity<Map<String, Object>> updateUserData(@RequestBody UserDto userDto){
+        Map<String, Object> map = new HashMap<>();
+        int result = adminMapper.updateUserData(userDto.getUserName(), userDto.getRoles(), userDto.getFloor(), userDto.getUserId());
+        if(result == 1){
+            map.put("message", userDto.getUserName() + "님의 데이터가 수정되었습니다.");
+        }else{
+            map.put("message", "데이터 업데이트 실패");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+
+    @ApiOperation(value = "유저 데이터 삽입")
+    @PostMapping("insertion/user")
+    public ResponseEntity<Map<String, Object>> insertUserData(@RequestBody UserDto userDto){
+        Map<String, Object> map = new HashMap<>();
+        int result = adminMapper.insertUserData(userDto.getClasses(), userDto.getUserId(), userDto.getUserName(), userDto.getRoles(), userDto.getFloor());
+        if(result == 1){
+            map.put("message", userDto.getUserName() + "님의 데이터가 추가되었습니다.");
+        }else{
+            map.put("message", "데이터 추가 실패");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+
+    @Data
+    static class UserId{
+        private String userId;
+    }
+
+    @ApiOperation(value="유저 데이터 삭제")
+    @PostMapping("/deletion/user")
+    public ResponseEntity<Map<String, Object>> deleteUserData(@RequestBody UserId userId){
+        String getUserId = userId.userId;
+        Map<String, Object> map = new HashMap<>();
+        int result = adminMapper.deleteUser(getUserId);
+        if(result == 1){
+            map.put("message", "데이터 삭제가 완료되었습니다.");
+        }else{
+            map.put("message", "데이터 삭제 실패");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+
     }
 
 

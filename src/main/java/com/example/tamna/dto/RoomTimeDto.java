@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomTimeDto {
-    private int floor;
-    private String roomName;
+    private int roomId;
     private int maxTime;
 }
