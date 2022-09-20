@@ -2,6 +2,7 @@ package com.example.tamna.controller;
 
 import com.example.tamna.dto.*;
 
+import com.example.tamna.model.Room;
 import com.example.tamna.model.UserDto;
 import com.example.tamna.service.*;
 
@@ -41,6 +42,25 @@ public class BookingController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     };
+
+    @ApiOperation(value = "[완료] 현정 내비", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
+    @GetMapping(value = "/room-data2")
+    public ResponseEntity<Map<String, Object>> getRoomBookingState(HttpServletResponse response){
+        UserDto user = authService.checkUser(response);
+        Map<String, Object> map = new HashMap<>();
+        if (user != null) {
+            if (user.getFloor() == 2 || user.getFloor() == 3 || user.getFloor() == 4) {
+                map.put("roomData", roomService.getFloorRoom(user.getFloor()));
+            } else {
+                map.put("roomData", roomService.roomList());
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(map);
+        }else{
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+        }
+    };
+
 
 
     @ApiOperation(value = "[완료] 층수 회의실 데이터, 회의실별 예약 현황", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
@@ -86,6 +106,38 @@ public class BookingController {
         map.put("BookingData", bookingService.floorDetailBookingData(floor));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+    @ApiOperation(value = " [완료] 예약 현황 페이지 데이터")
+    @GetMapping(value = "/details-booking2")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getBookingState(HttpServletResponse response) {
+        UserDto user = authService.checkUser(response);
+        Map<String, Object> map = new HashMap<>();
+        if(user != null){
+            if(user.getFloor() == 2 || user.getFloor() == 3 || user.getFloor() == 4) {
+                map.put("RoomData", roomService.getFloorRoom(user.getFloor()));
+                map.put("BookingData", bookingService.floorDetailBookingData(user.getFloor()));
+            }else{
+                List<Room> roomData = new ArrayList<>(roomService.getFloorRoom(2));
+                roomData.addAll(roomService.getFloorRoom(3));
+                roomData.addAll(roomService.getFloorRoom(4));
+
+                List<DetailBookingDataDto> bookingData = new ArrayList<>(bookingService.floorDetailBookingData(2));
+                bookingData.addAll(bookingService.floorDetailBookingData(3));
+                bookingData.addAll(bookingService.floorDetailBookingData(4));
+
+                map.put("RoomData", roomData);
+                map.put("BookingData", bookingData);
+            }
+            map.put("floor", user.getFloor());
+            return ResponseEntity.status(HttpStatus.OK).body(map);
+        }else{
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+        }
+
+
     }
 
 

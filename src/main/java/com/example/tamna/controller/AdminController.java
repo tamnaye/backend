@@ -28,21 +28,11 @@ public class AdminController {
     @ApiOperation(value="최신기수 업데이트")
     @PostMapping("/update/user")
     public ResponseEntity<Map<String, Object>> insertUserData(@RequestPart(required = false) MultipartFile file, HttpServletRequest request) throws IOException {
-//        File originalFileName = new File(Objects.requireNonNull(file.getOriginalFilename()));
-//        originalFileName.delete();
         String resourceSrc = request.getServletContext().getRealPath("/data/");
-//        System.out.println(resourceSrc);
         File dest = new File(resourceSrc + file.getOriginalFilename());
-//        origindest.delete();
-//        File dest = new File(resourceSrc + originalFileName);
-        if(dest.exists()){
-            System.out.println("여기로 오나");
-            dest.delete();
-//            dest = new File(resourceSrc + file.getOriginalFilename());
-        }
-        System.out.println(dest);
-//        file.transferTo(dest);
+        file.transferTo(dest);
         String result = adminService.updateUser(dest);
+
         Map<String, Object> map = new HashMap<>();
         if(result.equals("success")){
             map.put("message", "최신기수 업로드가 완료되었습니다.");
@@ -90,7 +80,7 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value = "회의실별 최대 시간 수정")
+    @ApiOperation(value = "회의실별 최대 시간 수정", notes = "floor가 2,3이 아닌경우 변경불가 메시지")
     @PostMapping("/change/maxtime")
     public ResponseEntity<Map<String, Object>> updateRoomTIme(@RequestBody RoomTimeDto roomTimeDto){
         Map<String, Object> map = new HashMap<>();

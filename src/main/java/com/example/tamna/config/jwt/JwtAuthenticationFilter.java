@@ -1,8 +1,6 @@
 package com.example.tamna.config.jwt;
 
 import com.example.tamna.model.Token;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
