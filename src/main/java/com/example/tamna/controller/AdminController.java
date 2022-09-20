@@ -29,17 +29,23 @@ public class AdminController {
     @PostMapping("/update/user")
     public ResponseEntity<Map<String, Object>> insertUserData(@RequestPart(required = false) MultipartFile file, HttpServletRequest request) throws IOException {
         String resourceSrc = request.getServletContext().getRealPath("/data/");
-        File dest = new File(resourceSrc + file.getOriginalFilename());
-        file.transferTo(dest);
-        String result = adminService.updateUser(dest);
-
         Map<String, Object> map = new HashMap<>();
-        if(result.equals("success")){
-            map.put("message", "최신기수 업로드가 완료되었습니다.");
-        }else{
-            map.put("message", "파일 오류<빈 파일인지, 파일 양식이 옳은지 확인 혹은 파일명을 바꿔주세요!>");
+        try {
+            File dest = new File(resourceSrc + file.getOriginalFilename());
+            file.transferTo(dest);
+            String result = adminService.updateUser(dest);
+
+            if (result.equals("success")) {
+                map.put("message", "최신기수 업로드가 완료되었습니다.");
+            } else {
+                map.put("message", "파일 오류<빈 파일인지, 파일 양식이 옳은지 확인 혹은 파일명을 바꿔주세요!>");
+            }
+        }catch (NullPointerException e){
+            map.put("message", "파일을 선택해주세요.");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
+
+
     }
 
     @ApiOperation(value = "기수별 층수 보기")
@@ -80,11 +86,11 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value = "회의실별 최대 시간 수정", notes = "floor가 2,3이 아닌경우 변경불가 메시지")
+    @ApiOperation(value = "회의실별 최대 시간 수정", notes = "floor가 2,3,4이 아닌경우 변경불가 메시지")
     @PostMapping("/change/maxtime")
     public ResponseEntity<Map<String, Object>> updateRoomTIme(@RequestBody RoomTimeDto roomTimeDto){
         Map<String, Object> map = new HashMap<>();
-        if(roomTimeDto.getFloor() == 2 || roomTimeDto.getFloor() == 3) {
+        if(roomTimeDto.getFloor() == 2 || roomTimeDto.getFloor() == 3 || roomTimeDto.getFloor() == 4) {
             String result = adminService.updateRoomTime(roomTimeDto);
             if (result.equals("success")) {
                 map.put("message", "최대 시간 변경이 완료되었습니다.");
@@ -93,7 +99,7 @@ public class AdminController {
             }
             return ResponseEntity.status(HttpStatus.OK).body(map);
         }
-        map.put("message", "2,3층만 변경 가능합니다.");
+        map.put("message", "fail");
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 

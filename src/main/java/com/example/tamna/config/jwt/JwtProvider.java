@@ -126,11 +126,11 @@ public class JwtProvider implements InitializingBean {
     }
 
 
-    // 인증 선공시 SecurityContextHolder에 저장할 Authentication 객체 생성
-    public Authentication getAuthentication(String token) {
-         UserDetails principalDetails = principalDetailsService.loadUserByUsername(getUserIdFromJwt(token));
-        return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
-    }
+//    // 인증 선공시 SecurityContextHolder에 저장할 Authentication 객체 생성
+//    public Authentication getAuthentication(String token) {
+//         UserDetails principalDetails = principalDetailsService.loadUserByUsername(getUserIdFromJwt(token));
+//        return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
+//    }
 
     // 헤더에서 accessToken 가져오기
     public String getHeaderAccessToken(HttpServletRequest request){
