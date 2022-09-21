@@ -29,13 +29,12 @@ public class UserController {
     private final AuthService authService;
 
 
-    @ApiOperation(value="[완료] 현재 최대기수와 유저 데이터 보내기")
+    @ApiOperation(value="유저 데이터")
     @GetMapping("/data")
     public ResponseEntity<Map<String, Object>> resUserData(HttpServletResponse response){
         UserDto user = authService.checkUser(response);
         Map<String, Object> map = new HashMap<>();
         if(user != null) {
-            map.put("maxClasses", userService.getMaxClasses());
             map.put("userData", user);
             return ResponseEntity.status(HttpStatus.OK).body(map);
         } map.put("message", "tokenFail");
@@ -43,7 +42,7 @@ public class UserController {
     }
 
 
-    @ApiOperation(value = "[완료] 마이페이지 자기 예약 목록 보기")
+    @ApiOperation(value = "마이페이지 데이터")
     @GetMapping(value = "/mypage")
     public ResponseEntity<Map<String, Object>> myBookingState(HttpServletResponse response){
         UserDto user = authService.checkUser(response);

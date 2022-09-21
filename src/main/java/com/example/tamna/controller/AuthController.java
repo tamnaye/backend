@@ -1,6 +1,8 @@
 package com.example.tamna.controller;
 
 import com.example.tamna.service.AuthService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +34,7 @@ public class AuthController {
         private String userId;
     }
 
+    @ApiOperation(value = "JWT 발급")
     @PostMapping(value = "/login")
     @ResponseBody
     public ResponseEntity<Map<String, String>> createToken(@RequestBody UserId userId, HttpServletResponse response){

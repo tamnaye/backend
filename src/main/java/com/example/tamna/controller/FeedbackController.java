@@ -22,7 +22,7 @@ public class FeedbackController {
     private final FeedbackService feedbackService;
 
 
-    @ApiOperation(value = "[완료] 피드백 내용 보내기")
+    @ApiOperation(value = "피드백 내용 보내기")
     @PostMapping(value = "/feedback")
     public ResponseEntity<Map<String, Object>> feedback(@RequestBody Feedback feedback){
             Map<String, Object> map = new HashMap<>();
@@ -41,7 +41,7 @@ public class FeedbackController {
         }
     }
 
-    @ApiOperation(value= "[완료] 피드백 페이지")
+    @ApiOperation(value= "피드백 페이지")
     @GetMapping(value = "/feedback")
     public ResponseEntity<Map<String, Object>> getFeedback(){
         Map<String, Object> map = new HashMap<>();

@@ -3,18 +3,14 @@ package com.example.tamna.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,32 +27,44 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api(){
-        Parameter parameterBuilder1 = new ParameterBuilder().name(HttpHeaders.AUTHORIZATION).description("Access Token")
-                .modelRef(new ModelRef("string"))
-                .parameterType("header")
-                .required(false)
-                .build();
-
-        Parameter parameterBuilder2 = new ParameterBuilder().name(REAUTHORIZATION_HEADER).description("refresh Token")
-                .modelRef(new ModelRef("string"))
-                .parameterType("header")
-                .required(false)
-                .build();
-
-        List<Parameter> globalParamters = new ArrayList<>();
-        globalParamters.add(parameterBuilder1);
-        globalParamters.add(parameterBuilder2);
-
         return new Docket(DocumentationType.SWAGGER_2)
-                .globalOperationParameters(globalParamters)
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.example.tamna"))
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .securityContexts(Arrays.asList(securityContext()))
+                .securitySchemes(Arrays.asList(apiKey(), anotherApiKey()));
 
     }
 
+    private ApiKey apiKey() {
+        return new ApiKey(AUTHORIZATION_HEADER, AUTHORIZATION_HEADER, "header");
+    }
+
+    private ApiKey anotherApiKey(){
+        return new ApiKey(REAUTHORIZATION_HEADER, REAUTHORIZATION_HEADER, "header");
+    }
+
+    private SecurityContext securityContext() {
+        return springfox
+                .documentation
+                .spi.service
+                .contexts
+                .SecurityContext
+                .builder()
+                .securityReferences(defaultAuth()).forPaths(PathSelectors.any()).build();
+    }
+
+    List<SecurityReference> defaultAuth() {
+        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope authorizationScope1 = new AuthorizationScope("global", "refreshEverything");
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+        AuthorizationScope[] authorizationScopes1 = new AuthorizationScope[1];
+        authorizationScopes[0] = authorizationScope;
+        authorizationScopes1[0] = authorizationScope1;
+        return Arrays.asList(new SecurityReference(AUTHORIZATION_HEADER, authorizationScopes), new SecurityReference(REAUTHORIZATION_HEADER, authorizationScopes1));
+    }
 
     private ApiInfo apiInfo(){
         return new ApiInfoBuilder()
@@ -67,5 +75,5 @@ public class SwaggerConfig {
     }
 
 
-    
+
 }

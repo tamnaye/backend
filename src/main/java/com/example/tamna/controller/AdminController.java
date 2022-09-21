@@ -126,6 +126,7 @@ public class AdminController {
     @PostMapping("/update/user")
     public ResponseEntity<Map<String, Object>> updateUserData(@RequestBody UserDto userDto){
         Map<String, Object> map = new HashMap<>();
+        System.out.println(userDto);
         int result = adminMapper.updateUserData(userDto.getUserName(), userDto.getRoles(), userDto.getFloor(), userDto.getUserId());
         if(result == 1){
             map.put("message", userDto.getUserName() + "님의 데이터가 수정되었습니다.");

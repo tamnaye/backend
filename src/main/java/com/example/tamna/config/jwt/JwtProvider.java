@@ -1,6 +1,5 @@
 package com.example.tamna.config.jwt;
 
-import com.example.tamna.config.auth.PrincipalDetailsService;
 import com.example.tamna.mapper.TokenMapper;
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.model.Token;
@@ -10,9 +9,6 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -45,7 +41,6 @@ public class JwtProvider implements InitializingBean {
     @Value("${jwt.refreshtoken-validity-in-seconds}")
     private long refreshTokenValidityInMilliSeconds;
 
-    private PrincipalDetailsService principalDetailsService;
 
     private Key key;
 
@@ -125,13 +120,6 @@ public class JwtProvider implements InitializingBean {
         return claims.getSubject();
     }
 
-
-//    // 인증 선공시 SecurityContextHolder에 저장할 Authentication 객체 생성
-//    public Authentication getAuthentication(String token) {
-//         UserDetails principalDetails = principalDetailsService.loadUserByUsername(getUserIdFromJwt(token));
-//        return new UsernamePasswordAuthenticationToken(principalDetails, "", principalDetails.getAuthorities());
-//    }
-
     // 헤더에서 accessToken 가져오기
     public String getHeaderAccessToken(HttpServletRequest request){
         String bearerAccessToken = request.getHeader(AUTHORIZATION_HEADER);
@@ -182,6 +170,8 @@ public class JwtProvider implements InitializingBean {
             System.out.println("지원되지 않는 JWT");
         }catch (IllegalStateException e){
             System.out.println("JWT 토큰 잘못됨");
+        }catch (IllegalArgumentException e){
+            System.out.println("JWT 토큰 없음");
         }
         result.put(false, "유호하지 않음");
         System.out.println("토큰 검증 결과: " + result);

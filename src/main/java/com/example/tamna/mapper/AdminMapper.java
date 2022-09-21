@@ -1,7 +1,6 @@
 package com.example.tamna.mapper;
 
 import com.example.tamna.dto.ClassFloorDto;
-import com.example.tamna.dto.RoomTimeDto;
 import com.example.tamna.model.Room;
 import com.example.tamna.model.UserDto;
 import org.apache.ibatis.annotations.*;
