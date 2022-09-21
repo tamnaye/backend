@@ -201,7 +201,7 @@ public class BookingController {
             // 신청자 회의실 하루에 한번만 예약 체크 or 나박스 최대 시간 예약 체크
             Map<Boolean, String> checkBooking = participantsService.checkBookingUser(postBookingDataDto.getRoomType(), user.getUserId());
             // 신청자가 예약이 안되어 있으면 or 나박스 최대 시간 안채웠으면
-            if (checkBooking.keySet().contains(true)){
+            if (checkBooking.containsKey(true)){
                 // 룸타입이 회의실일 경우인데 팀메이트가 비어있는 경우
                 if(roomType.equals("회의실") && teamMateNames.isEmpty()){
                     arr.put("fail", "회의실은 2인이상일 경우만 예약하실 수 있습니다️.");
@@ -244,7 +244,7 @@ public class BookingController {
                                 return ResponseEntity.status(HttpStatus.OK).body(map);
                             }else{ // 나박스일때
                                 boolean timeResult = participantsService.checkUsingTime(postBookingDataDto.getStartTime(), postBookingDataDto.getEndTime());
-                                if(checkBooking.values().contains("add") && !timeResult) {
+                                if(checkBooking.containsValue("add") && !timeResult) {
                                     arr.put("fail", "나박스 하루 최대 이용시간은 2시간 입니다.");
                                     map.put("message", arr);
                                 }

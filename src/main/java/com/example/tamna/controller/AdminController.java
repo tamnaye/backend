@@ -6,9 +6,11 @@ import com.example.tamna.mapper.AdminMapper;
 import com.example.tamna.model.Room;
 import com.example.tamna.model.UserDto;
 import com.example.tamna.service.AdminService;
+import com.example.tamna.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.filters.ExpiresFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final AdminMapper adminMapper;
+    private final UserService userService;
 
     @ApiOperation(value="최신기수 업데이트")
     @PostMapping("/insert/user")
@@ -91,10 +94,10 @@ public class AdminController {
     }
 
     @ApiOperation(value = "회의실별 최대 시간 수정", notes = "floor가 2,3,4가  아닌경우 변경불가 메시지")
-    @PostMapping("/change/maxtime")
+    @PostMapping("/update/room-data")
     public ResponseEntity<Map<String, Object>> updateRoomTIme(@RequestBody RoomTimeDto roomTimeDto){
         Map<String, Object> map = new HashMap<>();
-        int result = adminMapper.updateTime(roomTimeDto.getMaxTime(), roomTimeDto.getRoomId());
+        int result = adminMapper.updateRoomData(roomTimeDto.getMaxTime(), roomTimeDto.getRoomType(),roomTimeDto.getRoomId());
         if (result != 0) {
             map.put("message", "최대 시간 변경이 완료되었습니다.");
         } else {
@@ -139,13 +142,21 @@ public class AdminController {
 
     @ApiOperation(value = "유저 데이터 삽입")
     @PostMapping("insertion/user")
-    public ResponseEntity<Map<String, Object>> insertUserData(@RequestBody UserDto userDto){
+    public ResponseEntity<Map<String, Object>> insertUserData(@RequestBody UserDto userDto) {
         Map<String, Object> map = new HashMap<>();
-        int result = adminMapper.insertUserData(userDto.getClasses(), userDto.getUserId(), userDto.getUserName(), userDto.getRoles(), userDto.getFloor());
-        if(result == 1){
-            map.put("message", userDto.getUserName() + "님의 데이터가 추가되었습니다.");
-        }else{
-            map.put("message", "데이터 추가 실패");
+        try {
+            if(userDto.getUserId() != null || userDto.getUserName()!= null){
+                int result = adminMapper.insertUserData(userDto.getClasses(), userDto.getUserId(), userDto.getUserName(), userDto.getRoles(), userDto.getFloor());
+                if(result == 1) {
+                    map.put("message", userDto.getUserName() + "님의 데이터가 추가되었습니다.");
+                }else{
+                    map.put("message", "데이터 업로드 실패!");
+                }
+            }
+        }catch(NullPointerException e){
+            map.put("message", "빈 값을 입력해주세요!");
+        }catch(Exception e){
+            map.put("message", "이미 있는 인재번호입니다.");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
@@ -153,16 +164,19 @@ public class AdminController {
 
     @Data
     static class UserId{
-        private String userId;
+        private List<String> userId;
     }
 
     @ApiOperation(value="유저 데이터 삭제")
     @PostMapping("/deletion/user")
     public ResponseEntity<Map<String, Object>> deleteUserData(@RequestBody UserId userId){
-        String getUserId = userId.userId;
+        System.out.println(userId);
+        List<String> usersId = userId.userId;
+        System.out.println(usersId);
         Map<String, Object> map = new HashMap<>();
-        int result = adminMapper.deleteUser(getUserId);
-        if(result == 1){
+        String usersIdString = userService.changeString("", usersId);
+        int result = adminMapper.deleteUser(usersIdString);
+        if(result >= 1){
             map.put("message", "데이터 삭제가 완료되었습니다.");
         }else{
             map.put("message", "데이터 삭제 실패");

@@ -26,8 +26,8 @@ public interface AdminMapper {
     @Select("SELECT * FROM ROOM WHERE FLOOR=#{floor}")
     List<Room> getFloorRoomData(int floor);
 
-    @Update("UPDATE ROOM SET MAX_TIME=#{maxTime} WHERE ROOM_ID=#{roomId}")
-    int updateTime(@Param("maxTime") int maxTime, @Param("roomId") int roomId);
+    @Update("UPDATE ROOM SET MAX_TIME=#{maxTime}, ROOM_TYPE=#{roomType} WHERE ROOM_ID=#{roomId}")
+    int updateRoomData(@Param("maxTime") int maxTime, @Param("roomType") String roomType, @Param("roomId") int roomId);
 
     // 모든 유저 데이터 보내기
     @Select("SELECT * FROM USER WHERE CLASSES=#{classes} ORDER BY USER_ID")
@@ -38,8 +38,8 @@ public interface AdminMapper {
     List<Integer> getAllClass();
 
     // 유저 삭제
-    @Delete("DELETE FROM USER WHERE USER_ID=#{userId}")
-    int deleteUser(String userId);
+    @Delete("DELETE FROM USER WHERE USER_ID IN (${usersIdString})")
+    int deleteUser(String usersIdString);
 
     // 유저 업데이트
     @Update("UPDATE USER SET USER_NAME=#{userName}, ROLES=#{roles}, FLOOR=#{floor} WHERE USER_ID=#{userId}")

@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RoomTimeDto {
     private int roomId;
+    private String roomType;
     private int maxTime;
 }
