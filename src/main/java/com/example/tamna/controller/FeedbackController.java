@@ -4,13 +4,10 @@ import com.example.tamna.model.Feedback;
 import com.example.tamna.service.FeedbackService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 

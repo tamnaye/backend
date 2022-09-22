@@ -11,10 +11,6 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
 
-    // 최대 기수 가져오기
-    @Select("SELECT MAX(CLASSES) FROM USER")
-    int findMaxClasses();
-
     // 유저 아이디로 데이터 검색
     @Select("SELECT * FROM USER WHERE user_id=#{userId}")
     UserDto findByUserId(String userId);

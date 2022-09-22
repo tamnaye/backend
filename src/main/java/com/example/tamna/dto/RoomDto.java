@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomTimeDto {
+public class RoomDto {
     private int roomId;
     private String roomType;
     private int maxTime;

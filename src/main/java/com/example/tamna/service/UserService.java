@@ -32,11 +32,6 @@ public class UserService {
 
     }
 
-    // 최대 기수 가져오기
-    public int getMaxClasses(){
-       return userMapper.findMaxClasses();
-    }
-
     // 유저 아이디로 정보조회
     public UserDto getUserData(String userId){
         return userMapper.findByUserId(userId);

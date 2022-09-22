@@ -15,7 +15,7 @@ public interface TokenMapper {
     @Select("SELECT * FROM TOKEN WHERE REFRESH_TOKEN=#{refreshToken}")
     Token findToken(String refreshToken);
 
-    @Delete("DELETE FROM TOKEN WHERE USER_ID=#{userId}")
-    int deleteToken(String userId);
+    @Delete("DELETE FROM TOKEN WHERE REFRESH_TOKEN=#{refreshToken}")
+    int deleteToken(String refreshToken);
 
 }

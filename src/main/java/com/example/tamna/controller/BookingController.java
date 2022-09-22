@@ -31,39 +31,6 @@ public class BookingController {
     private final ParticipantsService participantsService;
     private final AuthService authService;
 
-//
-//    @ApiOperation(value = "[완료] 현정 내비", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
-//    @GetMapping(value = "/room-data")
-//    public ResponseEntity<Map<String, Object>> getRoomBookingState(@RequestParam("floor") int floor){
-//        Map<String, Object> map = new HashMap<>();
-//        if (floor == 2 || floor == 3 || floor == 4) {
-//            map.put("roomData", roomService.getFloorRoom(floor));
-//        } else {
-//            map.put("roomData", roomService.roomList());
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    };
-//
-//    @ApiOperation(value = "[완료] 현정 내비", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
-//    @GetMapping(value = "/room-data2")
-//    public ResponseEntity<Map<String, Object>> getRoomBookingState(HttpServletResponse response){
-//        UserDto user = authService.checkUser(response);
-//        Map<String, Object> map = new HashMap<>();
-//        if (user != null) {
-//            if (user.getFloor() == 2 || user.getFloor() == 3 || user.getFloor() == 4) {
-//                map.put("roomData", roomService.getFloorRoom(user.getFloor()));
-//            } else {
-//                map.put("roomData", roomService.roomList());
-//            }
-//            map.put("floor", user.getFloor());
-//            return ResponseEntity.status(HttpStatus.OK).body(map);
-//        }else{
-//            map.put("message", "tokenFail");
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
-//        }
-//    };
-
-
 
     @ApiOperation(value = "예약페이지 데이터", notes = "회의실 전체 데이터, 유저데이터, 현재 회의실데이터, 예약데이터, 유저들 이름 목록 데이터")
     @GetMapping(value = "")
@@ -86,34 +53,6 @@ public class BookingController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
         }
     };
-
-//    @ApiOperation(value = " [완료] 메인 회의실, 예약 데이터 보내기", notes = "@Param(floor)가 2,3층이면 각 층 데이터 | 2,3 아니면 모든 층 데이터 전송")
-//    @ResponseBody
-//    @GetMapping(value = "/main")
-//    public ResponseEntity<Map<String, Object>> getUsers(@RequestParam("floor") int floor) {
-//        Map<String, Object> map = new HashMap<>();
-//        if (floor == 2 || floor == 3 || floor == 4) {
-//            map.put("RoomData", roomService.getFloorRoom(floor));
-//            map.put("BookingData", bookingService.floorBookingData(floor));
-//        } else {
-//            map.put("RoomData", roomService.roomList());
-//            map.put("BookingData", bookingService.allRoomBookingState());
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    }//
-
-
-
-//    @ApiOperation(value = "예약 현황 페이지 데이터")
-//    @GetMapping(value = "/details-booking")
-//    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> getBookingState(@RequestParam("floor") int floor) {
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("RoomData", roomService.getFloorRoom(floor));
-//        map.put("BookingData", bookingService.floorDetailBookingData(floor));
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(map);
-//    }
 
     @ApiOperation(value = "예약 현황 페이지 데이터", notes = "회의실데이터, 예약데이터")
     @GetMapping(value = "/details-booking")
@@ -321,7 +260,7 @@ public class BookingController {
         private int bookingId;
     }
 
-    @ApiOperation(value = "예약 취소", notes = "보내는 데이터: bookingId")
+    @ApiOperation(value = "마이페이지 예약 취소", notes = "보내는 데이터: bookingId")
     @PostMapping(value ="/cancellation")
     public ResponseEntity<Map<String, Object>> cancelBooking(@RequestBody BookingId bookingId, HttpServletResponse response){
         Map<String, Object> map = new HashMap<>();

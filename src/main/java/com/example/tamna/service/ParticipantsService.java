@@ -3,7 +3,6 @@ package com.example.tamna.service;
 import com.example.tamna.dto.BookingDataDto;
 import com.example.tamna.dto.PostBookingDataDto;
 import com.example.tamna.model.Booking;
-import com.example.tamna.model.Participants;
 import com.example.tamna.model.UserDto;
 import com.example.tamna.mapper.ParticipantsMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +27,6 @@ public class ParticipantsService {
         long miliseconds = System.currentTimeMillis();
         return new Date(miliseconds);
     }
-
-    // 예약자 확인
-    public List<Participants> checkBookingUser(String userId, List<UserDto> users){
-        Date today = time();
-        List<String> teamMateId = new ArrayList<>();
-        users.stream().filter(m -> teamMateId.add(m.getUserId()));
-        String usersIdData = userService.changeString(userId, teamMateId);
-        return participantsMapper.findByUsersId(today, usersIdData);
-    }//
 
     // 나박스 회의실 예약자 insert
     public int insertApplicant(int bookingId, String userId){
