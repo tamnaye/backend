@@ -51,7 +51,7 @@ public class AuthService {
     // 로그아웃 refreshToken 삭제
     public String logOutCheckUser(HttpServletResponse response){
         String accessToken = jwtProvider.getResHeaderAccessToken(response);
-        String refreshToken = jwtProvider.getHeaderNewRefreshToken(response);
+        String refreshToken = jwtProvider.getHeaderRefreshToken(null, response);
         String result;
         if(accessToken != null && refreshToken != null) {
             return result = jwtProvider.deleteToken(refreshToken);

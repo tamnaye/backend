@@ -47,19 +47,19 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("accessToken 유효함");
                 UserDto user = jwtProvider.checkUser(accessToken);
                 if(!user.getRoles().equals("ADMIN")){
-//                    response.sendError(404);
+                    response.sendError(404);
                 }else{
                     response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + accessToken);
                 }
             }else{
-//                response.sendError(403);
+                response.sendError(403);
             }
         }
         else{ // /auth/로 시작하는 라우터가 아닌경우 토큰 검증
             System.out.println("########토큰 검증 필터###########");
             // 헤더에서 access토큰 & refresh토큰 가져옴
             String accessToken = jwtProvider.getHeaderAccessToken(request);
-            String refreshToken = jwtProvider.getHeaderRefreshToken(request);
+            String refreshToken = jwtProvider.getHeaderRefreshToken(request, null);
             System.out.println("accessToken: " + accessToken);
             System.out.println("refreshToken: " + refreshToken);
             // 로그 기록 : 요청 uri

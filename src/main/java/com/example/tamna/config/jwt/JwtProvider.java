@@ -62,7 +62,6 @@ public class JwtProvider implements InitializingBean {
     //accessToken 생성
     public String createAccessToken(String userId) {
         Claims claims = Jwts.claims().setSubject(userId);
-//        System.out.println("id: " + userId);
 
         Date now = new Date();
         Date accessValidity = new Date(now.getTime() + accessTokenValidityInMilliSeconds * 1000);
@@ -74,7 +73,6 @@ public class JwtProvider implements InitializingBean {
                 .setExpiration(accessValidity) // 만료시간 설정
                 .compact();
 
-//        System.out.println(accessToken);
         return accessToken;
     }
 
@@ -147,27 +145,20 @@ public class JwtProvider implements InitializingBean {
     }
 
     // 헤더에서 refreshToken 가져오기
-    public String getHeaderRefreshToken(HttpServletRequest request){
-        String bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
-        System.out.println("헤더 리프레시 토큰: " + bearerRefreshToken);
-        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
+    public String getHeaderRefreshToken(HttpServletRequest request, HttpServletResponse response){
+        String bearerRefreshToken;
+        if(request != null){
+            bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
+
+        }else{
+            bearerRefreshToken = response.getHeader(REAUTHORIZATION_HEADER);
+        }
+        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")) {
             bearerRefreshToken = bearerRefreshToken.substring(7);
         }
 
         return bearerRefreshToken;
     }
-
-    // 헤더에서 refreshToken 가져오기
-    public String getHeaderNewRefreshToken(HttpServletResponse response){
-        String bearerRefreshToken = response.getHeader(REAUTHORIZATION_HEADER);
-        System.out.println("헤더 리프레시 토큰: " + bearerRefreshToken);
-        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
-            bearerRefreshToken = bearerRefreshToken.substring(7);
-        }
-
-        return bearerRefreshToken;
-    }
-
 
     // Jwt 유효성 검사
     public Map<Boolean, String> validateToken(String token){

@@ -48,7 +48,9 @@ public class AdminService {
     public String updateClassOfFloorData(ClassFloorDto classFloorDto){
         if(classFloorDto.getClasses()!= 0) {
             int result = adminMapper.updateFloor(classFloorDto.getFloor(), classFloorDto.getClasses());
-            return "success";
+            if(result > 0){
+                return "success";
+            }
         }
         return "fail";
     }

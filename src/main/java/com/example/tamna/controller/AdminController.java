@@ -18,11 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.SQLNonTransientException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/admin")
@@ -32,6 +28,18 @@ public class AdminController {
     private final AdminService adminService;
     private final AdminMapper adminMapper;
     private final UserService userService;
+
+    private List<Integer> floor = Arrays.asList(0, 2, 3);
+
+    @ApiOperation(value = "최신기수 페이지")
+    @GetMapping("/insert/user")
+    public ResponseEntity<Map<String, Object>> insertUserData(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("message", "success");
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+
 
     @ApiOperation(value="최신기수 업데이트")
     @PostMapping("/insert/user")
@@ -60,8 +68,9 @@ public class AdminController {
     @GetMapping("/view/class&floor")
     public ResponseEntity<Map<String, Object>> getClassOfFloor(){
         Map<String, Object> map = new HashMap<>();
-        List<ClassFloorDto> result =  adminMapper.getClassOfFloor();;
+        List<ClassFloorDto> result =  adminMapper.getClassOfFloor();
         if(!result.isEmpty()) {
+            map.put("floorData", floor);
             map.put("ClassOfFloorData", result);
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
@@ -69,14 +78,21 @@ public class AdminController {
 
     @ApiOperation(value = "기수별 층수 데이터 바꾸기", notes = "기수가 0으로 들어올 경우 fail 처리")
     @PostMapping("/change/floor")
-    public ResponseEntity<Map<String, Object>> changeFloor(@RequestBody ClassFloorDto changeFloorDto){
+    public ResponseEntity<Map<String, Object>> changeFloor(@RequestBody ClassFloorDto classFloorDto){
         Map<String, Object> map = new HashMap<>();
-        String result = adminService.updateClassOfFloorData(changeFloorDto);
+        System.out.println(classFloorDto);
+        String result;
+        if(floor.contains(classFloorDto.getFloor())){
+            result = adminService.updateClassOfFloorData(classFloorDto);
+        }else{
+            result = "fail";
+        }
+
         if(result.equals("success")){
-            System.out.println(changeFloorDto.getClasses() + "기 가 " + changeFloorDto.getFloor() + "로 변경되었음.");
+            System.out.println(classFloorDto.getClasses() + "기 가 " + classFloorDto.getFloor() + "로 변경되었음.");
             map.put("message", "층수 변경이 완료되었습니다!");
         }else{
-            map.put("message", "fail");
+            map.put("message", "층수 변경 실패");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
@@ -148,26 +164,20 @@ public class AdminController {
         Map<String, Object> map = new HashMap<>();
         System.out.println(userDto);
         try {
-//            if(!userDto.getUserId().equals(" ") || !userDto.getUserName().equals(" ") ){
+            if(!userDto.getUserId().equals(" ") || !userDto.getUserName().equals(" ") ) {
                 int result = adminMapper.insertUserData(userDto.getClasses(), userDto.getUserId(), userDto.getUserName(), userDto.getRoles(), userDto.getFloor());
-                if(result == 1) {
-                    map.put("message", userDto.getUserName() + "님의 데이터가 추가되었습니다.");}
-//                }else{
-//                    map.put("message", "빈 값을 입력해주세요!");
-//                }
-//            } else{ map.put("message", "빈 값을 입력해주세요!");}
-
-//        }catch (SQLNonTransientException e){
-//            map.put("message", "빈 값을 입력해주세요.");
+                if (result == 1) {
+                    map.put("message", userDto.getUserName() + "님의 데이터가 추가되었습니다.");
+                } else {
+                    map.put("message", "빈 값을 입력해주세요!");
+                }
+            }
         }catch(NullPointerException e) {
             System.out.println(e);
             map.put("message", "빈 값을 입력해주세요!");
         }catch(Exception e){
             System.out.println(e);
-//            if(e.equals(SQLIntegrityConstraintViolationException))
             map.put("message", "이미 있는 인재번호입니다.");
-//        }catch (SQLIntegrityConstraintViolationException e){
-//            map.put("message", "빈 값을 입력해");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
@@ -185,7 +195,7 @@ public class AdminController {
         List<String> usersId = userId.userId;
         System.out.println(usersId);
         Map<String, Object> map = new HashMap<>();
-        String usersIdString = userService.changeString("", usersId);
+        String usersIdString = userService.changeString(null, usersId);
         int result = adminMapper.deleteUser(usersIdString);
         if(result >= 1){
             map.put("message", "데이터 삭제가 완료되었습니다.");
