@@ -3,6 +3,7 @@ package com.example.tamna.config.jwt;
 import com.example.tamna.mapper.TokenMapper;
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.model.Token;
+import com.example.tamna.model.UserDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -120,6 +121,12 @@ public class JwtProvider implements InitializingBean {
         return claims.getSubject();
     }
 
+    // 토큰을 통해 유저 정보 얻기
+    public UserDto checkUser(String accessToken){
+        String userId = getUserIdFromJwt(accessToken);
+        return userMapper.findByUserId(userId);
+    }
+
     // 헤더에서 accessToken 가져오기
     public String getHeaderAccessToken(HttpServletRequest request){
         String bearerAccessToken = request.getHeader(AUTHORIZATION_HEADER);
@@ -142,6 +149,17 @@ public class JwtProvider implements InitializingBean {
     // 헤더에서 refreshToken 가져오기
     public String getHeaderRefreshToken(HttpServletRequest request){
         String bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
+        System.out.println(bearerRefreshToken);
+        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
+            bearerRefreshToken = bearerRefreshToken.substring(7);
+        }
+
+        return bearerRefreshToken;
+    }
+
+    // 헤더에서 refreshToken 가져오기
+    public String getHeaderNewRefreshToken(HttpServletResponse response){
+        String bearerRefreshToken = response.getHeader(REAUTHORIZATION_HEADER);
         System.out.println(bearerRefreshToken);
         if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
             bearerRefreshToken = bearerRefreshToken.substring(7);
@@ -180,12 +198,20 @@ public class JwtProvider implements InitializingBean {
 
 
     // refresh토큰 DB 삭제
-    public String deleteToken(String userId){
-        int result = tokenMapper.deleteToken(userId);
-        if(result != 0){
+    public String deleteToken(String refreshToken, String newRefreshToken) {
+        int result;
+
+        if (newRefreshToken == null) {
+            result = tokenMapper.deleteToken(refreshToken);
+        } else {
+            result = tokenMapper.deleteToken(refreshToken) + tokenMapper.deleteToken(newRefreshToken);
+        }
+
+        if (result > 0) {
             return "success";
         }
         return "fail";
     }
+
 
 }

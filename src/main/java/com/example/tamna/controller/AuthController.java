@@ -1,7 +1,6 @@
 package com.example.tamna.controller;
 
 import com.example.tamna.service.AuthService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,16 @@ public class AuthController {
             map.put("message", "success");
             return ResponseEntity.status(HttpStatus.OK).body(map);
         }
+    }
+
+
+    @ApiOperation(value = "로그아웃")
+    @GetMapping(value = "/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response){
+        Map<String, String> map = new HashMap<>();
+        String result = authService.logOutCheckUser(request, response);
+        map.put("message", result);
+        return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
 

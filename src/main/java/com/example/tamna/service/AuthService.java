@@ -6,6 +6,7 @@ import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
 
     private final UserMapper userMapper;
     private final JwtProvider jwtProvider;
@@ -42,8 +44,24 @@ public class AuthService {
     public UserDto checkUser(HttpServletResponse response){
         String accessToken = jwtProvider.getResHeaderAccessToken(response);
         if(accessToken!= null) {
-            String userId = jwtProvider.getUserIdFromJwt(accessToken);
-            return userMapper.findByUserId(userId);
+           return jwtProvider.checkUser(accessToken);
+        }
+        return null;
+    }
+
+    // 로그아웃 refreshToken 삭제
+    public String logOutCheckUser(HttpServletRequest request, HttpServletResponse response){
+        String accessToken = jwtProvider.getResHeaderAccessToken(response);
+        String refreshToken = jwtProvider.getHeaderRefreshToken(request);
+        String newRefreshToken = jwtProvider.getHeaderNewRefreshToken(response);
+        String result;
+        if(accessToken != null && refreshToken != null) {
+            if(refreshToken.equals(newRefreshToken)){
+                result = jwtProvider.deleteToken(refreshToken, null);
+            }else{
+                result = jwtProvider.deleteToken(refreshToken, newRefreshToken);
+            }
+            return result;
         }
         return null;
     }

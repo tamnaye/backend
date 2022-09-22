@@ -1,7 +1,7 @@
 package com.example.tamna.controller;
 
 import com.example.tamna.dto.ClassFloorDto;
-import com.example.tamna.dto.RoomTimeDto;
+import com.example.tamna.dto.RoomDto;
 import com.example.tamna.mapper.AdminMapper;
 import com.example.tamna.model.Room;
 import com.example.tamna.model.UserDto;
@@ -10,7 +10,6 @@ import com.example.tamna.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.filters.ExpiresFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -80,7 +79,7 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value = "회의실별 최대시간 조회", notes = "floor가 2,3,4가 아닌경우 fail 처리")
+    @ApiOperation(value = "회의실 데이터 조회", notes = "floor가 2,3,4가 아닌경우 fail 처리")
     @GetMapping("/view/room")
     public ResponseEntity<Map<String, Object>> getRoomData(@RequestParam("floor")int floor){
         Map<String, Object> map = new HashMap<>();
@@ -93,15 +92,16 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
 
-    @ApiOperation(value = "회의실별 최대 시간 수정", notes = "floor가 2,3,4가  아닌경우 변경불가 메시지")
+    @ApiOperation(value = "회의실별 데이터 수정", notes = "floor가 2,3,4가  아닌경우 변경불가 메시지")
     @PostMapping("/update/room-data")
-    public ResponseEntity<Map<String, Object>> updateRoomTIme(@RequestBody RoomTimeDto roomTimeDto){
+    public ResponseEntity<Map<String, Object>> updateRoomTIme(@RequestBody RoomDto roomDto){
         Map<String, Object> map = new HashMap<>();
-        int result = adminMapper.updateRoomData(roomTimeDto.getMaxTime(), roomTimeDto.getRoomType(),roomTimeDto.getRoomId());
+        System.out.println(roomDto);
+        int result = adminMapper.updateRoomData(roomDto.getMaxTime(), roomDto.getRoomType(),roomDto.getRoomId());
         if (result != 0) {
-            map.put("message", "최대 시간 변경이 완료되었습니다.");
+            map.put("message", "회의실 데이터가 수정되었습니다.");
         } else {
-            map.put("message", "최대 시간 변경 실패");
+            map.put("message", "회의실 데이터 변경 실패");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
@@ -179,7 +179,7 @@ public class AdminController {
         if(result >= 1){
             map.put("message", "데이터 삭제가 완료되었습니다.");
         }else{
-            map.put("message", "데이터 삭제 실패");
+            map.put("message", "삭제할 데이터를 체크 해 주세요!");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
