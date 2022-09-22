@@ -149,7 +149,7 @@ public class JwtProvider implements InitializingBean {
     // 헤더에서 refreshToken 가져오기
     public String getHeaderRefreshToken(HttpServletRequest request){
         String bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
-        System.out.println(bearerRefreshToken);
+        System.out.println("헤더 리프레시 토큰: " + bearerRefreshToken);
         if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
             bearerRefreshToken = bearerRefreshToken.substring(7);
         }
@@ -160,7 +160,7 @@ public class JwtProvider implements InitializingBean {
     // 헤더에서 refreshToken 가져오기
     public String getHeaderNewRefreshToken(HttpServletResponse response){
         String bearerRefreshToken = response.getHeader(REAUTHORIZATION_HEADER);
-        System.out.println(bearerRefreshToken);
+        System.out.println("헤더 리프레시 토큰: " + bearerRefreshToken);
         if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")){
             bearerRefreshToken = bearerRefreshToken.substring(7);
         }
@@ -198,14 +198,8 @@ public class JwtProvider implements InitializingBean {
 
 
     // refresh토큰 DB 삭제
-    public String deleteToken(String refreshToken, String newRefreshToken) {
-        int result;
-
-        if (newRefreshToken == null) {
-            result = tokenMapper.deleteToken(refreshToken);
-        } else {
-            result = tokenMapper.deleteToken(refreshToken) + tokenMapper.deleteToken(newRefreshToken);
-        }
+    public String deleteToken(String refreshToken) {
+        int result = tokenMapper.deleteToken(refreshToken);
 
         if (result > 0) {
             return "success";

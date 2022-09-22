@@ -20,8 +20,12 @@ import java.util.Map;
 public class  JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private static String AUTHORIZATION_HEADER = "Authorization";
-    private static String REAUTHORIZATION_HEADER = "reAuthorization";
+
+    @Value("${AUTHORIZATION_HEADER}")
+    private String AUTHORIZATION_HEADER;
+
+    @Value("${REAUTHORIZATION_HEADER}")
+    private String REAUTHORIZATION_HEADER;
 
     @Value("${jwt.token-prefix}")
     private String tokenPrefix;
@@ -30,7 +34,7 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // 로그인시 토큰 발급 라우터는 토큰 검증 없이 진행
-        if(request.getRequestURI().startsWith("/auth/")){
+        if(request.getRequestURI().startsWith("/auth/login")){
             System.out.println("토큰검증없이 로그인");
             log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
         }
@@ -43,10 +47,12 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
                 System.out.println("accessToken 유효함");
                 UserDto user = jwtProvider.checkUser(accessToken);
                 if(!user.getRoles().equals("ADMIN")){
-                    response.setStatus(404);
+//                    response.sendError(404);
                 }else{
                     response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + accessToken);
                 }
+            }else{
+//                response.sendError(403);
             }
         }
         else{ // /auth/로 시작하는 라우터가 아닌경우 토큰 검증
@@ -78,7 +84,7 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
                             response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
                         } else {
                             // 로그아웃
-                            jwtProvider.deleteToken(refreshToken, null);
+                            jwtProvider.deleteToken(refreshToken);
                             response.sendError(403);
                         }
                     }

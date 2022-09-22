@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.SQLNonTransientException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,19 +146,28 @@ public class AdminController {
     @PostMapping("insertion/user")
     public ResponseEntity<Map<String, Object>> insertUserData(@RequestBody UserDto userDto) {
         Map<String, Object> map = new HashMap<>();
+        System.out.println(userDto);
         try {
-            if(userDto.getUserId() != null || userDto.getUserName()!= null){
+//            if(!userDto.getUserId().equals(" ") || !userDto.getUserName().equals(" ") ){
                 int result = adminMapper.insertUserData(userDto.getClasses(), userDto.getUserId(), userDto.getUserName(), userDto.getRoles(), userDto.getFloor());
                 if(result == 1) {
-                    map.put("message", userDto.getUserName() + "님의 데이터가 추가되었습니다.");
-                }else{
-                    map.put("message", "데이터 업로드 실패!");
-                }
-            }
-        }catch(NullPointerException e){
+                    map.put("message", userDto.getUserName() + "님의 데이터가 추가되었습니다.");}
+//                }else{
+//                    map.put("message", "빈 값을 입력해주세요!");
+//                }
+//            } else{ map.put("message", "빈 값을 입력해주세요!");}
+
+//        }catch (SQLNonTransientException e){
+//            map.put("message", "빈 값을 입력해주세요.");
+        }catch(NullPointerException e) {
+            System.out.println(e);
             map.put("message", "빈 값을 입력해주세요!");
         }catch(Exception e){
+            System.out.println(e);
+//            if(e.equals(SQLIntegrityConstraintViolationException))
             map.put("message", "이미 있는 인재번호입니다.");
+//        }catch (SQLIntegrityConstraintViolationException e){
+//            map.put("message", "빈 값을 입력해");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }

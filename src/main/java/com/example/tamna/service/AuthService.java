@@ -6,7 +6,6 @@ import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,20 +49,16 @@ public class AuthService {
     }
 
     // 로그아웃 refreshToken 삭제
-    public String logOutCheckUser(HttpServletRequest request, HttpServletResponse response){
+    public String logOutCheckUser(HttpServletResponse response){
         String accessToken = jwtProvider.getResHeaderAccessToken(response);
-        String refreshToken = jwtProvider.getHeaderRefreshToken(request);
-        String newRefreshToken = jwtProvider.getHeaderNewRefreshToken(response);
+        String refreshToken = jwtProvider.getHeaderNewRefreshToken(response);
         String result;
         if(accessToken != null && refreshToken != null) {
-            if(refreshToken.equals(newRefreshToken)){
-                result = jwtProvider.deleteToken(refreshToken, null);
-            }else{
-                result = jwtProvider.deleteToken(refreshToken, newRefreshToken);
-            }
-            return result;
+            return result = jwtProvider.deleteToken(refreshToken);
+        }else{
+            System.out.println("헤더에 토큰이 없는 경우");
+            return null;
         }
-        return null;
     }
 
 }
