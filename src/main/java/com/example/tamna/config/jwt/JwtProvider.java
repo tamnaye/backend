@@ -33,6 +33,9 @@ public class JwtProvider implements InitializingBean {
     @Value("${REAUTHORIZATION_HEADER}")
     private String REAUTHORIZATION_HEADER;
 
+    @Value("${ADMINAUTHORIZATION_HEADER}")
+    private String ADMINAUTHORIZATION_HEADER;
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -126,8 +129,8 @@ public class JwtProvider implements InitializingBean {
     }
 
     // 헤더에서 accessToken 가져오기
-    public String getHeaderAccessToken(HttpServletRequest request){
-        String bearerAccessToken = request.getHeader(AUTHORIZATION_HEADER);
+    public String getHeaderToken(String headerKey, HttpServletRequest request){
+        String bearerAccessToken = request.getHeader(headerKey);
         System.out.println("헤더 토큰: " + bearerAccessToken);
         if (StringUtils.hasText(bearerAccessToken) && bearerAccessToken.startsWith("Bearer ")){
             bearerAccessToken = bearerAccessToken.substring(7);
@@ -135,8 +138,9 @@ public class JwtProvider implements InitializingBean {
         return bearerAccessToken;
     }
 
-    public String getResHeaderAccessToken(HttpServletResponse response){
-        String bearerAccessToken = response.getHeader(AUTHORIZATION_HEADER);
+
+    public String getResHeaderAccessToken(String headerKey, HttpServletResponse response){
+        String bearerAccessToken = response.getHeader(headerKey);
         System.out.println("헤더 토큰: " + bearerAccessToken);
         if (StringUtils.hasText(bearerAccessToken) && bearerAccessToken.startsWith("Bearer ")){
             bearerAccessToken = bearerAccessToken.substring(7);
@@ -144,21 +148,21 @@ public class JwtProvider implements InitializingBean {
         return bearerAccessToken;
     }
 
-    // 헤더에서 refreshToken 가져오기
-    public String getHeaderRefreshToken(HttpServletRequest request, HttpServletResponse response){
-        String bearerRefreshToken;
-        if(request != null){
-            bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
-
-        }else{
-            bearerRefreshToken = response.getHeader(REAUTHORIZATION_HEADER);
-        }
-        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")) {
-            bearerRefreshToken = bearerRefreshToken.substring(7);
-        }
-
-        return bearerRefreshToken;
-    }
+//    // 헤더에서 refreshToken 가져오기
+//    public String getHeaderRefreshToken(HttpServletRequest request, HttpServletResponse response){
+//        String bearerRefreshToken;
+//        if(request != null){
+//            bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
+//
+//        }else{
+//            bearerRefreshToken = response.getHeader(REAUTHORIZATION_HEADER);
+//        }
+//        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")) {
+//            bearerRefreshToken = bearerRefreshToken.substring(7);
+//        }
+//
+//        return bearerRefreshToken;
+//    }
 
     // Jwt 유효성 검사
     public Map<Boolean, String> validateToken(String token){

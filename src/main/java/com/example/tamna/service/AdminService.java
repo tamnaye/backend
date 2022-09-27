@@ -1,7 +1,10 @@
 package com.example.tamna.service;
 
+import com.example.tamna.config.jwt.JwtProvider;
 import com.example.tamna.dto.ClassFloorDto;
 import com.example.tamna.mapper.AdminMapper;
+import com.example.tamna.mapper.UserMapper;
+import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +18,23 @@ import java.io.IOException;
 public class AdminService {
 
     private final AdminMapper adminMapper;
+    private final UserMapper userMapper;
+    private final JwtProvider jwtProvider;
 
+
+    // 어드민 로그인
+    public String getAdminToken(String userId){
+        UserDto user = userMapper.findByUserId(userId);
+        try{
+            assert user != null;
+            if(user.getRoles().equals("ADMIN")){
+                return jwtProvider.createAccessToken(userId);
+            }
+            return "tokenFail";
+        }catch (NullPointerException e){
+            return "tokenFail";
+        }
+    }
 
     // 최신 인재들 업데이트
     public String updateUser(File dest) throws IOException {
