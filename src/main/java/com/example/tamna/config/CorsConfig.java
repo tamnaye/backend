@@ -16,6 +16,9 @@ public class CorsConfig {
     @Value("${REAUTHORIZATION_HEADER}")
     private String REFRESHTOKEN_HEADER;
 
+    @Value("${ADMINAUTHORIZATION_HEADER}")
+    private String ADMINTOKEN_HEADER;
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -26,6 +29,7 @@ public class CorsConfig {
         config.addAllowedMethod("*"); // 모든 메소드(get, post, put, delete) 허용
         config.addExposedHeader(ACCESSTOKEN_HEADER);
         config.addExposedHeader(REFRESHTOKEN_HEADER);
+        config.addExposedHeader(ADMINTOKEN_HEADER);
         source.registerCorsConfiguration("/api/**", config);
         source.registerCorsConfiguration("/auth/**", config);
         source.registerCorsConfiguration("/admin/**", config);

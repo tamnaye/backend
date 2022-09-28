@@ -114,6 +114,11 @@
 <img width="510" alt="스크린샷 2022-09-13 오후 4 58 12" src="https://user-images.githubusercontent.com/85235063/189845062-e328f7bf-0ea8-468c-8720-02849613d006.png"> 
 <br/>
 
+> ### 6. 어드민페이지
+> 파일 업로드를 통한 최신기수 업로드, 유저 회원정보 CRUD, 기수별 층수관리, 회의실 데이터 수정
+> 
+<img width="954" alt="KakaoTalk_Photo_2022-09-26-15-58-10" src="https://user-images.githubusercontent.com/85235063/192753147-7885677c-7c70-4063-a321-6c451693e308.png">
+
 ## 6. 개발 및 기획
 - 송민아 [m1naworld](https://github.com/m1naworld)
 - 안수빈 [AnSuebin](https://github.com/AnSuebin)
