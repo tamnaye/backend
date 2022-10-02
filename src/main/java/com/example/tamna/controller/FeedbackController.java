@@ -37,24 +37,28 @@ public class FeedbackController {
 
     @ApiOperation(value = "피드백 내용 보내기")
     @PostMapping(value = "/feedback")
-    public ResponseEntity<Map<String, Object>> feedback(@RequestBody FeedBack feedBack, HttpServletResponse response){
+    public ResponseEntity<Map<String, Object>> feedback(@RequestBody FeedBack feedBack, HttpServletResponse response) {
         Date today = time();
-
         Map<String, Object> map = new HashMap<>();
         UserDto user = authService.checkUser(response);
-
         String content = feedBack.getContent();
-        if(user != null) {
-            int result = feedbackMapper.insertFeedback(user.getUserId(), today, content);
-            if (result == 1) {
-                map.put("message", "success");
-            } else {
-                map.put("message", "fail");
+
+        try {
+            if (user != null) {
+                int result = feedbackMapper.insertFeedback(user.getUserId(), today, content);
+                if (result == 1) {
+                    map.put("message", "success");
+                } else {
+                    map.put("message", "fail");
+                }
+                return ResponseEntity.status(HttpStatus.OK).body(map);
             }
+            map.put("message", "tokenFail");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+        }catch(NullPointerException e){
+            map.put("message", "빈 값을 입력해주세요!");
             return ResponseEntity.status(HttpStatus.OK).body(map);
         }
-        map.put("message", "tokenFail");
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
     }
 
 
@@ -65,6 +69,8 @@ public class FeedbackController {
         Map<String, Object> map = new HashMap<>();
         if(user != null){
             List<String> feedbackData  = user.getRoles().equals("DEV") ? feedbackMapper.findAllFeedback() :  feedbackMapper.findFeedbackById(user.getUserId());
+            System.out.println(user.getRoles());
+            System.out.println(feedbackData);
             map.put("feedbackData", feedbackData);
             map.put("userRole", user.getRoles());
             return ResponseEntity.status(HttpStatus.OK).body(map);
