@@ -27,15 +27,6 @@ public class JwtProvider implements InitializingBean {
     private final UserMapper userMapper;
 
 
-    @Value("${AUTHORIZATION_HEADER}")
-    private String AUTHORIZATION_HEADER;
-
-    @Value("${REAUTHORIZATION_HEADER}")
-    private String REAUTHORIZATION_HEADER;
-
-    @Value("${ADMINAUTHORIZATION_HEADER}")
-    private String ADMINAUTHORIZATION_HEADER;
-
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -148,21 +139,6 @@ public class JwtProvider implements InitializingBean {
         return bearerAccessToken;
     }
 
-//    // 헤더에서 refreshToken 가져오기
-//    public String getHeaderRefreshToken(HttpServletRequest request, HttpServletResponse response){
-//        String bearerRefreshToken;
-//        if(request != null){
-//            bearerRefreshToken = request.getHeader(REAUTHORIZATION_HEADER);
-//
-//        }else{
-//            bearerRefreshToken = response.getHeader(REAUTHORIZATION_HEADER);
-//        }
-//        if (StringUtils.hasText(bearerRefreshToken) && bearerRefreshToken.startsWith("Bearer ")) {
-//            bearerRefreshToken = bearerRefreshToken.substring(7);
-//        }
-//
-//        return bearerRefreshToken;
-//    }
 
     // Jwt 유효성 검사
     public Map<Boolean, String> validateToken(String token){

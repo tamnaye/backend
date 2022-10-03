@@ -5,7 +5,7 @@ import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.*;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @RequiredArgsConstructor
-@Configuration
+@Component
 @Slf4j
 public class  JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -36,15 +36,16 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // 로그 기록 : 요청 uri
+        log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
+
         // 로그인시 토큰 발급 라우터는 토큰 검증 없이 진행
         if(request.getRequestURI().startsWith("/auth/login")){
             System.out.println("토큰검증없이 로그인");
-            log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
         }
         else if(request.getRequestURI().startsWith("/admin/")){
             if(!request.getRequestURI().startsWith("/admin/login")){
                 // 어드민 페이지 일 경우
-                log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
                 String accessToken = jwtProvider.getHeaderToken(ADMINAUTHORIZATION_HEADER, request);
                 Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);
                 if (!accessResult.isEmpty() && accessResult.containsKey(true) && accessResult.containsValue("success")) {
@@ -67,8 +68,7 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
             System.out.println("accessToken: " + accessToken);
             System.out.println("refreshToken: " + refreshToken);
-            // 로그 기록 : 요청 uri
-            log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
+
             if (accessToken != null && refreshToken != null) {
                 Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);
                 if (!accessResult.isEmpty() && accessResult.containsKey(true) && accessResult.containsValue("success")) {
