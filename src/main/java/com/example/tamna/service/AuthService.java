@@ -4,8 +4,10 @@ import com.example.tamna.config.jwt.JwtProvider;
 import com.example.tamna.mapper.UserMapper;
 import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +19,12 @@ public class AuthService {
 
     private final UserMapper userMapper;
     private final JwtProvider jwtProvider;
+
+    @Value("${AUTHORIZATION_HEADER}")
+    private String AUTHORIZATION_HEADER;
+
+    @Value("${REAUTHORIZATION_HEADER}")
+    private String REAUTHORIZATION_HEADER;
 
     // 로그인 시 토큰 생성
     public Map<String, String> login(String userId) {
@@ -34,14 +42,13 @@ public class AuthService {
             map.put("refresh", refresh);
         } else {
             map.put("message", "fail");
-
         }
         return map;
     }
 
     // 유저 확인
     public UserDto checkUser(HttpServletResponse response){
-        String accessToken = jwtProvider.getResHeaderAccessToken(response);
+        String accessToken = jwtProvider.getResHeaderAccessToken(AUTHORIZATION_HEADER, response);
         if(accessToken!= null) {
            return jwtProvider.checkUser(accessToken);
         }
@@ -49,9 +56,9 @@ public class AuthService {
     }
 
     // 로그아웃 refreshToken 삭제
-    public String logOutCheckUser(HttpServletResponse response){
-        String accessToken = jwtProvider.getResHeaderAccessToken(response);
-        String refreshToken = jwtProvider.getHeaderRefreshToken(null, response);
+    public String logOutCheckUser(HttpServletRequest request){
+        String accessToken = jwtProvider.getHeaderToken(AUTHORIZATION_HEADER, request);
+        String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
         String result;
         if(accessToken != null && refreshToken != null) {
             return result = jwtProvider.deleteToken(refreshToken);

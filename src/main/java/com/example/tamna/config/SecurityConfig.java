@@ -12,13 +12,13 @@ import org.springframework.web.filter.CorsFilter;
 
 //시큐리티 관련 설정
 @Configuration //IoC
-@EnableWebSecurity // Security 활성화
+@EnableWebSecurity// Security 활성화
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final CorsFilter corsFilter;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+//    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+//    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
 
     @Bean
@@ -31,8 +31,8 @@ public class SecurityConfig {
                 .httpBasic().disable() // 기본 http basic 인증방식 사용 x
 
                 .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
+//                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+//                .accessDeniedHandler(jwtAccessDeniedHandler)
 
                 .and()
                 .authorizeRequests()

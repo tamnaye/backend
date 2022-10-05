@@ -10,12 +10,14 @@ import com.example.tamna.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -29,7 +31,35 @@ public class AdminController {
     private final AdminMapper adminMapper;
     private final UserService userService;
 
+    @Value("${ADMINAUTHORIZATION_HEADER}")
+    private String ADMINAUTHORIZATION_HEADER;
+
+    @Value("${jwt.token-prefix}")
+    private String tokenPrefix;
+
+
     private List<Integer> floor = Arrays.asList(0, 2, 3);
+
+    @Data
+    static class UserId{
+        private String userId;
+    }
+
+    @ApiOperation(value= "어드민 로그인")
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> loginAdmin(@RequestBody UserId userId, HttpServletResponse response){
+        Map<String, Object> map = new HashMap<>();
+        String getUserId = userId.userId;
+        System.out.println(getUserId);
+        String result = adminService.getAdminToken(getUserId);
+        if(result.equals("fail")){
+            map.put("message", result);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+        }
+        response.addHeader(ADMINAUTHORIZATION_HEADER, tokenPrefix + result);
+        map.put("message", "success");
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
 
     @ApiOperation(value = "최신기수 페이지")
     @GetMapping("/insert/user")
@@ -54,7 +84,7 @@ public class AdminController {
             if (result.equals("success")) {
                 map.put("message", "최신기수 업로드가 완료되었습니다.");
             } else {
-                map.put("message", "파일 오류<빈 파일인지, 파일 양식이 옳은지 확인 혹은 파일명을 바꿔주세요!>");
+                map.put("message", "최신기수 업로드에 실패하였습니다.");
             }
         }catch (NullPointerException e){
             map.put("message", "파일을 선택해주세요.");
@@ -87,7 +117,6 @@ public class AdminController {
         }else{
             result = "fail";
         }
-
         if(result.equals("success")){
             System.out.println(classFloorDto.getClasses() + "기 가 " + classFloorDto.getFloor() + "로 변경되었음.");
             map.put("message", "층수 변경이 완료되었습니다!");
@@ -184,28 +213,40 @@ public class AdminController {
 
 
     @Data
-    static class UserId{
-        private List<String> userId;
+    static class UserIdList{
+        private List<String> userIdList;
     }
 
     @ApiOperation(value="유저 데이터 삭제")
     @PostMapping("/deletion/user")
-    public ResponseEntity<Map<String, Object>> deleteUserData(@RequestBody UserId userId){
-        System.out.println(userId);
-        List<String> usersId = userId.userId;
-        System.out.println(usersId);
+    public ResponseEntity<Map<String, Object>> deleteUserData(@RequestBody UserIdList userIdList){
         Map<String, Object> map = new HashMap<>();
-        String usersIdString = userService.changeString(null, usersId);
-        int result = adminMapper.deleteUser(usersIdString);
-        if(result >= 1){
-            map.put("message", "데이터 삭제가 완료되었습니다.");
-        }else{
+
+        try {
+            System.out.println(userIdList);
+            List<String> usersId = userIdList.userIdList;
+            System.out.println(usersId);
+            String usersIdString = userService.changeString(null, usersId);
+            int result = adminMapper.deleteUser(usersIdString);
+            if (result >= 1) {
+                map.put("message", "데이터 삭제가 완료되었습니다.");
+            } else {
+                map.put("message", "삭제할 데이터를 체크 해 주세요!");
+            }
+        }catch (NullPointerException e){
             map.put("message", "삭제할 데이터를 체크 해 주세요!");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
     }
 
+    @ApiOperation(value = "로그아웃")
+    @GetMapping(value = "/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request){
+        Map<String, String> map = new HashMap<>();
+        map.put("message", "success");
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
 
 
 }
