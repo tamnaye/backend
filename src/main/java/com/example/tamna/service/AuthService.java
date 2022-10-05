@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,9 +56,9 @@ public class AuthService {
     }
 
     // 로그아웃 refreshToken 삭제
-    public String logOutCheckUser(HttpServletResponse response){
-        String accessToken = jwtProvider.getResHeaderAccessToken(AUTHORIZATION_HEADER, response);
-        String refreshToken = jwtProvider.getResHeaderAccessToken(REAUTHORIZATION_HEADER, response);
+    public String logOutCheckUser(HttpServletRequest request){
+        String accessToken = jwtProvider.getHeaderToken(AUTHORIZATION_HEADER, request);
+        String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
         String result;
         if(accessToken != null && refreshToken != null) {
             return result = jwtProvider.deleteToken(refreshToken);

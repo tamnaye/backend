@@ -5,6 +5,7 @@ import com.example.tamna.model.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -38,13 +39,16 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 로그 기록 : 요청 uri
         log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
-
+        System.out.println(request.getMethod());
         // 로그인시 토큰 발급 라우터는 토큰 검증 없이 진행
-        if(request.getRequestURI().startsWith("/auth/login")){
-            System.out.println("토큰검증없이 로그인");
+        if(request.getRequestURI().startsWith("/auth")){
+            System.out.println("토큰검증없이 로그인 및 로그아윳");
         }
-        else if(request.getRequestURI().startsWith("/admin/")){
-            if(!request.getRequestURI().startsWith("/admin/login")){
+        else if(request.getRequestURI().startsWith("/admin")){
+            System.out.println("어드민 로그인 & 로그아웃");
+            if(!request.getRequestURI().startsWith("/admin/login") && !request.getRequestURI().startsWith("/admin/logout")){
+
+                System.out.println("여기로 오냐?");
                 // 어드민 페이지 일 경우
                 String accessToken = jwtProvider.getHeaderToken(ADMINAUTHORIZATION_HEADER, request);
                 Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);
@@ -66,8 +70,8 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
             // 헤더에서 access토큰 & refresh토큰 가져옴
             String accessToken = jwtProvider.getHeaderToken(AUTHORIZATION_HEADER, request);
             String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
-            System.out.println("accessToken: " + accessToken);
-            System.out.println("refreshToken: " + refreshToken);
+//            System.out.println("accessToken: " + accessToken);
+//            System.out.println("refreshToken: " + refreshToken);
 
             if (accessToken != null && refreshToken != null) {
                 Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);

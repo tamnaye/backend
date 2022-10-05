@@ -27,7 +27,6 @@ public interface ParticipantsMapper {
     @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where DATES=#{today} AND USER_ID=#{userId} AND (#{startTime} <= START_TIME AND START_TIME < #{endTime} OR #{startTime} < END_TIME AND END_TIME <= #{endTime} OR START_TIME <= #{startTime} AND #{endTime} < END_TIME) ")
     List<BookingDataDto> selectUsingOnlyUser(@Param("today")Date today, @Param("startTime") String startTime, @Param("endTime") String endTime, @Param("userId") String userId);
 
-
     // 예약 신청자와 멤버들 insert
     @Insert("INSERT INTO PARTICIPANTS VALUES (#{bookingId}, #{userId}, #{userType})")
     int insertParticipants( @Param("bookingId") int bookingId, @Param("userId") String userId, @Param("userType") boolean userType);
@@ -35,7 +34,6 @@ public interface ParticipantsMapper {
     // 예약 취소시 예약자 삭제
     @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID=#{bookingId}")
     int deleteParticipants(int bookingId);
-
 
     // 여러 예약 예약자들 삭제
     @Delete("DELETE FROM PARTICIPANTS WHERE BOOKING_ID IN (${bookingsIdString})")

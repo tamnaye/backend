@@ -52,9 +52,9 @@ public class AdminController {
         String getUserId = userId.userId;
         System.out.println(getUserId);
         String result = adminService.getAdminToken(getUserId);
-        if(result.equals("tokenFail")){
+        if(result.equals("fail")){
             map.put("message", result);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(map);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
         }
         response.addHeader(ADMINAUTHORIZATION_HEADER, tokenPrefix + result);
         map.put("message", "success");
@@ -117,7 +117,6 @@ public class AdminController {
         }else{
             result = "fail";
         }
-
         if(result.equals("success")){
             System.out.println(classFloorDto.getClasses() + "기 가 " + classFloorDto.getFloor() + "로 변경되었음.");
             map.put("message", "층수 변경이 완료되었습니다!");
@@ -221,21 +220,33 @@ public class AdminController {
     @ApiOperation(value="유저 데이터 삭제")
     @PostMapping("/deletion/user")
     public ResponseEntity<Map<String, Object>> deleteUserData(@RequestBody UserIdList userIdList){
-        System.out.println(userIdList);
-        List<String> usersId = userIdList.userIdList;
-        System.out.println(usersId);
         Map<String, Object> map = new HashMap<>();
-        String usersIdString = userService.changeString(null, usersId);
-        int result = adminMapper.deleteUser(usersIdString);
-        if(result >= 1){
-            map.put("message", "데이터 삭제가 완료되었습니다.");
-        }else{
+
+        try {
+            System.out.println(userIdList);
+            List<String> usersId = userIdList.userIdList;
+            System.out.println(usersId);
+            String usersIdString = userService.changeString(null, usersId);
+            int result = adminMapper.deleteUser(usersIdString);
+            if (result >= 1) {
+                map.put("message", "데이터 삭제가 완료되었습니다.");
+            } else {
+                map.put("message", "삭제할 데이터를 체크 해 주세요!");
+            }
+        }catch (NullPointerException e){
             map.put("message", "삭제할 데이터를 체크 해 주세요!");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
     }
 
+    @ApiOperation(value = "로그아웃")
+    @GetMapping(value = "/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request){
+        Map<String, String> map = new HashMap<>();
+        map.put("message", "success");
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
 
 
 }

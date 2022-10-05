@@ -30,9 +30,9 @@ public class AdminService {
             if(user.getRoles().equals("ADMIN")){
                 return jwtProvider.createAccessToken(userId);
             }
-            return "tokenFail";
+            return "fail";
         }catch (NullPointerException e){
-            return "tokenFail";
+            return "fail";
         }
     }
 

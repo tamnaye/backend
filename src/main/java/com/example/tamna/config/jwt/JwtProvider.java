@@ -122,7 +122,7 @@ public class JwtProvider implements InitializingBean {
     // 헤더에서 accessToken 가져오기
     public String getHeaderToken(String headerKey, HttpServletRequest request){
         String bearerAccessToken = request.getHeader(headerKey);
-        System.out.println("헤더 토큰: " + bearerAccessToken);
+//        System.out.println("헤더 토큰: " + bearerAccessToken);
         if (StringUtils.hasText(bearerAccessToken) && bearerAccessToken.startsWith("Bearer ")){
             bearerAccessToken = bearerAccessToken.substring(7);
         }

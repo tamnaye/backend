@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,9 +59,9 @@ public class AuthController {
 
     @ApiOperation(value = "로그아웃")
     @GetMapping(value = "/logout")
-    public ResponseEntity<Map<String, String>> logout(HttpServletResponse response){
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request){
         Map<String, String> map = new HashMap<>();
-        String result = authService.logOutCheckUser(response);
+        String result = authService.logOutCheckUser(request);
         System.out.println("로그아웃 결과: " + result);
         map.put("message", result);
         return ResponseEntity.status(HttpStatus.OK).body(map);
