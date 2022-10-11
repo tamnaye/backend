@@ -31,7 +31,7 @@ public class AdminController {
     private final AdminMapper adminMapper;
     private final UserService userService;
 
-    @Value("${ADMINAUTHORIZATION_HEADER}")
+    @Value("${ADMIN_HEADER}")
     private String ADMINAUTHORIZATION_HEADER;
 
     @Value("${jwt.token-prefix}")

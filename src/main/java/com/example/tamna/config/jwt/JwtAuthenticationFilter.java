@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,85 +29,84 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${REAUTHORIZATION_HEADER}")
     private String REAUTHORIZATION_HEADER;
 
-    @Value("${ADMINAUTHORIZATION_HEADER}")
+    @Value("${ADMIN_HEADER}")
     private String ADMINAUTHORIZATION_HEADER;
 
     @Value("${jwt.token-prefix}")
     private String tokenPrefix;
 
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // 로그 기록 : 요청 uri
-        log.info("doFilter JWTFilter, uri : {}", ((HttpServletRequest) request).getRequestURI());
-        System.out.println(request.getMethod());
-        // 로그인시 토큰 발급 라우터는 토큰 검증 없이 진행
-        if(request.getRequestURI().startsWith("/auth")){
-            System.out.println("토큰검증없이 로그인 및 로그아윳");
-        }
-        else if(request.getRequestURI().startsWith("/admin")){
-            System.out.println("어드민 로그인 & 로그아웃");
-            if(!request.getRequestURI().startsWith("/admin/login") && !request.getRequestURI().startsWith("/admin/logout")){
-
-                System.out.println("여기로 오냐?");
-                // 어드민 페이지 일 경우
-                String accessToken = jwtProvider.getHeaderToken(ADMINAUTHORIZATION_HEADER, request);
-                Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);
+        // 로그: 요청 url, method
+        log.info("doFilter JWTFilter, uri: {}, method: {}", ((HttpServletRequest) request).getRequestURI(), request.getMethod());
+        if(request.getMethod().equals("OPTIONS")){
+            System.out.println("JWT 토큰 체크 x");
+        }else if (request.getRequestURI().startsWith("/auth") || request.getRequestURI().startsWith("/admin")) {
+            if (request.getRequestURI().startsWith("/auth") || request.getRequestURI().startsWith("/admin/login") || request.getRequestURI().startsWith("/admin/logout")) {
+                System.out.println("로그인 및 로그아웃 시 토큰 검증 pass");
+            } else {
+                // admin 토큰 검증
+                String adminAccessToken = jwtProvider.getHeaderToken(ADMINAUTHORIZATION_HEADER, request);
+                Map<Boolean, String> accessResult = jwtProvider.validateToken(adminAccessToken); // 토큰검증
                 if (!accessResult.isEmpty() && accessResult.containsKey(true) && accessResult.containsValue("success")) {
-                    System.out.println("accessToken 유효함");
-                    UserDto user = jwtProvider.checkUser(accessToken);
-                    if(!user.getRoles().equals("ADMIN")){
+                    UserDto user = jwtProvider.checkUser(adminAccessToken);
+                    if (!user.getRoles().equals("ADMIN")) {
+                        System.out.println("어드민페이지 권한 없음");
                         response.sendError(404);
-                    }else{
-                        response.setHeader(ADMINAUTHORIZATION_HEADER, tokenPrefix + accessToken);
+                    } else {
+                        System.out.println("어드민토큰 유효");
+                        response.setHeader(ADMINAUTHORIZATION_HEADER, tokenPrefix + adminAccessToken);
                     }
-                }else{
+                } else {
+                    // 헤더에 토큰이 실리지 않았을 때 및 토큰이 유효하지 않을 때
+                    System.out.println("어드민 토큰 유효하지 않음");
                     response.sendError(403);
                 }
             }
-        }
-        else{
+        } else {
             System.out.println("########토큰 검증 필터###########");
+
             // 헤더에서 access토큰 & refresh토큰 가져옴
             String accessToken = jwtProvider.getHeaderToken(AUTHORIZATION_HEADER, request);
             String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
-//            System.out.println("accessToken: " + accessToken);
-//            System.out.println("refreshToken: " + refreshToken);
 
-            if (accessToken != null && refreshToken != null) {
-                Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);
-                if (!accessResult.isEmpty() && accessResult.containsKey(true) && accessResult.containsValue("success")) {
-                    System.out.println("accessToken 유효함");
+            Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);  // accessToken 검증
+            if (!accessResult.isEmpty() && accessResult.containsKey(true)) {
+                if (accessResult.containsValue("success")) { // accessToken 유효
                     response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + accessToken);
                     response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
-                } else if (!accessResult.isEmpty() && accessResult.containsKey(true) && accessResult.containsValue("fail")) {
-                    System.out.println("accessToken 만료됨");
-                    // refreshToken 디비랑 같은지 확인
-                    Token checkRefresh = jwtProvider.checkRefresh(refreshToken);
+                    System.out.println("accessToken 유효");
+                } else {
+                    // accessToken이 만료되었을 때
+                    Token checkRefresh = jwtProvider.checkRefresh(refreshToken); // refreshToken
                     System.out.println(checkRefresh);
                     if (checkRefresh != null) {
-                        Map<Boolean, String> refreshResult = jwtProvider.validateToken(refreshToken);
-                        if (!refreshResult.isEmpty() && refreshResult.containsKey(true) && refreshResult.containsValue("success")) {
+                        Map<Boolean, String> refreshResult = jwtProvider.validateToken(refreshToken); // refreshToken 검증
+                        if (!refreshResult.isEmpty() && refreshResult.containsKey(true) && refreshResult.containsValue("success")) { // 유효
                             String newAccessToken = jwtProvider.createAccessToken(checkRefresh.getUserId());
-                            System.out.println("newAccessToken: " + newAccessToken);
+                            System.out.println("access 재발급");
                             response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + newAccessToken);
                             response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
-                        } else {
-                            // 로그아웃
+                        } else { // 유효x -> 로그아웃 처리
+                            System.out.println("refresh만료, 로그아웃 처리");
                             jwtProvider.deleteToken(refreshToken);
                             response.sendError(403);
                         }
-                    }
-                    else{
+                    } else {
+                        System.out.println("DB에 같은 refresh없음");
                         // refreshToken 오류
                         response.sendError(403);
                     }
-                } else {
-                    // accessToken 오류
-                    response.sendError(403);
                 }
+            } else {
+                System.out.println("access 유효하지 않음");
+                // 헤더에 accessToken이 실리지 않았거나 유효하지 않을 경우
+                response.sendError(403);
             }
+
         }
-        filterChain.doFilter(request, response);
-    }
+            filterChain.doFilter(request, response);
+        }
 }

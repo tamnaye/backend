@@ -61,7 +61,7 @@ public class AuthService {
         String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
         String result;
         if(accessToken != null && refreshToken != null) {
-            return result = jwtProvider.deleteToken(refreshToken);
+            return jwtProvider.deleteToken(refreshToken);
         }else{
             System.out.println("헤더에 토큰이 없는 경우");
             return null;

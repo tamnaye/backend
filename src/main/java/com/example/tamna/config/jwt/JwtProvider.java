@@ -85,12 +85,23 @@ public class JwtProvider implements InitializingBean {
                 .setExpiration(refreshValidity)
                 .compact();
 
-        System.out.println("refreshToken" + refreshToken);
+        System.out.println("refreshToken " + refreshToken);
 
         java.sql.Date today = time();
-        int success = tokenMapper.insertToken(today, userId, refreshToken);
-        System.out.println(success);
-        return refreshToken;
+        Token result = tokenMapper.findToken(refreshToken);
+        System.out.println("result: " + result);
+
+        if(result == null) {
+            int success = tokenMapper.insertToken(today, userId, refreshToken);
+            System.out.println("success: " + success);
+            return refreshToken;
+
+        }else{
+            System.out.println("db에 같은 refreshToken 있는경우");
+            return createRefreshToken(userId);
+        }
+
+
     }
 
 
@@ -171,7 +182,6 @@ public class JwtProvider implements InitializingBean {
     // refresh토큰 DB 삭제
     public String deleteToken(String refreshToken) {
         int result = tokenMapper.deleteToken(refreshToken);
-
         if (result > 0) {
             return "success";
         }

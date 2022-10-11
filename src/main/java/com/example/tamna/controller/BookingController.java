@@ -120,7 +120,7 @@ public class BookingController {
 
         if(user!= null){
         System.out.println("북킹 데이터: " + postBookingDataDto);
-        if(!user.getRoles().equals("MANAGER") || !user.getRoles().equals("ADMIN")){
+        if(user.getClasses() != 0){
             // 신청자 회의실 하루에 한번만 예약 체크 or 나박스 최대 시간 예약 체크
             Map<Boolean, String> checkBooking = participantsService.checkBookingUser(postBookingDataDto.getRoomType(), user.getUserId());
             // 신청자가 예약이 안되어 있으면 or 나박스 최대 시간 안채웠으면
@@ -171,7 +171,7 @@ public class BookingController {
 //                                    LOGGER.info("예약 성공한 bookingId: " + bookingId);
                                     participantsService.insertApplicant(bookingId, user.getUserId());
                                     //LOGGER.info("나박스 예약 유저 데이터: " + participantsService.insertNaboxApplicant(bookingId, postBookingDataDto.getUserId()));
-                                    arr.put("success", postBookingDataDto.getRoomType() + " 예약 성공! ♥ ");
+                                    arr.put("success", "나박스 예약 성공! ♥ ");
 
                                 }
                             }
@@ -182,7 +182,7 @@ public class BookingController {
                 }
             }
             else{
-                String message = postBookingDataDto.getRoomType().equals("nabox") ? "나박스 하루 최대 예약시간을 초과하셨습니다." : postBookingDataDto.getRoomType() + "예약은 하루에 한번만 가능합니다.";
+                String message = postBookingDataDto.getRoomType().equals("nabox") ? "나박스 하루 최대 예약시간을 초과하셨습니다." :  "회의실 예약은 하루에 한번만 가능합니다.";
                 arr.put("fail",  message);
                 map.put("message", arr);
                 return ResponseEntity.status(HttpStatus.OK).body(map);
@@ -203,7 +203,7 @@ public class BookingController {
                     System.out.println(users);
                     participantsService.insertParticipants(resultBookingId, users, postBookingDataDto.getTeamMate());
 
-                    arr.put("success", postBookingDataDto.getRoomType() + " 공식 일정 등록 완료 ✅");
+                    arr.put("success", "공식 일정 등록 완료 ✅");
                 }
             }
             else{ // 4층일 경우
@@ -216,7 +216,7 @@ public class BookingController {
                     // 유저들 이름 종합
                     List<UserDto> users = userService.getUsersData(user.getClasses(), user.getUserName(), postBookingDataDto.getTeamMate());
                     participantsService.insertParticipants(bookingId, users, postBookingDataDto.getTeamMate());
-                    arr.put("success", postBookingDataDto.getRoomType() + "예약 성공! ♥ ");
+                    arr.put("success",  "회의실 예약 성공! ♥ ");
                 }
             }
             map.put("message", arr);
