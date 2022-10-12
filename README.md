@@ -13,7 +13,7 @@
 4. [DB구조](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#4-db-%EA%B5%AC%EC%A1%B0)
 5. [페이지별 구현기능](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#5-%ED%8E%98%EC%9D%B4%EC%A7%80%EB%B3%84-%EA%B5%AC%ED%98%84%EA%B8%B0%EB%8A%A5)
 6. [개발 및 기획](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system#6-%EA%B0%9C%EB%B0%9C-%EB%B0%8F-%EA%B8%B0%ED%9A%8D)
-
+7. [프로젝트 과정 기록](https://github.com/m1naworld/Tamna-ConferenceRoom_reservation_system/blob/master/README.md#7-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B3%BC%EC%A0%95-%EA%B8%B0%EB%A1%9D)
 <br/>
 
 ## 1. 프로젝트 배경
