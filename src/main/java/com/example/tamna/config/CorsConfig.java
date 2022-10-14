@@ -2,7 +2,11 @@ package com.example.tamna.config;
 
 import io.swagger.models.HttpMethod;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -26,8 +30,8 @@ public class CorsConfig implements WebMvcConfigurer{
                 .allowedOriginPatterns("*")
                 .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name())
                 .allowedHeaders("*")
-                .exposedHeaders(ACCESSTOKEN_HEADER, REFRESHTOKEN_HEADER, ADMINTOKEN_HEADER);
-//                .maxAge(3000);
+                .exposedHeaders(ACCESSTOKEN_HEADER, REFRESHTOKEN_HEADER, ADMINTOKEN_HEADER)
+                .maxAge(3000);
         WebMvcConfigurer.super.addCorsMappings(registry);
 
     }

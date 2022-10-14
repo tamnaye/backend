@@ -59,7 +59,6 @@ public class AuthService {
     public String logOutCheckUser(HttpServletRequest request){
         String accessToken = jwtProvider.getHeaderToken(AUTHORIZATION_HEADER, request);
         String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
-        String result;
         if(accessToken != null && refreshToken != null) {
             return jwtProvider.deleteToken(refreshToken);
         }else{

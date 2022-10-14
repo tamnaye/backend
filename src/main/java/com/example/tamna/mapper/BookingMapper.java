@@ -48,7 +48,7 @@ public interface BookingMapper {
     int findCancelSameBooking(@Param("today") Date today, @Param("usersIdString") String usersIdString, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
     // 내가 포함된 bookingId를 통해 예약관련 모두 조회
-    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where BOOKING_ID IN (${bookingIdList}) ORDER BY START_TIME ASC, USER_TYPE DESC")
+    @Select("SELECT * FROM BOOKING INNER JOIN ROOM USING(ROOM_ID) INNER JOIN PARTICIPANTS USING(BOOKING_ID) INNER JOIN USER USING(USER_ID) where BOOKING_ID IN (${bookingIdList}) ORDER BY START_TIME AND USER_NAME ASC")
     List<JoinBooking> findMyBookingData(@Param("bookingIdList") String bookingIdList);
 
     // 예약된 회의실 별 디테일 정보

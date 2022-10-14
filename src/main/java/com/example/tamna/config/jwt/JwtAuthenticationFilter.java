@@ -72,40 +72,41 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
             String accessToken = jwtProvider.getHeaderToken(AUTHORIZATION_HEADER, request);
             String refreshToken = jwtProvider.getHeaderToken(REAUTHORIZATION_HEADER, request);
 
-            Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);  // accessToken 검증
-            if (!accessResult.isEmpty() && accessResult.containsKey(true)) {
-                if (accessResult.containsValue("success")) { // accessToken 유효
-                    response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + accessToken);
-                    response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
-                    System.out.println("accessToken 유효");
-                } else {
-                    // accessToken이 만료되었을 때
-                    Token checkRefresh = jwtProvider.checkRefresh(refreshToken); // refreshToken
-                    System.out.println(checkRefresh);
-                    if (checkRefresh != null) {
-                        Map<Boolean, String> refreshResult = jwtProvider.validateToken(refreshToken); // refreshToken 검증
-                        if (!refreshResult.isEmpty() && refreshResult.containsKey(true) && refreshResult.containsValue("success")) { // 유효
-                            String newAccessToken = jwtProvider.createAccessToken(checkRefresh.getUserId());
-                            System.out.println("access 재발급");
-                            response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + newAccessToken);
-                            response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
-                        } else { // 유효x -> 로그아웃 처리
-                            System.out.println("refresh만료, 로그아웃 처리");
-                            jwtProvider.deleteToken(refreshToken);
+            if(accessToken != null && refreshToken != null){
+                Map<Boolean, String> accessResult = jwtProvider.validateToken(accessToken);  // accessToken 검증
+                if (!accessResult.isEmpty() && accessResult.containsKey(true)) {
+                    if (accessResult.containsValue("success")) { // accessToken 유효
+                        response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + accessToken);
+                        response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
+                        System.out.println("accessToken 유효");
+                    } else {
+                        // accessToken이 만료되었을 때
+                        Token checkRefresh = jwtProvider.checkRefresh(refreshToken); // refreshToken
+                        System.out.println(checkRefresh);
+                        if (checkRefresh != null) {
+                            Map<Boolean, String> refreshResult = jwtProvider.validateToken(refreshToken); // refreshToken 검증
+                            if (!refreshResult.isEmpty() && refreshResult.containsKey(true) && refreshResult.containsValue("success")) { // 유효
+                                String newAccessToken = jwtProvider.createAccessToken(checkRefresh.getUserId());
+                                System.out.println("access 재발급");
+                                response.setHeader(AUTHORIZATION_HEADER, tokenPrefix + newAccessToken);
+                                response.setHeader(REAUTHORIZATION_HEADER, tokenPrefix + refreshToken);
+                            } else { // 유효x -> 로그아웃 처리
+                                System.out.println("refresh만료, 로그아웃 처리");
+                                jwtProvider.deleteToken(refreshToken);
+                                response.sendError(403);
+                            }
+                        } else {
+                            System.out.println("DB에 같은 refresh없음");
+                            // refreshToken 오류
                             response.sendError(403);
                         }
-                    } else {
-                        System.out.println("DB에 같은 refresh없음");
-                        // refreshToken 오류
-                        response.sendError(403);
                     }
+                } else {
+                    System.out.println("access 유효하지 않음");
+                    // 헤더에 accessToken이 실리지 않았거나 유효하지 않을 경우
+                    response.sendError(403);
                 }
-            } else {
-                System.out.println("access 유효하지 않음");
-                // 헤더에 accessToken이 실리지 않았거나 유효하지 않을 경우
-                response.sendError(403);
             }
-
         }
             filterChain.doFilter(request, response);
         }
