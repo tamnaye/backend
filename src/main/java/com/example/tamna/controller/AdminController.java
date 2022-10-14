@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 @RestController
@@ -74,21 +76,26 @@ public class AdminController {
     @ApiOperation(value="최신기수 업데이트")
     @PostMapping("/insert/user")
     public ResponseEntity<Map<String, Object>> insertUserData(@RequestPart(required = false) MultipartFile file, HttpServletRequest request) throws IOException {
-        String resourceSrc = request.getServletContext().getRealPath("/data/");
+//        String resourceSrc = request.getServletContext().getRealPath("/data/");
+        String resourceSrc = "/home/opc/server/resources/"; // 서버 파일 절대경로
+        System.out.println(resourceSrc);
         Map<String, Object> map = new HashMap<>();
         try {
             File dest = new File(resourceSrc + file.getOriginalFilename());
             file.transferTo(dest);
             String result = adminService.updateUser(dest);
 
+            dest.delete();
+
             if (result.equals("success")) {
                 map.put("message", "최신기수 업로드가 완료되었습니다.");
             } else {
-                map.put("message", "최신기수 업로드에 실패하였습니다.");
+                map.put("message", "새로 업로드된 데이터가 없습니다. 파일을 다시 확인해주세요.");
             }
         }catch (NullPointerException e){
             map.put("message", "파일을 선택해주세요.");
         }
+        System.out.println(map);
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
 

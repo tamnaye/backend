@@ -23,7 +23,7 @@ public class AdminService {
 
 
     // 어드민 로그인
-    public String getAdminToken(String userId){
+    public String  getAdminToken(String userId){
         UserDto user = userMapper.findByUserId(userId);
         try{
             assert user != null;
@@ -55,6 +55,7 @@ public class AdminService {
                 }
             }
             br.close();
+            System.out.println(result);
             if(result >= 1){
                 return "success";
             }
