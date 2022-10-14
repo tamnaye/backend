@@ -242,6 +242,8 @@ public class AdminController {
             }
         }catch (NullPointerException e){
             map.put("message", "삭제할 데이터를 체크 해 주세요!");
+        }catch (StringIndexOutOfBoundsException e){
+            map.put("message", "삭제할 데이터를 체크 해 주세요!");
         }
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
